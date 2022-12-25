@@ -13,6 +13,8 @@ import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
@@ -39,7 +41,43 @@ public class GuiController {
     @FXML
     private Canvas canvas;
 
+    @FXML
+    private TextField rotateX;
+
+    @FXML
+    private TextField rotateY;
+
+    @FXML
+    private TextField rotateZ;
+
+    @FXML
+    private TextField scaleX;
+
+    @FXML
+    private TextField scaleY;
+
+    @FXML
+    private TextField scaleZ;
+
+    @FXML
+    private TextField translateX;
+
+    @FXML
+    private TextField translateY;
+
+    @FXML
+    private TextField translateZ;
+
+    @FXML
+    private Button checkBut;
+
     private Model mesh = null;
+
+    private Vector3f rotateV = new Vector3f(0, 0,0);
+
+    private Vector3f scaleV = new Vector3f(1, 1,1);
+
+    private Vector3f translateV = new Vector3f(0, 0,0);
 
     private Camera camera = new Camera(
             new Vector3f(0, 00, 100),
@@ -59,12 +97,11 @@ public class GuiController {
         KeyFrame frame = new KeyFrame(Duration.millis(15), event -> {
             double width = canvas.getWidth();
             double height = canvas.getHeight();
-
             canvas.getGraphicsContext2D().clearRect(0, 0, width, height);
             camera.setAspectRatio((float) (width / height));
 
             if (mesh != null) {
-                RenderEngine.render(canvas.getGraphicsContext2D(), camera, mesh, (int) width, (int) height);
+                RenderEngine.render(canvas.getGraphicsContext2D(), camera, mesh, (int) width, (int) height, rotateV, scaleV, translateV);
             }
         });
 
@@ -122,5 +159,12 @@ public class GuiController {
     @FXML
     public void handleCameraDown(ActionEvent actionEvent) {
         camera.movePosition(new Vector3f(0, -TRANSLATION, 0));
+    }
+
+    @FXML
+    public void takeTransformations(){
+        rotateV = new Vector3f(Integer.parseInt(rotateX.getText()), Integer.parseInt(rotateY.getText()), Integer.parseInt(rotateZ.getText()));
+        scaleV = new Vector3f(Integer.parseInt(scaleX.getText()), Integer.parseInt(scaleY.getText()), Integer.parseInt(scaleZ.getText()));
+        translateV = new Vector3f(Integer.parseInt(translateX.getText()), Integer.parseInt(translateY.getText()), Integer.parseInt(translateZ.getText()));
     }
 }

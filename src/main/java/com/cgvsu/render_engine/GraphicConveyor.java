@@ -4,9 +4,44 @@ import com.cgvsu.math.*;
 
 public class GraphicConveyor {
 
-    public static Matrix4f rotateScaleTranslate() {
-        Matrix4f matrix = Matrix4f.getOneMatrix();
-        return matrix;
+    public static Matrix4f rotate(Vector3f rotateV){
+        double xAngle = Math.toRadians(rotateV.getX());
+        double yAngle = Math.toRadians(rotateV.getY());
+        double zAngle = Math.toRadians(rotateV.getZ());
+        double[] firstLine = {Math.cos(yAngle) * Math.cos(zAngle), -Math.sin(zAngle) * Math.cos(yAngle), Math.sin(yAngle), 0};
+        double[] secondLine = {Math.sin(xAngle) * Math.sin(yAngle) * Math.cos(zAngle) + Math.sin(zAngle) * Math.cos(xAngle), -Math.sin(xAngle) * Math.sin(yAngle) * Math.sin(zAngle) + Math.cos(xAngle) * Math.cos(zAngle), -Math.sin(xAngle) * Math.cos(yAngle), 0};
+        double[] thirdLine = {Math.sin(xAngle) * Math.sin(zAngle) - Math.sin(yAngle) * Math.cos(xAngle) * Math.cos(zAngle), Math.sin(xAngle) * Math.cos(zAngle) + Math.sin(yAngle) * Math.sin(zAngle) * Math.cos(xAngle), Math.cos(xAngle) * Math.cos(yAngle), 0};
+        double[] fourthLine = {0, 0, 0, 1};
+        double[][] matrixA = {firstLine, secondLine, thirdLine, fourthLine};
+        return new Matrix4f(matrixA);
+    }
+
+    public static Matrix4f scale(Vector3f scaleV){
+        double xScale = scaleV.getX();
+        double yScale = scaleV.getY();
+        double zScale = scaleV.getZ();
+        double[] firstLine = {xScale, 0, 0, 0};
+        double[] secondLine = {0, yScale, 0, 0};
+        double[] thirdLine = {0, 0, zScale, 0};
+        double[] fourthLine = {0, 0, 0, 1};
+        double[][] matrixA = {firstLine, secondLine, thirdLine, fourthLine};
+        return new Matrix4f(matrixA);
+    }
+
+    public static Matrix4f translate(Vector3f translateV){
+        double xTranslate = translateV.getX();
+        double yTranslate = translateV.getY();
+        double zTranslate = translateV.getZ();
+        double[] firstLine = {1, 0, 0, 0};
+        double[] secondLine = {0, 1, 0, 0};
+        double[] thirdLine = {0, 0, 1, 0};
+        double[] fourthLine = {xTranslate, yTranslate, zTranslate, 1};
+        double[][] matrixA = {firstLine, secondLine, thirdLine, fourthLine};
+        return new Matrix4f(matrixA);
+    }
+
+    public static Matrix4f rotateScaleTranslate(Vector3f rotateV, Vector3f scaleV, Vector3f translateV) {
+        return Matrix4f.matrixMultiplier(Matrix4f.matrixMultiplier(rotate(rotateV), scale(scaleV)), translate(translateV));
     }
 
     public static Matrix4f lookAt(Vector3f eye, Vector3f target) {
