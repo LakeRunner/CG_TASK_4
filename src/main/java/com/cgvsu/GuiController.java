@@ -161,11 +161,4 @@ public class GuiController {
         camera.movePosition(new Vector3f(0, -TRANSLATION, 0));
     }
 
-    @FXML
-    public void takeTransformations(){
-        rotateV = new Vector3f(Integer.parseInt(rotateX.getText()), Integer.parseInt(rotateY.getText()), Integer.parseInt(rotateZ.getText()));
-        scaleV = new Vector3f(Integer.parseInt(scaleX.getText()), Integer.parseInt(scaleY.getText()), Integer.parseInt(scaleZ.getText()));
-        translateV = new Vector3f(Integer.parseInt(translateX.getText()), Integer.parseInt(translateY.getText()), Integer.parseInt(translateZ.getText()));
-        System.out.println("dfgfd");
-    }
 }
