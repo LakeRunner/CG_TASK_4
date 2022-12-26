@@ -8,9 +8,9 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
-import javafx.stage.Stage;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
 
@@ -60,6 +60,10 @@ public class GuiController {
 
     @FXML
     private TextField translateZ;
+
+    @FXML
+    private Button triangulationButton;
+
     private Model mesh = null;
 
     private Vector3f rotateV = new Vector3f(0, 0,0);
@@ -98,6 +102,7 @@ public class GuiController {
 
         timeline.getKeyFrames().add(frame);
         timeline.play();
+
     }
 
     @FXML
@@ -106,7 +111,7 @@ public class GuiController {
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Model (*.obj)", "*.obj"));
         fileChooser.setTitle("Load Model");
 
-        File file = fileChooser.showOpenDialog((Stage) canvas.getScene().getWindow());
+        File file = fileChooser.showOpenDialog(canvas.getScene().getWindow());
         if (file == null) {
             return;
         }
@@ -152,4 +157,8 @@ public class GuiController {
         camera.movePosition(new Vector3f(0, -TRANSLATION, 0));
     }
 
+    @FXML
+    public void triangulation() {
+        mesh.triangulate();
+    }
 }
