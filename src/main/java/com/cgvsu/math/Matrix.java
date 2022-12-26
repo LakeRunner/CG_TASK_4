@@ -18,6 +18,7 @@ public class Matrix {
     }
 
     protected Matrix() {
+
     }
 
     protected Matrix(int num) {

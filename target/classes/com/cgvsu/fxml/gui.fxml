@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.canvas.Canvas?>
-<?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.input.KeyCodeCombination?>
-<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.canvas.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.input.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane fx:id="anchorPane" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cgvsu.GuiController">
-    <MenuBar>
+<AnchorPane fx:id="anchorPane" style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cgvsu.GuiController">
+    <MenuBar style="-fx-font-size: 18;">
         <Menu mnemonicParsing="false" text="File">
             <MenuItem mnemonicParsing="false" onAction="#onOpenModelMenuItemClick" text="Load Model">
             <accelerator>
@@ -49,16 +47,132 @@
                 </accelerator>
             </MenuItem>
         </Menu>
+      <Menu mnemonicParsing="false" text="Settings">
+        <items>
+            <MenuItem mnemonicParsing="false" text="Translation" />
+          <MenuItem mnemonicParsing="false" text="Rotation" />
+            <MenuItem mnemonicParsing="false" text="Scale" />
+            <MenuItem mnemonicParsing="false" text="Theme" />
+        </items>
+      </Menu>
     </MenuBar>
 
-    <Canvas fx:id="canvas" focusTraversable="true" height="870" width="1600" AnchorPane.topAnchor="30.0" />
-   <TextField fx:id="rotateX" focusTraversable="false" layoutX="4.0" layoutY="46.0" text="0" />
-   <TextField fx:id="rotateY" focusTraversable="false" layoutX="4.0" layoutY="89.0" text="0" />
-   <TextField fx:id="rotateZ" focusTraversable="false" layoutX="5.0" layoutY="126.0" text="0" />
-   <TextField fx:id="scaleX" focusTraversable="false" layoutX="6.0" layoutY="196.0" text="1" />
-   <TextField fx:id="scaleY" focusTraversable="false" layoutX="7.0" layoutY="243.0" text="1" />
-   <TextField fx:id="scaleZ" focusTraversable="false" layoutX="8.0" layoutY="286.0" text="1" />
-   <TextField fx:id="translateX" focusTraversable="false" layoutX="8.0" layoutY="349.0" text="0" />
-   <TextField fx:id="translateY" focusTraversable="false" layoutX="8.0" layoutY="387.0" text="0" />
-   <TextField fx:id="translateZ" focusTraversable="false" layoutX="9.0" layoutY="425.0" text="0" />
+    <Canvas fx:id="canvas" focusTraversable="true" height="862.0" layoutY="38.0" width="1600" AnchorPane.topAnchor="38.0" />
+   <VBox layoutX="1.0" layoutY="46.0" prefHeight="224.0" prefWidth="200.0" style="-fx-border-color: white; -fx-border-width: 5;" AnchorPane.topAnchor="60.0">
+      <children>
+         <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="36.0" prefWidth="195.0" text="Rotation" textAlignment="CENTER" textFill="WHITE">
+            <font>
+               <Font size="25.0" />
+            </font>
+         </Label>
+         <Label text="X:" textFill="WHITE">
+            <font>
+               <Font size="20.0" />
+            </font>
+         </Label>
+         <TextField fx:id="rotateX" focusTraversable="false" text="0">
+            <font>
+               <Font size="15.0" />
+            </font>
+         </TextField>
+         <Label text="Y:" textFill="WHITE">
+            <font>
+               <Font size="20.0" />
+            </font>
+         </Label>
+         <TextField fx:id="rotateY" focusTraversable="false" text="0">
+            <font>
+               <Font size="15.0" />
+            </font>
+         </TextField>
+         <Label text="Z:" textFill="WHITE">
+            <font>
+               <Font size="20.0" />
+            </font>
+         </Label>
+         <TextField fx:id="rotateZ" focusTraversable="false" prefHeight="18.0" prefWidth="169.0" text="0">
+            <font>
+               <Font size="15.0" />
+            </font>
+         </TextField>
+      </children>
+   </VBox>
+   <VBox layoutX="1.0" layoutY="286.0" prefHeight="230.0" prefWidth="200.0" style="-fx-border-color: white; -fx-border-width: 5;" AnchorPane.topAnchor="310.0">
+      <children>
+         <Label alignment="CENTER" prefHeight="36.0" prefWidth="199.0" text="Scale" textFill="WHITE">
+            <font>
+               <Font size="25.0" />
+            </font>
+         </Label>
+         <Label text="X:" textFill="WHITE">
+            <font>
+               <Font size="20.0" />
+            </font>
+         </Label>
+         <TextField fx:id="scaleX" focusTraversable="false" text="1">
+            <font>
+               <Font size="15.0" />
+            </font>
+         </TextField>
+         <Label text="Y:" textFill="WHITE">
+            <font>
+               <Font size="20.0" />
+            </font>
+         </Label>
+         <TextField fx:id="scaleY" focusTraversable="false" text="1">
+            <font>
+               <Font size="15.0" />
+            </font>
+         </TextField>
+         <Label text="Z:" textFill="WHITE">
+            <font>
+               <Font size="20.0" />
+            </font>
+         </Label>
+         <TextField fx:id="scaleZ" focusTraversable="false" text="1">
+            <font>
+               <Font size="15.0" />
+            </font>
+         </TextField>
+      </children>
+   </VBox>
+   <VBox layoutX="1.0" layoutY="528.0" prefHeight="221.0" prefWidth="200.0" style="-fx-border-color: white; -fx-border-width: 5;" AnchorPane.topAnchor="560.0">
+      <children>
+         <Label alignment="CENTER" prefHeight="13.0" prefWidth="190.0" text="Translation" textFill="WHITE">
+            <font>
+               <Font size="25.0" />
+            </font>
+         </Label>
+         <Label text="X:" textFill="WHITE">
+            <font>
+               <Font size="20.0" />
+            </font>
+         </Label>
+         <TextField fx:id="translateX" focusTraversable="false" text="0">
+            <font>
+               <Font size="15.0" />
+            </font>
+         </TextField>
+         <Label text="Y:" textFill="WHITE">
+            <font>
+               <Font size="20.0" />
+            </font>
+         </Label>
+         <TextField fx:id="translateY" focusTraversable="false" text="0">
+            <font>
+               <Font size="15.0" />
+            </font>
+         </TextField>
+         <Label text="Z:" textFill="WHITE">
+            <font>
+               <Font size="20.0" />
+            </font>
+         </Label>
+         <TextField fx:id="translateZ" focusTraversable="false" text="0">
+            <font>
+               <Font size="15.0" />
+            </font>
+         </TextField>
+      </children>
+   </VBox>
 </AnchorPane>

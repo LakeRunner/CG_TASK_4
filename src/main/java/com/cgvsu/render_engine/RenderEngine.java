@@ -1,7 +1,6 @@
 package com.cgvsu.render_engine;
 
 import java.util.ArrayList;
-import java.util.Vector;
 
 import com.cgvsu.math.Matrix4f;
 import com.cgvsu.math.Vector2f;
@@ -9,21 +8,16 @@ import com.cgvsu.math.Vector3f;
 import com.cgvsu.math.Vector4f;
 import javafx.scene.canvas.GraphicsContext;
 import com.cgvsu.model.Model;
+import javafx.scene.paint.Color;
 
 import static com.cgvsu.render_engine.GraphicConveyor.*;
 
 public class RenderEngine {
 
-    public static void render(
-            final GraphicsContext graphicsContext,
-            final Camera camera,
-            final Model mesh,
-            final int width,
-            final int height,
-            final Vector3f rotateV,
-            final Vector3f scaleV,
-            final Vector3f translateV)
-    {
+    public static void render(final GraphicsContext graphicsContext, final Camera camera, final Model mesh,
+                              final int width, final int height, final Vector3f rotateV, final Vector3f scaleV,
+                              final Vector3f translateV) {
+
         Matrix4f modelMatrix = rotateScaleTranslate(rotateV, scaleV, translateV);
         Matrix4f viewMatrix = camera.getViewMatrix();
         Matrix4f projectionMatrix = camera.getProjectionMatrix();
@@ -32,6 +26,7 @@ public class RenderEngine {
         modelViewProjectionMatrix =  Matrix4f.matrixMultiplier(modelViewProjectionMatrix, viewMatrix);
         modelViewProjectionMatrix =  Matrix4f.matrixMultiplier(modelViewProjectionMatrix, projectionMatrix);
         final int nPolygons = mesh.polygons.size();
+        graphicsContext.setStroke(Color.LIGHTGRAY);
         for (int polygonInd = 0; polygonInd < nPolygons; ++polygonInd) {
             final int nVerticesInPolygon = mesh.polygons.get(polygonInd).getVertexIndices().size();
 

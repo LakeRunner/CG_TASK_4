@@ -1,6 +1,7 @@
 package com.cgvsu.math;
 
 public class Vector3f extends Vector{
+
     public Vector3f(double a, double b, double c){
         super(a, b, c);
     }

@@ -1,22 +1,15 @@
 package com.cgvsu;
 
-import com.cgvsu.math.Matrix3f;
-import com.cgvsu.math.Matrix4f;
 import com.cgvsu.math.Vector3f;
 import com.cgvsu.render_engine.RenderEngine;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.fxml.FXML;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
-import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
@@ -36,7 +29,7 @@ public class GuiController {
     final private float TRANSLATION = 0.5F;
 
     @FXML
-    AnchorPane anchorPane;
+    private AnchorPane anchorPane;
 
     @FXML
     private Canvas canvas;
