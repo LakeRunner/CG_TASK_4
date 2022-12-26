@@ -5,13 +5,8 @@ import com.cgvsu.math.Vector3f;
 
 public class Camera {
 
-    public Camera(
-            final Vector3f position,
-            final Vector3f target,
-            final float fov,
-            final float aspectRatio,
-            final float nearPlane,
-            final float farPlane) {
+    public Camera(final Vector3f position, final Vector3f target, final float fov,
+                  final float aspectRatio, final float nearPlane, final float farPlane) {
         this.position = position;
         this.target = target;
         this.fov = fov;

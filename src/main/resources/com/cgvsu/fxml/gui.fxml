@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.canvas.Canvas?>
-<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
@@ -52,15 +51,14 @@
         </Menu>
     </MenuBar>
 
-    <Canvas fx:id="canvas" height="870" width="1600" AnchorPane.topAnchor="30.0" />
-   <TextField fx:id="rotateX" layoutX="4.0" layoutY="46.0" text="0" />
-   <TextField fx:id="rotateY" layoutX="4.0" layoutY="89.0" text="0" />
-   <TextField fx:id="rotateZ" layoutX="5.0" layoutY="126.0" text="0" />
-   <TextField fx:id="scaleX" layoutX="6.0" layoutY="196.0" text="1" />
-   <TextField fx:id="scaleY" layoutX="7.0" layoutY="243.0" text="1" />
-   <TextField fx:id="scaleZ" layoutX="8.0" layoutY="286.0" text="1" />
-   <TextField fx:id="translateX" layoutX="8.0" layoutY="349.0" text="0" />
-   <TextField fx:id="translateY" layoutX="8.0" layoutY="387.0" text="0" />
-   <TextField fx:id="translateZ" layoutX="9.0" layoutY="425.0" text="0" />
-   <Button fx:id="checkBut" layoutX="54.0" layoutY="473.0" mnemonicParsing="false" onMouseClicked="#takeTransformations" text="Button" />
+    <Canvas fx:id="canvas" focusTraversable="true" height="870" width="1600" AnchorPane.topAnchor="30.0" />
+   <TextField fx:id="rotateX" focusTraversable="false" layoutX="4.0" layoutY="46.0" text="0" />
+   <TextField fx:id="rotateY" focusTraversable="false" layoutX="4.0" layoutY="89.0" text="0" />
+   <TextField fx:id="rotateZ" focusTraversable="false" layoutX="5.0" layoutY="126.0" text="0" />
+   <TextField fx:id="scaleX" focusTraversable="false" layoutX="6.0" layoutY="196.0" text="1" />
+   <TextField fx:id="scaleY" focusTraversable="false" layoutX="7.0" layoutY="243.0" text="1" />
+   <TextField fx:id="scaleZ" focusTraversable="false" layoutX="8.0" layoutY="286.0" text="1" />
+   <TextField fx:id="translateX" focusTraversable="false" layoutX="8.0" layoutY="349.0" text="0" />
+   <TextField fx:id="translateY" focusTraversable="false" layoutX="8.0" layoutY="387.0" text="0" />
+   <TextField fx:id="translateZ" focusTraversable="false" layoutX="9.0" layoutY="425.0" text="0" />
 </AnchorPane>

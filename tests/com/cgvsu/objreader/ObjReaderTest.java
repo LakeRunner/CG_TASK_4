@@ -52,7 +52,7 @@ class ObjReaderTest {
         // АГААА! Вот тест, который говорит, что у метода нет проверки на более, чем 3 числа
         // А такой случай лучше не игнорировать, а сообщать пользователю, что у него что-то не так
         // ассерт, чтобы не забыть про тест:
-        Assertions.assertTrue(false);
+        Assertions.fail();
 
 
         ArrayList<String> wordsInLineWithoutToken = new ArrayList<>(Arrays.asList("1.0", "2.0", "3.0", "4.0"));
