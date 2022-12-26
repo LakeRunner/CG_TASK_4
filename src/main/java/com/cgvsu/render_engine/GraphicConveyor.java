@@ -28,6 +28,10 @@ public class GraphicConveyor {
         return new Matrix4f(matrixA);
     }
 
+    public void takeTransformations(){
+        System.out.println("dfgfd");
+    }
+
     public static Matrix4f translate(Vector3f translateV){
         double xTranslate = translateV.getX();
         double yTranslate = translateV.getY();
