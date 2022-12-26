@@ -67,10 +67,6 @@ public class GuiController {
 
     @FXML
     private TextField translateZ;
-
-    @FXML
-    private Button checkBut;
-
     private Model mesh = null;
 
     private Vector3f rotateV = new Vector3f(0, 0,0);
@@ -99,7 +95,9 @@ public class GuiController {
             double height = canvas.getHeight();
             canvas.getGraphicsContext2D().clearRect(0, 0, width, height);
             camera.setAspectRatio((float) (width / height));
-
+            rotateV = new Vector3f(Double.parseDouble(rotateX.getText()), Double.parseDouble(rotateY.getText()), Double.parseDouble(rotateZ.getText()));
+            scaleV = new Vector3f(Double.parseDouble(scaleX.getText()), Double.parseDouble(scaleY.getText()), Double.parseDouble(scaleZ.getText()));
+            translateV = new Vector3f(-Double.parseDouble(translateX.getText()), Double.parseDouble(translateY.getText()), Double.parseDouble(translateZ.getText()));
             if (mesh != null) {
                 RenderEngine.render(canvas.getGraphicsContext2D(), camera, mesh, (int) width, (int) height, rotateV, scaleV, translateV);
             }
@@ -161,10 +159,4 @@ public class GuiController {
         camera.movePosition(new Vector3f(0, -TRANSLATION, 0));
     }
 
-    @FXML
-    public void takeTransformations(){
-        rotateV = new Vector3f(Integer.parseInt(rotateX.getText()), Integer.parseInt(rotateY.getText()), Integer.parseInt(rotateZ.getText()));
-        scaleV = new Vector3f(Integer.parseInt(scaleX.getText()), Integer.parseInt(scaleY.getText()), Integer.parseInt(scaleZ.getText()));
-        translateV = new Vector3f(Integer.parseInt(translateX.getText()), Integer.parseInt(translateY.getText()), Integer.parseInt(translateZ.getText()));
-    }
 }

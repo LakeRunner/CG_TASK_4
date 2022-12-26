@@ -49,13 +49,9 @@ public class GraphicConveyor {
     }
 
     public static Matrix4f lookAt(Vector3f eye, Vector3f target, Vector3f up) {
-        Vector3f resultX = new Vector3f();
-        Vector3f resultY = new Vector3f();
-        Vector3f resultZ = new Vector3f();
-
-        resultZ = Vector3f.subtraction(target, eye);
-        resultX = Vector3f.crossProduct(up, resultZ);
-        resultY = Vector3f.crossProduct(resultZ, resultX);
+        Vector3f resultZ = Vector3f.subtraction(target, eye);
+        Vector3f resultX = Vector3f.crossProduct(up, resultZ);
+        Vector3f resultY = Vector3f.crossProduct(resultZ, resultX);
 
         resultX.normalize();
         resultY.normalize();
@@ -69,11 +65,8 @@ public class GraphicConveyor {
         return new Matrix4f(matrix, 4);
     }
 
-    public static Matrix4f perspective(
-            final float fov,
-            final float aspectRatio,
-            final float nearPlane,
-            final float farPlane) {
+    public static Matrix4f perspective(final float fov, final float aspectRatio,
+                                       final float nearPlane, final float farPlane) {
         Matrix4f result = new Matrix4f();
         float tangentMinusOnDegree = (float) (1.0F / (Math.tan(fov * 0.5F)));
         result.getMatrixArray()[0][0] = tangentMinusOnDegree / aspectRatio;
@@ -84,7 +77,7 @@ public class GraphicConveyor {
         return result;
     }
 
-    public static Vector3f multiplyMatrix4ByVector3(final Matrix4f matrix, final Vector3f vertex) {
+    public static Vector3f multiplyMatrix4ByVector3(final Matrix4f matrix, final Vector4f vertex) {
         final double x = (vertex.getX() * matrix.getMatrixArray()[0][0]) + (vertex.getY() * matrix.getMatrixArray()[1][0]) + (vertex.getZ() * matrix.getMatrixArray()[2][0]) + matrix.getMatrixArray()[3][0];
         final double y = (vertex.getX() * matrix.getMatrixArray()[0][1]) + (vertex.getY() * matrix.getMatrixArray()[1][1]) + (vertex.getZ() * matrix.getMatrixArray()[2][1]) + matrix.getMatrixArray()[3][1];
         final double z = (vertex.getX() * matrix.getMatrixArray()[0][2]) + (vertex.getY() * matrix.getMatrixArray()[1][2]) + (vertex.getZ() * matrix.getMatrixArray()[2][2]) + matrix.getMatrixArray()[3][2];
