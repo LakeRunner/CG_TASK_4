@@ -64,10 +64,10 @@ public class ObjReader {
 					Float.parseFloat(wordsInLineWithoutToken.get(2)));
 
 		} catch(NumberFormatException e) {
-			throw new ObjReaderException("Failed to parse float value.", lineInd);
+			throw new ReaderExceptions.ObjReaderException("Failed to parse float value.", lineInd);
 
 		} catch(IndexOutOfBoundsException e) {
-			throw new ObjReaderException("Too few vertex arguments.", lineInd);
+			throw new ReaderExceptions.ObjReaderException("Too few vertex arguments.", lineInd);
 		}
 	}
 
@@ -78,10 +78,10 @@ public class ObjReader {
 					Float.parseFloat(wordsInLineWithoutToken.get(1)));
 
 		} catch(NumberFormatException e) {
-			throw new ObjReaderException("Failed to parse float value.", lineInd);
+			throw new ReaderExceptions.ObjReaderException("Failed to parse float value.", lineInd);
 
 		} catch(IndexOutOfBoundsException e) {
-			throw new ObjReaderException("Too few texture vertex arguments.", lineInd);
+			throw new ReaderExceptions.ObjReaderException("Too few texture vertex arguments.", lineInd);
 		}
 	}
 
@@ -93,10 +93,10 @@ public class ObjReader {
 					Float.parseFloat(wordsInLineWithoutToken.get(2)));
 
 		} catch(NumberFormatException e) {
-			throw new ObjReaderException("Failed to parse float value.", lineInd);
+			throw new ReaderExceptions.ObjReaderException("Failed to parse float value.", lineInd);
 
 		} catch(IndexOutOfBoundsException e) {
-			throw new ObjReaderException("Too few normal arguments.", lineInd);
+			throw new ReaderExceptions.ObjReaderException("Too few normal arguments.", lineInd);
 		}
 	}
 
@@ -143,15 +143,15 @@ public class ObjReader {
 					}
 				}
 				default -> {
-					throw new ObjReaderException("Invalid element size.", lineInd);
+					throw new ReaderExceptions.ObjReaderException("Invalid element size.", lineInd);
 				}
 			}
 
 		} catch(NumberFormatException e) {
-			throw new ObjReaderException("Failed to parse int value.", lineInd);
+			throw new ReaderExceptions.ObjReaderException("Failed to parse int value.", lineInd);
 
 		} catch(IndexOutOfBoundsException e) {
-			throw new ObjReaderException("Too few arguments.", lineInd);
+			throw new ReaderExceptions.ObjReaderException("Too few arguments.", lineInd);
 		}
 	}
 }
