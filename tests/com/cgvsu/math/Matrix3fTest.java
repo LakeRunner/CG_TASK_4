@@ -1,14 +1,13 @@
 package com.cgvsu.math;
 
-import com.cgvsu.math.Matrix3f;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class MyMatrix3Test {
+class Matrix3fTest {
 
     @Test
-    void plusMatrix() {
+    void addition() {
         double[] first = {1, 2, 3};
         double[] second = {4, 5, 6};
         double[] third = {7, 8, 9};
@@ -48,7 +47,7 @@ class MyMatrix3Test {
     }
 
     @Test
-    void minusMatrix() {
+    void subtraction() {
         double[] first = {1, 2, 3};
         double[] second = {4, 5, 6};
         double[] third = {7, 8, 9};
