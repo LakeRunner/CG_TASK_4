@@ -2,10 +2,7 @@ package com.cgvsu.render_engine;
 
 import java.util.ArrayList;
 
-import com.cgvsu.math.Matrix4f;
-import com.cgvsu.math.Vector2f;
-import com.cgvsu.math.Vector3f;
-import com.cgvsu.math.Vector4f;
+import com.cgvsu.math.*;
 import javafx.scene.canvas.GraphicsContext;
 import com.cgvsu.model.Model;
 import javafx.scene.paint.Color;
@@ -22,9 +19,9 @@ public class RenderEngine {
         Matrix4f viewMatrix = camera.getViewMatrix();
         Matrix4f projectionMatrix = camera.getProjectionMatrix();
 
-        Matrix4f modelViewProjectionMatrix = new Matrix4f(modelMatrix);
+        Matrix4f modelViewProjectionMatrix = new Matrix4f(projectionMatrix);
         modelViewProjectionMatrix =  Matrix4f.matrixMultiplier(modelViewProjectionMatrix, viewMatrix);
-        modelViewProjectionMatrix =  Matrix4f.matrixMultiplier(modelViewProjectionMatrix, projectionMatrix);
+        modelViewProjectionMatrix =  Matrix4f.matrixMultiplier(modelViewProjectionMatrix, modelMatrix);
         final int nPolygons = mesh.polygons.size();
         graphicsContext.setStroke(Color.LIGHTGRAY);
         for (int polygonInd = 0; polygonInd < nPolygons; ++polygonInd) {
@@ -36,7 +33,7 @@ public class RenderEngine {
 
                 Vector4f vertexVecmath = new Vector4f(vertex.getX(), vertex.getY(), vertex.getZ(), 1);
 
-                Vector2f resultPoint = vertexToPoint(multiplyMatrix4ByVector3(modelViewProjectionMatrix, vertexVecmath), width, height);
+                Vector2f resultPoint = vertexToPoint(multiplierMatrixToVector(modelViewProjectionMatrix, vertexVecmath), width, height);
                 resultPoints.add(resultPoint);
             }
 
