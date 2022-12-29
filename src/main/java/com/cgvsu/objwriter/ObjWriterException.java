@@ -1,2 +1,4 @@
-package com.cgvsu.objwriter;public class ObjWriterException {
+package com.cgvsu.objwriter;
+public class ObjWriterException {
+
 }

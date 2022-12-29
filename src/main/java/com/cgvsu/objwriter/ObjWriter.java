@@ -1,2 +1,4 @@
-package com.cgvsu.objwriter;public class ObjWriter {
+package com.cgvsu.objwriter;
+public class ObjWriter {
+
 }
