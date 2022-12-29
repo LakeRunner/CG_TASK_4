@@ -32,6 +32,20 @@ public class Model {
     }
 
     public void calcNormals() {
-
+        for (Polygon polygon : polygons) {
+            Vector3f a = vertices.get(polygon.getVertexIndices().get(0));
+            Vector3f b = vertices.get(polygon.getVertexIndices().get(1));
+            Vector3f c = vertices.get(polygon.getVertexIndices().get(2));
+            Vector3f ab = Vector3f.subtraction(b, a);
+            Vector3f ac = Vector3f.subtraction(c, a);
+            Vector3f normal = Vector3f.crossProduct(ab, ac);
+            normal.normalize();
+            normals.add(normal);
+            polygon.getNormalIndices().add(normals.size() - 1);
+            normals.add(normal);
+            polygon.getNormalIndices().add(normals.size() - 1);
+            normals.add(normal);
+            polygon.getNormalIndices().add(normals.size() - 1);
+        }
     }
 }
