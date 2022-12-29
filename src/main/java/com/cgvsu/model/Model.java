@@ -30,4 +30,8 @@ public class Model {
         }
         polygons = triangulatedPolygons;
     }
+
+    public void calcNormals() {
+
+    }
 }
