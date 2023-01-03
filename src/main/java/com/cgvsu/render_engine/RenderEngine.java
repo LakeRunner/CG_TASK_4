@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.cgvsu.math.*;
+import com.cgvsu.model.CurrentModel;
 import com.cgvsu.model.Polygon;
 import javafx.scene.canvas.GraphicsContext;
 import com.cgvsu.model.Model;
@@ -13,7 +14,7 @@ import static com.cgvsu.render_engine.GraphicConveyor.*;
 
 public class RenderEngine {
 
-    public static void render(final GraphicsContext graphicsContext, final Camera camera, final Model mesh,
+    public static void render(final GraphicsContext graphicsContext, final Camera camera, final CurrentModel model,
                               final int width, final int height, final Vector3f rotateV, final Vector3f scaleV,
                               final Vector3f translateV, final Color meshColor, final boolean drawPolygonMesh,
                               final boolean drawTextures, final boolean drawLighting, final Color polygonFillColor) {
@@ -25,15 +26,15 @@ public class RenderEngine {
         Matrix4f modelViewProjectionMatrix = new Matrix4f(projectionMatrix);
         modelViewProjectionMatrix =  Matrix4f.matrixMultiplier(modelViewProjectionMatrix, viewMatrix);
         modelViewProjectionMatrix =  Matrix4f.matrixMultiplier(modelViewProjectionMatrix, modelMatrix);
-        final int nPolygons = mesh.getPolygons().size();
+        final int nPolygons = model.getPolygons().size();
 
         for (int polygonInd = 0; polygonInd < nPolygons; polygonInd++) {
-            Polygon polygon = mesh.getPolygons().get(polygonInd);
+            Polygon polygon = model.getPolygons().get(polygonInd);
             List<Integer> vertexIndices = polygon.getVertexIndices();
 
             List<Vector2f> resultPoints = new ArrayList<>();
             for (Integer vertexIndex : vertexIndices) {
-                Vector3f vertex = mesh.getVertices().get(vertexIndex);
+                Vector3f vertex = model.getVertices().get(vertexIndex);
 
                 Vector4f vertexVecmath = new Vector4f(vertex.getX(), vertex.getY(), vertex.getZ(), 1);
 
