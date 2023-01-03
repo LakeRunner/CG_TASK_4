@@ -13,9 +13,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.ListView;
-import javafx.scene.control.RadioMenuItem;
-import javafx.scene.control.Slider;
+import javafx.scene.control.*;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -40,18 +38,25 @@ import com.cgvsu.render_engine.Camera;
 public class GuiController {
 
     final private float TRANSLATION = 0.5F;
+
     @FXML
     private AnchorPane anchorPane;
+
     @FXML
     private AnchorPane selection;
+
     @FXML
     private AnchorPane modelTrans;
+
     @FXML
     private AnchorPane renderingModels;
+
     @FXML
     private AnchorPane activeModels;
+
     @FXML
     private Canvas canvas;
+
     @FXML
     private ListView<String> listView;
 
@@ -81,17 +86,33 @@ public class GuiController {
 
     @FXML
     private TextField translateZ;
+
     @FXML
     private Slider xSlider;
+
     @FXML
     private Slider ySlider;
 
     @FXML
     private Slider zSlider;
+
     @FXML
     private RadioMenuItem light;
+
     @FXML
     private RadioMenuItem dark;
+
+    @FXML
+    private CheckBox drawPolygonMesh;
+
+    @FXML
+    private CheckBox drawTextures;
+
+    @FXML
+    private CheckBox drawLighting;
+
+    @FXML
+    private ColorPicker polygonFillColor;
 
 
     private Model mesh = null;
@@ -215,13 +236,15 @@ public class GuiController {
                 double width = canvas.getWidth();
                 double height = canvas.getHeight();
                 canvas.getGraphicsContext2D().clearRect(0, 0, width, height);
-                Color color = dark.isSelected() ? Color.WHITE : Color.BLACK;
+                Color meshColor = dark.isSelected() ? Color.WHITE : Color.BLACK;
                 camera.setAspectRatio((float) (width / height));
                 rotateV = new Vector3f(Double.parseDouble(rotateX.getText()), Double.parseDouble(rotateY.getText()), Double.parseDouble(rotateZ.getText()));
                 scaleV = new Vector3f(Double.parseDouble(scaleX.getText()), Double.parseDouble(scaleY.getText()), Double.parseDouble(scaleZ.getText()));
                 translateV = new Vector3f(-Double.parseDouble(translateX.getText()), Double.parseDouble(translateY.getText()), Double.parseDouble(translateZ.getText()));
                 if (mesh != null) {
-                    RenderEngine.render(canvas.getGraphicsContext2D(), camera, mesh, (int) width, (int) height, rotateV, scaleV, translateV, color);
+                    RenderEngine.render(canvas.getGraphicsContext2D(), camera, mesh, (int) width, (int) height,
+                            rotateV, scaleV, translateV, meshColor, drawPolygonMesh.isSelected(),
+                            drawTextures.isSelected(), drawLighting.isSelected(), polygonFillColor.getValue());
                 }
             }
         });
@@ -246,6 +269,7 @@ public class GuiController {
         try {
             String fileContent = Files.readString(path);
             mesh = ObjReader.read(fileContent, true);
+            mesh.triangulate();
             addModel(file.getName(), path);
             cleanTransform();
             // todo: обработка ошибок

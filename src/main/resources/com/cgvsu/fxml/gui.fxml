@@ -1,22 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.canvas.Canvas?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.ColorPicker?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.RadioMenuItem?>
-<?import javafx.scene.control.Slider?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.input.KeyCodeCombination?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.canvas.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.input.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane fx:id="anchorPane" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cgvsu.GuiController">
+<AnchorPane fx:id="anchorPane" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cgvsu.GuiController">
     <MenuBar>
         <Menu mnemonicParsing="false" text="File">
             <MenuItem mnemonicParsing="false" onAction="#onOpenLoadModelMenuItemClick" text="Load Model">
@@ -180,15 +170,15 @@
    </AnchorPane>
    <AnchorPane fx:id="renderingModels" layoutX="1013.0" layoutY="568.0" prefHeight="153.0" prefWidth="267.0">
       <children>
-         <CheckBox focusTraversable="false" layoutX="48.0" layoutY="30.0" mnemonicParsing="false" text="Polygon mesh">
+         <CheckBox fx:id="drawPolygonMesh" focusTraversable="false" layoutX="48.0" layoutY="30.0" mnemonicParsing="false" text="Polygon mesh">
             <font>
                <Font size="15.0" />
             </font></CheckBox>
-         <CheckBox focusTraversable="false" layoutX="48.0" layoutY="90.0" mnemonicParsing="false" text="Lighting">
+         <CheckBox fx:id="drawLighting" focusTraversable="false" layoutX="48.0" layoutY="90.0" mnemonicParsing="false" text="Lighting">
             <font>
                <Font size="15.0" />
             </font></CheckBox>
-         <CheckBox focusTraversable="false" layoutX="47.0" layoutY="60.0" mnemonicParsing="false" text="Textures">
+         <CheckBox fx:id="drawTextures" focusTraversable="false" layoutX="47.0" layoutY="60.0" mnemonicParsing="false" text="Textures">
             <font>
                <Font size="15.0" />
             </font></CheckBox>
@@ -197,7 +187,7 @@
                <Font size="15.0" />
             </font>
          </Label>
-         <ColorPicker focusTraversable="false" layoutX="47.0" layoutY="120.0" />
+         <ColorPicker fx:id="polygonFillColor" focusTraversable="false" layoutX="47.0" layoutY="120.0" />
       </children>
    </AnchorPane>
 </AnchorPane>
