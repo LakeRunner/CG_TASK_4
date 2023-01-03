@@ -7,21 +7,21 @@ public class CurrentModel extends Model{
     private Vector3f scaleV;
     private Vector3f translateV;
 
-    public CurrentModel (Model model){
+    public CurrentModel(Model model){
         super(model);
         rotateV = new Vector3f(0, 0, 0);
         scaleV = new Vector3f(1, 1, 1);
         translateV = new Vector3f(0, 0, 0);
     }
 
-    public CurrentModel (CurrentModel model){
+    public CurrentModel(CurrentModel model){
         super(model);
         rotateV = model.getRotateV();
         scaleV = model.getScaleV();
         translateV = model.getTranslateV();
     }
 
-    public CurrentModel (Model model, Vector3f rotateV, Vector3f scaleV, Vector3f translateV){
+    public CurrentModel(Model model, Vector3f rotateV, Vector3f scaleV, Vector3f translateV){
         super(model);
         rotateV = this.rotateV;
         scaleV = this.scaleV;

@@ -281,6 +281,7 @@ public class GuiController {
             String fileContent = Files.readString(path);
             Model model = ObjReader.read(fileContent, true);
             model.triangulate();
+            //model.calcNormals();
             loadedModels.put(file.getName(), new CurrentModel(model));
             currentModel = file.getName();
             listView.getItems().add(currentModel);

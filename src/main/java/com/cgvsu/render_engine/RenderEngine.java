@@ -7,7 +7,6 @@ import com.cgvsu.math.*;
 import com.cgvsu.model.CurrentModel;
 import com.cgvsu.model.Polygon;
 import javafx.scene.canvas.GraphicsContext;
-import com.cgvsu.model.Model;
 import javafx.scene.paint.Color;
 
 import static com.cgvsu.render_engine.GraphicConveyor.*;
@@ -42,13 +41,11 @@ public class RenderEngine {
                 resultPoints.add(resultPoint);
             }
 
-            //заглушка на время пока нельзя выбирать режим отрисовки (закраска модели цветом)
             if (!drawTextures) {
                 graphicsContext.setStroke(polygonFillColor);
                 fillPolygon(resultPoints, graphicsContext);
             }
 
-            //заглушка на время пока нельзя выбирать режим отрисовки (полигональная сетка)
             if (drawPolygonMesh) {
                 graphicsContext.setStroke(meshColor);
                 drawPolygon(resultPoints, graphicsContext);

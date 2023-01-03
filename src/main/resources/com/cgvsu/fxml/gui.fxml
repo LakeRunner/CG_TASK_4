@@ -134,8 +134,8 @@
      <menus>
        <Menu mnemonicParsing="false" text="Params">
          <items>
-               <RadioMenuItem fx:id="light" mnemonicParsing="false" onAction="#lightTheme" text="Light theme" />
-               <RadioMenuItem fx:id="dark" mnemonicParsing="false" onAction="#darkTheme" selected="true" text="Dark theme" />
+               <RadioMenuItem fx:id="light" mnemonicParsing="false" onAction="#lightTheme" selected="true" text="Light theme" />
+               <RadioMenuItem fx:id="dark" mnemonicParsing="false" onAction="#darkTheme" text="Dark theme" />
          </items>
        </Menu>
      </menus>
@@ -190,7 +190,7 @@
          </Label>
          <ColorPicker fx:id="polygonFillColor" focusTraversable="false" layoutX="47.0" layoutY="120.0">
             <value>
-               <Color red="1.0" />
+               <Color red="0.4000000059604645" green="0.501960813999176" blue="0.9019607901573181" />
             </value></ColorPicker>
       </children>
    </AnchorPane>
