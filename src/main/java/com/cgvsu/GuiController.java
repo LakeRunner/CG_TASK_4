@@ -138,7 +138,7 @@ public class GuiController {
 
     @FXML
     private void initialize() {
-        anchorPane.setStyle("-fx-background-color: white;");
+        anchorPane.setStyle("-fx-background-color: black;");
         list = getTextFields();
         List<Slider> sliders = Arrays.asList(xSlider, ySlider, zSlider);
         xSlider.valueProperty().addListener(new ChangeListener<Number>() {
@@ -236,7 +236,7 @@ public class GuiController {
                 double width = canvas.getWidth();
                 double height = canvas.getHeight();
                 canvas.getGraphicsContext2D().clearRect(0, 0, width, height);
-                Color meshColor = dark.isSelected() ? Color.WHITE : Color.BLACK;
+                Color meshColor = dark.isSelected() ? Color.LIGHTGRAY : Color.BLACK;
                 camera.setAspectRatio((float) (width / height));
                 rotateV = new Vector3f(Double.parseDouble(rotateX.getText()), Double.parseDouble(rotateY.getText()), Double.parseDouble(rotateZ.getText()));
                 scaleV = new Vector3f(Double.parseDouble(scaleX.getText()), Double.parseDouble(scaleY.getText()), Double.parseDouble(scaleZ.getText()));
