@@ -4,63 +4,63 @@ import com.cgvsu.math.*;
 
 public class GraphicConveyor {
 
-    public static Matrix4f rotate(Vector3f rotateV) {
+    public static Matrix4f rotate(final Vector3f rotateV) {
         final double xAngle = Math.toRadians(rotateV.getX());
-        double yAngle = Math.toRadians(rotateV.getY());
-        double zAngle = Math.toRadians(rotateV.getZ());
-        double[] firstLine = {
+        final double yAngle = Math.toRadians(rotateV.getY());
+        final double zAngle = Math.toRadians(rotateV.getZ());
+        final double[] firstLine = {
                 Math.cos(yAngle) * Math.cos(zAngle),
                 -Math.sin(zAngle) * Math.cos(yAngle),
                 Math.sin(yAngle),
                 0};
-        double[] secondLine = {
+        final double[] secondLine = {
                 Math.sin(xAngle) * Math.sin(yAngle) * Math.cos(zAngle) + Math.sin(zAngle) * Math.cos(xAngle),
                 -Math.sin(xAngle) * Math.sin(yAngle) * Math.sin(zAngle) + Math.cos(xAngle) * Math.cos(zAngle),
                 -Math.sin(xAngle) * Math.cos(yAngle),
                 0};
-        double[] thirdLine = {
+        final double[] thirdLine = {
                 Math.sin(xAngle) * Math.sin(zAngle) - Math.sin(yAngle) * Math.cos(xAngle) * Math.cos(zAngle),
                 Math.sin(xAngle) * Math.cos(zAngle) + Math.sin(yAngle) * Math.sin(zAngle) * Math.cos(xAngle),
                 Math.cos(xAngle) * Math.cos(yAngle),
                 0};
-        double[] fourthLine = {0, 0, 0, 1};
-        double[][] matrixA = {firstLine, secondLine, thirdLine, fourthLine};
+        final double[] fourthLine = {0, 0, 0, 1};
+        final double[][] matrixA = {firstLine, secondLine, thirdLine, fourthLine};
         return new Matrix4f(matrixA);
     }
 
-    public static Matrix4f scale(Vector3f scaleV) {
-        double xScale = scaleV.getX();
-        double yScale = scaleV.getY();
-        double zScale = scaleV.getZ();
-        double[] firstLine = {xScale, 0, 0, 0};
-        double[] secondLine = {0, yScale, 0, 0};
-        double[] thirdLine = {0, 0, zScale, 0};
-        double[] fourthLine = {0, 0, 0, 1};
-        double[][] matrixA = {firstLine, secondLine, thirdLine, fourthLine};
+    public static Matrix4f scale(final Vector3f scaleV) {
+        final double xScale = scaleV.getX();
+        final double yScale = scaleV.getY();
+        final double zScale = scaleV.getZ();
+        final double[] firstLine = {xScale, 0, 0, 0};
+        final double[] secondLine = {0, yScale, 0, 0};
+        final  double[] thirdLine = {0, 0, zScale, 0};
+        final double[] fourthLine = {0, 0, 0, 1};
+        final  double[][] matrixA = {firstLine, secondLine, thirdLine, fourthLine};
         return new Matrix4f(matrixA);
     }
 
-    public static Matrix4f translate(Vector3f translateV) {
-        double xTranslate = translateV.getX();
-        double yTranslate = translateV.getY();
-        double zTranslate = translateV.getZ();
-        double[] firstLine = {1, 0, 0, xTranslate};
-        double[] secondLine = {0, 1, 0, yTranslate};
-        double[] thirdLine = {0, 0, 1, zTranslate};
-        double[] fourthLine = {0, 0, 0, 1};
-        double[][] matrixA = {firstLine, secondLine, thirdLine, fourthLine};
+    public static Matrix4f translate(final Vector3f translateV) {
+        final double xTranslate = translateV.getX();
+        final double yTranslate = translateV.getY();
+        final double zTranslate = translateV.getZ();
+        final double[] firstLine = {1, 0, 0, xTranslate};
+        final double[] secondLine = {0, 1, 0, yTranslate};
+        final double[] thirdLine = {0, 0, 1, zTranslate};
+        final double[] fourthLine = {0, 0, 0, 1};
+        final double[][] matrixA = {firstLine, secondLine, thirdLine, fourthLine};
         return new Matrix4f(matrixA);
     }
 
-    public static Matrix4f rotateScaleTranslate(Vector3f rotateV, Vector3f scaleV, Vector3f translateV) {
+    public static Matrix4f rotateScaleTranslate(final Vector3f rotateV, final Vector3f scaleV, final Vector3f translateV) {
         return Matrix4f.matrixMultiplier(Matrix4f.matrixMultiplier(translate(translateV), scale(scaleV)), rotate(rotateV) );
     }
 
-    public static Matrix4f lookAt(Vector3f eye, Vector3f target) {
+    public static Matrix4f lookAt(final Vector3f eye, final Vector3f target) {
         return lookAt(eye, target, new Vector3f(0F, 1.0F, 0F));
     }
 
-    public static Matrix4f lookAt(Vector3f eye, Vector3f target, Vector3f up) {
+    public static Matrix4f lookAt(final Vector3f eye, final Vector3f target, final Vector3f up) {
         Vector3f resultZ = Vector3f.subtraction(target, eye);
         Vector3f resultX = Vector3f.crossProduct(up, resultZ);
         Vector3f resultY = Vector3f.crossProduct(resultZ, resultX);
@@ -69,12 +69,6 @@ public class GraphicConveyor {
         resultY.normalize();
         resultZ.normalize();
 
-
-       /*double[] matrix = new double[]{
-                resultX.getX(), resultY.getX(), resultZ.getX(), 0,
-                resultX.getY(), resultY.getY(), resultZ.getY(), 0,
-                resultX.getZ(), resultY.getZ(), resultZ.getZ(), 0,
-                -Vector3f.dotProduct(resultX, eye), -Vector3f.dotProduct(resultY, eye), -Vector3f.dotProduct(resultZ, eye), 1};*/
         double[] matrix = new double[]{
                 resultX.getX(), resultX.getY(), resultX.getZ(), -Vector3f.dotProduct(resultX, eye),
                 resultY.getX(), resultY.getY(), resultY.getZ(), -Vector3f.dotProduct(resultY, eye),
@@ -86,7 +80,7 @@ public class GraphicConveyor {
     public static Matrix4f perspective(final float fov, final float aspectRatio,
                                        final float nearPlane, final float farPlane) {
         Matrix4f result = new Matrix4f();
-        float tangentMinusOnDegree = (float) (1.0F / (Math.tan(fov * 0.5F)));
+        final float tangentMinusOnDegree = (float) (1.0F / (Math.tan(fov * 0.5F)));
         result.getMatrixArray()[0][0] = tangentMinusOnDegree / aspectRatio;
         result.getMatrixArray()[1][1] = tangentMinusOnDegree;
         result.getMatrixArray()[2][2] = (farPlane + nearPlane) / (farPlane - nearPlane);
