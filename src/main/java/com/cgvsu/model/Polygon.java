@@ -1,45 +1,68 @@
 package com.cgvsu.model;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Polygon {
 
-    private List<Integer> vertexIndices;
-    private List<Integer> textureVertexIndices;
-    private List<Integer> normalIndices;
+    private ArrayList<Integer> vertexIndices;
+    private ArrayList<Integer> textureVertexIndices;
+    private ArrayList<Integer> normalIndices;
 
 
     public Polygon() {
-        vertexIndices = new ArrayList<>();
-        textureVertexIndices = new ArrayList<>();
-        normalIndices = new ArrayList<>();
+        vertexIndices = new ArrayList<Integer>();
+        textureVertexIndices = new ArrayList<Integer>();
+        normalIndices = new ArrayList<Integer>();
     }
 
-    public void setVertexIndices(List<Integer> vertexIndices) {
+    public void addVertexIndex(final int vertexIndex) {
+        this.vertexIndices.add(vertexIndex);
+    }
+
+    public void addTextureVertexIndex(final int textureVertexIndex) {
+        this.textureVertexIndices.add(textureVertexIndex);
+    }
+
+    public void addNormalIndex(final int normalIndex) {
+        this.normalIndices.add(normalIndex);
+    }
+
+    public void setVertexIndices(ArrayList<Integer> vertexIndices) {
         assert vertexIndices.size() >= 3;
         this.vertexIndices = vertexIndices;
     }
 
-    public void setTextureVertexIndices(List<Integer> textureVertexIndices) {
+    public void setTextureVertexIndices(ArrayList<Integer> textureVertexIndices) {
         assert textureVertexIndices.size() >= 3;
         this.textureVertexIndices = textureVertexIndices;
     }
 
-    public void setNormalIndices(List<Integer> normalIndices) {
+    public void setNormalIndices(ArrayList<Integer> normalIndices) {
         assert normalIndices.size() >= 3;
         this.normalIndices = normalIndices;
     }
 
-    public List<Integer> getVertexIndices() {
+    public int getSizePolygonsVertexIndices() {
+        return vertexIndices.size();
+    }
+
+    public int getSizePolygonsTextureVertexIndices() {
+        return textureVertexIndices.size();
+    }
+
+    public int getSizePolygonsNormalIndices() {
+        return normalIndices.size();
+    }
+
+    public ArrayList<Integer> getVertexIndices() {
         return vertexIndices;
     }
 
-    public List<Integer> getTextureVertexIndices() {
+    public ArrayList<Integer> getTextureVertexIndices() {
         return textureVertexIndices;
     }
 
-    public List<Integer> getNormalIndices() {
+    public ArrayList<Integer> getNormalIndices() {
         return normalIndices;
     }
 }

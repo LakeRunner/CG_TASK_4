@@ -1,24 +1,37 @@
 package com.cgvsu;
 
 import com.cgvsu.math.Vector3f;
+import com.cgvsu.objwriter.ObjWriter;
 import com.cgvsu.render_engine.RenderEngine;
+import javafx.animation.TranslateTransition;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
+import javafx.scene.control.RadioMenuItem;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
 
 import java.awt.*;
+import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.io.IOException;
 import java.io.File;
+import java.util.*;
+import java.util.List;
 
 import com.cgvsu.model.Model;
 import com.cgvsu.objreader.ObjReader;
@@ -27,12 +40,20 @@ import com.cgvsu.render_engine.Camera;
 public class GuiController {
 
     final private float TRANSLATION = 0.5F;
-
     @FXML
     private AnchorPane anchorPane;
-
+    @FXML
+    private AnchorPane selection;
+    @FXML
+    private AnchorPane modelTrans;
+    @FXML
+    private AnchorPane renderingModels;
+    @FXML
+    private AnchorPane activeModels;
     @FXML
     private Canvas canvas;
+    @FXML
+    private ListView<String> listView;
 
     @FXML
     private TextField rotateX;
@@ -60,9 +81,18 @@ public class GuiController {
 
     @FXML
     private TextField translateZ;
+    @FXML
+    private Slider xSlider;
+    @FXML
+    private Slider ySlider;
 
     @FXML
-    private Button triangulationButton;
+    private Slider zSlider;
+    @FXML
+    private RadioMenuItem light;
+    @FXML
+    private RadioMenuItem dark;
+
 
     private Model mesh = null;
 
@@ -79,54 +109,172 @@ public class GuiController {
 
     private Timeline timeline;
     private Robot robot;
+    private boolean modelIsSelected;
+    private List<TextField> list;
+    private boolean onActionParams;
+    private boolean onActionList;
+    private boolean onActionModes;
 
     @FXML
     private void initialize() {
+        anchorPane.setStyle("-fx-background-color: white;");
+        list = getTextFields();
+        List<Slider> sliders = Arrays.asList(xSlider, ySlider, zSlider);
+        xSlider.valueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
+                String degrees = String.format(Locale.ENGLISH, "%(.2f", sliders.get(0).getValue());
+                list.get(0).setText(degrees);
+            }
+        });
+        ySlider.valueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
+                String degrees = String.format(Locale.ENGLISH, "%(.2f", sliders.get(1).getValue());
+                list.get(1).setText(degrees);
+            }
+        });
+        zSlider.valueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
+                String degrees = String.format(Locale.ENGLISH, "%(.2f", sliders.get(2).getValue());
+                list.get(2).setText(degrees);
+            }
+        });
+
+        TranslateTransition transitionRightUpSide = new TranslateTransition();
+        TranslateTransition transitionRightDownSide = new TranslateTransition();
+        TranslateTransition transitionLeftSide = new TranslateTransition();
+        transitionLeftSide.setNode(activeModels);
+        transitionRightUpSide.setNode(modelTrans);
+        transitionRightDownSide.setNode(renderingModels);
+        transitionRightUpSide.setByX(270);
+        transitionRightDownSide.setByX(270);
+        transitionLeftSide.setByX(-230);
+        transitionLeftSide.play();
+        transitionRightUpSide.play();
+        transitionRightDownSide.play();
+        anchorPane.setOnMouseMoved(new EventHandler<MouseEvent>() {
+            @Override
+        public void handle(MouseEvent mouseEvent) {
+            double rightBorder = activeModels.getLayoutX();
+            double posRightBorder = activeModels.getLocalToParentTransform().getTx();
+            double leftUpBorder = modelTrans.getLayoutX() + 260;
+            double posLeftUpBorder = modelTrans.getLocalToParentTransform().getTx();
+            double leftDownBorder = renderingModels.getLayoutX() + 260;
+            double posLeftDownBorder = renderingModels.getLocalToParentTransform().getTx();
+            if (posLeftUpBorder == modelTrans.getLayoutX() || posLeftUpBorder == modelTrans.getLayoutX() + 270) {
+                if (modelIsSelected && !onActionParams && mouseEvent.getX() > leftUpBorder && mouseEvent.getX() < leftUpBorder + 7 && mouseEvent.getY() < 565) {
+                    transitionRightUpSide.setByX(-270);
+                    transitionRightUpSide.play();
+                    onActionParams = true;
+                    disable(false);
+                } else if (onActionParams && (mouseEvent.getX() < leftUpBorder - 260 || mouseEvent.getY() > 565)) {
+                    transitionRightUpSide.setByX(270);
+                    transitionRightUpSide.play();
+                    onActionParams = false;
+                    disable(true);
+                }
+            }
+            if (posLeftDownBorder == renderingModels.getLayoutX() || posLeftDownBorder == renderingModels.getLayoutX() + 270) {
+                if (modelIsSelected && !onActionModes && mouseEvent.getX() > leftDownBorder && mouseEvent.getX() < leftDownBorder + 7 && mouseEvent.getY() < 720 && mouseEvent.getY() > 568) {
+                    transitionRightDownSide.setByX(-270);
+                    transitionRightDownSide.play();
+                    onActionModes = true;
+                } else if (onActionModes && (mouseEvent.getX() < leftDownBorder - 260 || mouseEvent.getY() < 568)) {
+                    transitionRightDownSide.setByX(270);
+                    transitionRightDownSide.play();
+                    onActionModes = false;
+                }
+            }
+            if (posRightBorder == activeModels.getLayoutX() || posRightBorder == activeModels.getLayoutX() - 230) {
+                if (modelIsSelected && !onActionList && mouseEvent.getX() > rightBorder && mouseEvent.getX() < rightBorder + 5 && mouseEvent.getY() > 32 && mouseEvent.getY() < 330) {
+                    transitionLeftSide.setByX(230);
+                    transitionLeftSide.play();
+                    onActionList = true;
+                } else if (onActionList && (mouseEvent.getX() > rightBorder + 225 || mouseEvent.getY() > 330 || mouseEvent.getY() <= 32)) {
+                    transitionLeftSide.setByX(-230);
+                    transitionLeftSide.play();
+                    onActionList = false;
+                }
+            }
+        }
+    });
+
         anchorPane.prefWidthProperty().addListener((ov, oldValue, newValue) -> canvas.setWidth(newValue.doubleValue()));
         anchorPane.prefHeightProperty().addListener((ov, oldValue, newValue) -> canvas.setHeight(newValue.doubleValue()));
+        modelTrans.setStyle("-fx-background-color: lightgray;");
+        activeModels.setStyle("-fx-background-color: lightgray;");
+        selection.setStyle("-fx-background-color: lightgray;");
+        renderingModels.setStyle("-fx-background-color: lightgray;");
         timeline = new Timeline();
         timeline.setCycleCount(Animation.INDEFINITE);
 
         KeyFrame frame = new KeyFrame(Duration.millis(15), event -> {
-            double width = canvas.getWidth();
-            double height = canvas.getHeight();
-            canvas.getGraphicsContext2D().clearRect(0, 0, width, height);
-            camera.setAspectRatio((float) (width / height));
-            rotateV = new Vector3f(Double.parseDouble(rotateX.getText()), Double.parseDouble(rotateY.getText()), Double.parseDouble(rotateZ.getText()));
-            scaleV = new Vector3f(Double.parseDouble(scaleX.getText()), Double.parseDouble(scaleY.getText()), Double.parseDouble(scaleZ.getText()));
-            translateV = new Vector3f(-Double.parseDouble(translateX.getText()), Double.parseDouble(translateY.getText()), Double.parseDouble(translateZ.getText()));
-            if (mesh != null) {
-                RenderEngine.render(canvas.getGraphicsContext2D(), camera, mesh, (int) width, (int) height, rotateV, scaleV, translateV);
+            if (TransformFieldsNotNull()) {
+                double width = canvas.getWidth();
+                double height = canvas.getHeight();
+                canvas.getGraphicsContext2D().clearRect(0, 0, width, height);
+                Color color = dark.isSelected() ? Color.WHITE : Color.BLACK;
+                camera.setAspectRatio((float) (width / height));
+                rotateV = new Vector3f(Double.parseDouble(rotateX.getText()), Double.parseDouble(rotateY.getText()), Double.parseDouble(rotateZ.getText()));
+                scaleV = new Vector3f(Double.parseDouble(scaleX.getText()), Double.parseDouble(scaleY.getText()), Double.parseDouble(scaleZ.getText()));
+                translateV = new Vector3f(-Double.parseDouble(translateX.getText()), Double.parseDouble(translateY.getText()), Double.parseDouble(translateZ.getText()));
+                if (mesh != null) {
+                    RenderEngine.render(canvas.getGraphicsContext2D(), camera, mesh, (int) width, (int) height, rotateV, scaleV, translateV, color);
+                }
             }
         });
 
         timeline.getKeyFrames().add(frame);
         timeline.play();
-
     }
 
     @FXML
-    private void onOpenModelMenuItemClick() {
+    private void onOpenLoadModelMenuItemClick() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Model (*.obj)", "*.obj"));
         fileChooser.setTitle("Load Model");
 
-        File file = fileChooser.showOpenDialog(canvas.getScene().getWindow());
+        File file = fileChooser.showOpenDialog((Stage) canvas.getScene().getWindow());
         if (file == null) {
             return;
         }
 
-        Path fileName = Path.of(file.getAbsolutePath());
+        Path path = Path.of(file.getAbsolutePath());
 
         try {
-            String fileContent = Files.readString(fileName);
-            mesh = ObjReader.read(fileContent);
-            mesh.triangulate();
-            mesh.calcNormals();
+            String fileContent = Files.readString(path);
+            mesh = ObjReader.read(fileContent, true);
+            addModel(file.getName(), path);
+            cleanTransform();
             // todo: обработка ошибок
         } catch (IOException exception) {
 
         }
+        modelIsSelected = true;
+    }
+    public void onOpenSaveUnchangedModel() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Model (*.obj)", "*.obj"));
+        File file = fileChooser.showSaveDialog((Stage) canvas.getScene().getWindow());
+
+        try {
+            ArrayList<String> fileContent2 = ObjWriter.write(mesh);
+            FileWriter writer = new FileWriter(file);
+            for (String s : fileContent2) {
+                writer.write(s + "\n");
+            }
+            writer.flush();
+            writer.close();
+            cleanTransform();
+        } catch (IOException ignored) {
+        }
+        selection.setVisible(false);
+    }
+    public void onOpenSaveWithChangesModel() {
+         // добавить сохранение изменений модели в предыдущий метод.
+        selection.setVisible(false);
     }
 
     @FXML
@@ -158,9 +306,142 @@ public class GuiController {
     public void handleCameraDown(ActionEvent actionEvent) {
         camera.movePosition(new Vector3f(0, -TRANSLATION, 0));
     }
-
     @FXML
     public void triangulation() {
         mesh.triangulate();
     }
+    public Map<String,Path> models = new HashMap<>();
+
+    public List<TextField> getTextFields () {
+        List<TextField> list = new ArrayList<>();
+        list.add(rotateX);
+        list.add(rotateY);
+        list.add(rotateZ);
+        list.add(scaleX);
+        list.add(scaleY);
+        list.add(scaleZ);
+        list.add(translateX);
+        list.add(translateY);
+        list.add(translateZ);
+        return list;
+    }
+    public void disable (boolean disable) {
+        for (TextField field : list) {
+            field.setDisable(disable);
+        }
+        xSlider.setDisable(disable);
+        ySlider.setDisable(disable);
+        zSlider.setDisable(disable);
+    }
+    public boolean TransformFieldsNotNull() {
+        for (TextField field : list) {
+            if (field.getText().equals("")) {
+                return false;
+            }
+        }
+        return true;
+    }
+    public void cleanTransform() {
+        for (int i = 0; i < list.size(); i++) {
+            if (i > 2 && i < 6) {
+                list.get(i).setText("1");
+            } else {
+                list.get(i).setText("0");
+            }
+        }
+        xSlider.setValue(0);
+        ySlider.setValue(0);
+        zSlider.setValue(0);
+    }
+    public void addModel (String name, Path path) {
+        listView.getItems().add(name);
+        models.put(name, path);
+    }
+    public void modelSelected () throws IOException {
+        for (int i = 0; i < listView.getItems().size(); i++) {
+            int index = listView.getSelectionModel().getSelectedIndex();
+            if (index != -1) {
+                String name = listView.getItems().get(i);
+                mesh = ObjReader.read(Files.readString(models.get(name)), true);
+                cleanTransform();
+            }
+        }
+    }
+    public void darkTheme () {
+        if (!dark.isSelected()) {
+            dark.setSelected(true);
+        }
+        light.setSelected(false);
+        anchorPane.setStyle("-fx-background-color: black;");
+    }
+    public void lightTheme () {
+        dark.setSelected(false);
+        anchorPane.setStyle("-fx-background-color: white;");
+    }
+    public void saveSelection () {
+        if (modelIsSelected) {
+            selection.setVisible(true);
+        }
+    }
+    public void closeSaveSelection () {
+        selection.setVisible(false);
+    }
 }
+//    TranslateTransition transitionRightUpSide = new TranslateTransition();
+//    TranslateTransition transitionRightDownSide = new TranslateTransition();
+//    TranslateTransition transitionLeftSide = new TranslateTransition();
+//        transitionLeftSide.setNode(activeModels);
+//                transitionRightUpSide.setNode(modelTrans);
+//                transitionRightDownSide.setNode(renderingModels);
+//                transitionRightUpSide.setByX(270);
+//                transitionRightDownSide.setByX(270);
+//                transitionLeftSide.setByX(-230);
+//                transitionLeftSide.play();
+//                transitionRightUpSide.play();
+//                transitionRightDownSide.play();
+//                anchorPane.setOnMouseMoved(new EventHandler<MouseEvent>() {
+//@Override
+//public void handle(MouseEvent mouseEvent) {
+//        double rightBorder = activeModels.getLayoutX();
+//        double posRightBorder = activeModels.getLocalToParentTransform().getTx();
+//        double leftUpBorder = modelTrans.getLayoutX() + 250;
+//        double posLeftUpBorder = modelTrans.getLocalToParentTransform().getTx();
+//        double leftDownBorder = renderingModels.getLayoutX() + 250;
+//        double posLeftDownBorder = renderingModels.getLocalToParentTransform().getTx();
+//        if (posLeftUpBorder == modelTrans.getLayoutX() || posLeftUpBorder == modelTrans.getLayoutX() + 270) {
+//        if (modelIsSelected && !onActionParams && mouseEvent.getX() > leftUpBorder && mouseEvent.getX() < leftUpBorder + 17 && mouseEvent.getY() < 565) {
+//        transitionRightUpSide.setByX(-270);
+//        transitionRightUpSide.play();
+//        onActionParams = true;
+//        disable(false);
+//        } else if (onActionParams && (mouseEvent.getX() < leftUpBorder - 250 || mouseEvent.getY() > 565)) {
+//        transitionRightUpSide.setByX(270);
+//        transitionRightUpSide.play();
+//        onActionParams = false;
+//        disable(true);
+//        }
+//        }
+////                if (posLeftDownBorder == renderingModels.getLayoutX() || posLeftDownBorder == renderingModels.getLayoutX() + 270) {
+////                    if (modelIsSelected && !onActionModes && mouseEvent.getX() > leftDownBorder && mouseEvent.getX() < leftDownBorder + 17 && mouseEvent.getY() < 720 && mouseEvent.getY() > 568) {
+////                        transitionRightDownSide.setByX(-270);
+////                        transitionRightDownSide.play();
+////                        onActionModes = true;
+////                    } else if (onActionParams && (mouseEvent.getX() < leftDownBorder - 250 || mouseEvent.getY() < 568)) {
+////                        transitionRightDownSide.setByX(270);
+////                        transitionRightDownSide.play();
+////                        onActionModes = false;
+////                    }
+////                }
+//        if (posRightBorder == activeModels.getLayoutX() || posRightBorder == activeModels.getLayoutX() - 230) {
+//        if (modelIsSelected && !onActionList && mouseEvent.getX() > rightBorder && mouseEvent.getX() < rightBorder + 5 && mouseEvent.getY() > 32 && mouseEvent.getY() < 330) {
+//        transitionLeftSide.setByX(230);
+//        transitionLeftSide.play();
+//        onActionList = true;
+//        } else if (onActionList && (mouseEvent.getX() > rightBorder + 225 || mouseEvent.getY() > 330 || mouseEvent.getY() <= 32)) {
+//        transitionLeftSide.setByX(-230);
+//        transitionLeftSide.play();
+//        onActionList = false;
+//        }
+//        }
+//        }
+//        });
