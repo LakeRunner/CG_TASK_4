@@ -1,6 +1,11 @@
 package com.cgvsu;
 
+import com.cgvsu.math.Matrix4f;
+import com.cgvsu.math.Vector2f;
 import com.cgvsu.math.Vector3f;
+import com.cgvsu.math.Vector4f;
+import com.cgvsu.model.CurrentModel;
+import com.cgvsu.model.Polygon;
 import com.cgvsu.objwriter.ObjWriter;
 import com.cgvsu.render_engine.RenderEngine;
 import javafx.animation.TranslateTransition;
@@ -34,6 +39,8 @@ import java.util.List;
 import com.cgvsu.model.Model;
 import com.cgvsu.objreader.ObjReader;
 import com.cgvsu.render_engine.Camera;
+
+import static com.cgvsu.render_engine.GraphicConveyor.*;
 
 public class GuiController {
 
@@ -114,6 +121,9 @@ public class GuiController {
     @FXML
     private ColorPicker polygonFillColor;
 
+    String currentModel;
+
+    private HashMap<String, CurrentModel> loadedModels = new HashMap<>();
 
     private Model mesh = null;
 
@@ -138,7 +148,8 @@ public class GuiController {
 
     @FXML
     private void initialize() {
-        anchorPane.setStyle("-fx-background-color: black;");
+        loadedModels.put("Mesh", new CurrentModel(mesh));
+        currentModel = "Mesh";
         list = getTextFields();
         List<Slider> sliders = Arrays.asList(xSlider, ySlider, zSlider);
         xSlider.valueProperty().addListener(new ChangeListener<Number>() {
@@ -238,12 +249,12 @@ public class GuiController {
                 canvas.getGraphicsContext2D().clearRect(0, 0, width, height);
                 Color meshColor = dark.isSelected() ? Color.LIGHTGRAY : Color.BLACK;
                 camera.setAspectRatio((float) (width / height));
-                rotateV = new Vector3f(Double.parseDouble(rotateX.getText()), Double.parseDouble(rotateY.getText()), Double.parseDouble(rotateZ.getText()));
-                scaleV = new Vector3f(Double.parseDouble(scaleX.getText()), Double.parseDouble(scaleY.getText()), Double.parseDouble(scaleZ.getText()));
-                translateV = new Vector3f(-Double.parseDouble(translateX.getText()), Double.parseDouble(translateY.getText()), Double.parseDouble(translateZ.getText()));
-                if (mesh != null) {
-                    RenderEngine.render(canvas.getGraphicsContext2D(), camera, mesh, (int) width, (int) height,
-                            rotateV, scaleV, translateV, meshColor, drawPolygonMesh.isSelected(),
+                loadedModels.get(currentModel).setRotateV(new Vector3f(Double.parseDouble(rotateX.getText()), Double.parseDouble(rotateY.getText()), Double.parseDouble(rotateZ.getText())));
+                loadedModels.get(currentModel).setScaleV(new Vector3f(Double.parseDouble(scaleX.getText()), Double.parseDouble(scaleY.getText()), Double.parseDouble(scaleZ.getText())));
+                loadedModels.get(currentModel).setTranslateV(new Vector3f(-Double.parseDouble(translateX.getText()), Double.parseDouble(translateY.getText()), Double.parseDouble(translateZ.getText())));
+                if (loadedModels.get(currentModel) != null) {
+                    RenderEngine.render(canvas.getGraphicsContext2D(), camera, loadedModels.get(currentModel), (int) width, (int) height,
+                            loadedModels.get(currentModel).getRotateV(), loadedModels.get(currentModel).getScaleV(), loadedModels.get(currentModel).getTranslateV(), meshColor, drawPolygonMesh.isSelected(),
                             drawTextures.isSelected(), drawLighting.isSelected(), polygonFillColor.getValue());
                 }
             }
@@ -268,9 +279,12 @@ public class GuiController {
 
         try {
             String fileContent = Files.readString(path);
-            mesh = ObjReader.read(fileContent, true);
-            mesh.triangulate();
-            addModel(file.getName(), path);
+            Model model = ObjReader.read(fileContent, true);
+            model.triangulate();
+            loadedModels.put(file.getName(), new CurrentModel(model));
+            currentModel = file.getName();
+            listView.getItems().add(currentModel);
+            listView.scrollTo(currentModel);
             cleanTransform();
             // todo: обработка ошибок
         } catch (IOException exception) {
@@ -284,20 +298,43 @@ public class GuiController {
         File file = fileChooser.showSaveDialog((Stage) canvas.getScene().getWindow());
 
         try {
-            ArrayList<String> fileContent2 = ObjWriter.write(mesh);
+            ArrayList<String> fileContent2 = ObjWriter.write(loadedModels.get(currentModel));
             FileWriter writer = new FileWriter(file);
             for (String s : fileContent2) {
                 writer.write(s + "\n");
             }
             writer.flush();
             writer.close();
-            cleanTransform();
         } catch (IOException ignored) {
         }
         selection.setVisible(false);
     }
+
     public void onOpenSaveWithChangesModel() {
-         // добавить сохранение изменений модели в предыдущий метод.
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Model (*.obj)", "*.obj"));
+        File file = fileChooser.showSaveDialog((Stage) canvas.getScene().getWindow());
+        ArrayList<Vector3f> newVertecies = new ArrayList<>();
+        try {
+            Matrix4f modelMatrix = rotateScaleTranslate(loadedModels.get(currentModel).getRotateV(), loadedModels.get(currentModel).getScaleV(), loadedModels.get(currentModel).getTranslateV());
+                for (int i = 0; i < loadedModels.get(currentModel).getVertices().size(); i++) {
+                    Vector4f vertexVecmath = new Vector4f(loadedModels.get(currentModel).getVertices().get(i).getX(),loadedModels.get(currentModel).getVertices().get(i).getY(), loadedModels.get(currentModel).getVertices().get(i).getZ(), 1);
+                    Vector4f multipliedVector = Matrix4f.multiplierVector(modelMatrix, vertexVecmath);
+                    newVertecies.add(new Vector3f(
+                            multipliedVector.getX() / multipliedVector.getW(),
+                            multipliedVector.getY() / multipliedVector.getW(),
+                            multipliedVector.getZ() / multipliedVector.getW()));
+                }
+            Model changedModel = new Model(newVertecies, loadedModels.get(currentModel).getTextureVertices(), loadedModels.get(currentModel).getNormals(), loadedModels.get(currentModel).getPolygons());
+            ArrayList<String> fileContent2 = ObjWriter.write(changedModel);
+            FileWriter writer = new FileWriter(file);
+            for (String s : fileContent2) {
+                writer.write(s + "\n");
+            }
+            writer.flush();
+            writer.close();
+        } catch (IOException ignored) {
+        }
         selection.setVisible(false);
     }
 
@@ -334,7 +371,6 @@ public class GuiController {
     public void triangulation() {
         mesh.triangulate();
     }
-    public Map<String,Path> models = new HashMap<>();
 
     public List<TextField> getTextFields () {
         List<TextField> list = new ArrayList<>();
@@ -366,29 +402,25 @@ public class GuiController {
         return true;
     }
     public void cleanTransform() {
-        for (int i = 0; i < list.size(); i++) {
-            if (i > 2 && i < 6) {
-                list.get(i).setText("1");
-            } else {
-                list.get(i).setText("0");
-            }
-        }
-        xSlider.setValue(0);
-        ySlider.setValue(0);
-        zSlider.setValue(0);
-    }
-    public void addModel (String name, Path path) {
-        listView.getItems().add(name);
-        models.put(name, path);
+        list.get(0).setText(String.valueOf(loadedModels.get(currentModel).getRotateV().getX()));
+        list.get(1).setText(String.valueOf(loadedModels.get(currentModel).getRotateV().getY()));
+        list.get(2).setText(String.valueOf(loadedModels.get(currentModel).getRotateV().getZ()));
+        list.get(3).setText(String.valueOf(loadedModels.get(currentModel).getScaleV().getX()));
+        list.get(4).setText(String.valueOf(loadedModels.get(currentModel).getScaleV().getY()));
+        list.get(5).setText(String.valueOf(loadedModels.get(currentModel).getScaleV().getZ()));
+        list.get(6).setText(String.valueOf(loadedModels.get(currentModel).getTranslateV().getX()));
+        list.get(7).setText(String.valueOf(loadedModels.get(currentModel).getTranslateV().getY()));
+        list.get(8).setText(String.valueOf(loadedModels.get(currentModel).getTranslateV().getZ()));
+        xSlider.setValue(loadedModels.get(currentModel).getRotateV().getX());
+        ySlider.setValue(loadedModels.get(currentModel).getRotateV().getY());
+        zSlider.setValue(loadedModels.get(currentModel).getRotateV().getZ());
     }
     public void modelSelected () throws IOException {
-        for (int i = 0; i < listView.getItems().size(); i++) {
-            int index = listView.getSelectionModel().getSelectedIndex();
-            if (index != -1) {
-                String name = listView.getItems().get(i);
-                mesh = ObjReader.read(Files.readString(models.get(name)), true);
-                cleanTransform();
-            }
+        int index = listView.getSelectionModel().getSelectedIndex();
+        if (index != -1) {
+            String name = listView.getItems().get(index);
+            currentModel = name;
+            cleanTransform();
         }
     }
     public void darkTheme () {

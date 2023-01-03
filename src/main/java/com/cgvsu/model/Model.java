@@ -25,6 +25,20 @@ public class Model {
         polygons = new ArrayList<>();
     }
 
+    public Model(Model model) {
+        if(model!=null) {
+            vertices = model.vertices;
+            textureVertices = model.textureVertices;
+            normals = model.normals;
+            polygons = model.polygons;
+        }else {
+            vertices = new ArrayList<>();
+            textureVertices = new ArrayList<>();
+            normals = new ArrayList<>();
+            polygons = new ArrayList<>();
+        }
+    }
+
     public ArrayList<Vector3f> getVertices() {
         return vertices;
     }
