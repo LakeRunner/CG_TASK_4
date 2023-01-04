@@ -134,6 +134,13 @@ public class GuiController {
 
     @FXML
     private void initialize() {
+        double[][] zBuffer = new double[(int) canvas.getWidth()][(int) canvas.getHeight()];
+        for (int i = 0; i < zBuffer.length; i++) {
+            for (int j = 0; j < zBuffer[0].length; j++) {
+                zBuffer[i][j] = Double.NEGATIVE_INFINITY;
+            }
+        }
+
         scene.getLoadedModels().put("Mesh", new CurrentModel(mesh));
         scene.currentModel = "Mesh";
         list = getTextFields();
@@ -263,7 +270,7 @@ public class GuiController {
                 if (scene.getLoadedModels().get(scene.currentModel) != null) {
                     RenderEngine.render(canvas.getGraphicsContext2D(), scene.getCamera(), scene.getLoadedModels().get(scene.currentModel), (int) width, (int) height,
                             scene.getLoadedModels().get(scene.currentModel).getRotateV(), scene.getLoadedModels().get(scene.currentModel).getScaleV(), scene.getLoadedModels().get(scene.currentModel).getTranslateV(), meshColor, drawPolygonMesh.isSelected(),
-                            drawTextures.isSelected(), drawLighting.isSelected(), polygonFillColor.getValue());
+                            drawTextures.isSelected(), drawLighting.isSelected(), polygonFillColor.getValue(), zBuffer);
                 }
             }
         });

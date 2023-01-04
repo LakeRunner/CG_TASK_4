@@ -16,7 +16,8 @@ public class RenderEngine {
     public static void render(final GraphicsContext graphicsContext, final Camera camera, final CurrentModel model,
                               final int width, final int height, final Vector3f rotateV, final Vector3f scaleV,
                               final Vector3f translateV, final Color meshColor, final boolean drawPolygonMesh,
-                              final boolean drawTextures, final boolean drawLighting, final Color polygonFillColor) {
+                              final boolean drawTextures, final boolean drawLighting, final Color polygonFillColor,
+                              final double[][] zBuffer) {
 
         Matrix4f modelMatrix = rotateScaleTranslate(rotateV, scaleV, translateV);
         Matrix4f viewMatrix = camera.getViewMatrix();
@@ -32,18 +33,21 @@ public class RenderEngine {
             List<Integer> vertexIndices = polygon.getVertexIndices();
 
             List<Vector2f> resultPoints = new ArrayList<>();
+            List<Vector3f> originalVectors = new ArrayList<>();
             for (Integer vertexIndex : vertexIndices) {
                 Vector3f vertex = model.getVertices().get(vertexIndex);
 
                 Vector4f vertexVecmath = new Vector4f(vertex.getX(), vertex.getY(), vertex.getZ(), 1);
 
-                Vector2f resultPoint = vertexToPoint(multiplierMatrixToVector(modelViewProjectionMatrix, vertexVecmath), width, height);
+                Vector3f originalVector = multiplierMatrixToVector(modelViewProjectionMatrix, vertexVecmath);
+                Vector2f resultPoint = vertexToPoint(originalVector, width, height);
                 resultPoints.add(resultPoint);
+                originalVectors.add(originalVector);
             }
 
             if (!drawTextures) {
                 graphicsContext.setStroke(polygonFillColor);
-                fillPolygon(resultPoints, graphicsContext);
+                fillPolygon(resultPoints, originalVectors, graphicsContext, zBuffer);
             }
 
             if (drawPolygonMesh) {
@@ -53,20 +57,30 @@ public class RenderEngine {
         }
     }
 
-    private static void fillPolygon(final List<Vector2f> resultPoints, final GraphicsContext graphicsContext) {
+    private static void fillPolygon(final List<Vector2f> resultPoints,
+                                    final List<Vector3f> originalVectors,
+                                    final GraphicsContext graphicsContext,
+                                    double[][] zBuffer) {
         for (int i = 1; i < resultPoints.size(); i++) {
-            Vector2f v1 = resultPoints.get(i);
+            Vector2f v2f1 = resultPoints.get(i);
+            Vector3f v3f1 = originalVectors.get(i);
             for (int j = i; j > 0; j--) {
-                Vector2f v2 = resultPoints.get(j - 1);
-                if (v1.getY() < v2.getY()) {
-                    resultPoints.set(j, v2);
-                    resultPoints.set(j - 1, v1);
+                Vector2f v2f2 = resultPoints.get(j - 1);
+                Vector3f v3f2 = originalVectors.get(j - 1);
+                if (v2f1.getY() < v2f2.getY()) {
+                    resultPoints.set(j, v2f2);
+                    resultPoints.set(j - 1, v2f1);
+                    originalVectors.set(j, v3f2);
+                    originalVectors.set(j - 1, v3f1);
                 }
             }
         }
         final Vector2f p1 = resultPoints.get(0);
         final Vector2f p2 = resultPoints.get(1);
         final Vector2f p3 = resultPoints.get(2);
+        final Vector3f o1 = originalVectors.get(0);
+        final Vector3f o2 = originalVectors.get(1);
+        final Vector3f o3 = originalVectors.get(2);
         final double dx12;
         final double dx23;
         final double dx13;
@@ -96,9 +110,22 @@ public class RenderEngine {
         }
         double leftX = p1.getX();
         double rightX = leftX;
-        for (double i = p1.getY(); i < p2.getY(); i++) {
+        for (double i = p1.getY(); i <= p2.getY(); i++) {
             for (double j = leftX; j < rightX; j++) {
                 graphicsContext.strokeLine(j, i, j, i);
+                /*
+                double s = (p2.getY() - p3.getY()) * (p1.getX() - p3.getX()) +
+                        (p3.getX() - p2.getX()) * (p1.getY() - p3.getY());
+
+                double u = ((p2.getY() - p3.getY()) * (j - p3.getX()) + (p3.getX() - p2.getX()) * (i - p3.getY())) / s;
+                double v = ((p3.getY() - p1.getY()) * (j - p3.getX()) + (p1.getX() - p3.getX()) * (i - p3.getY())) / s;
+                double w = 1 - u - v;
+                double z = u * o1.getZ() + v * o2.getZ() + w * o3.getZ();
+                if (z > zBuffer[(int) j][(int) i]) {
+                    graphicsContext.strokeLine(j, i, j, i);
+                    zBuffer[(int) j][(int) i] = z;
+                }
+                 */
             }
             leftX += leftDx;
             rightX += rightDx;
@@ -112,9 +139,22 @@ public class RenderEngine {
         }
         leftX = p3.getX();
         rightX = leftX;
-        for (double i = p3.getY(); i > p2.getY(); i--) {
+        for (double i = p3.getY(); i >= p2.getY(); i--) {
             for (double j = leftX; j < rightX; j++) {
                 graphicsContext.strokeLine(j, i, j, i);
+                /*
+                double s = (p2.getY() - p3.getY()) * (p1.getX() - p3.getX()) +
+                        (p3.getX() - p2.getX()) * (p1.getY() - p3.getY());
+
+                double u = ((p2.getY() - p3.getY()) * (j - p3.getX()) + (p3.getX() - p2.getX()) * (i - p3.getY())) / s;
+                double v = ((p3.getY() - p1.getY()) * (j - p3.getX()) + (p1.getX() - p3.getX()) * (i - p3.getY())) / s;
+                double w = 1 - u - v;
+                double z = u * o1.getZ() + v * o2.getZ() + w * o3.getZ();
+                if (z > zBuffer[(int) j][(int) i]) {
+                    graphicsContext.strokeLine(j, i, j, i);
+                    zBuffer[(int) j][(int) i] = z;
+                }
+                 */
             }
             leftX -= leftDx;
             rightX -= rightDx;
