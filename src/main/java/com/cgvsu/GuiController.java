@@ -45,7 +45,7 @@ import static com.cgvsu.render_engine.GraphicConveyor.*;
 
 public class GuiController {
 
-    final private float TRANSLATION = 1.5F;
+    final private float TRANSLATION = 1.5F ;
 
     @FXML
     private AnchorPane anchorPane;
@@ -468,61 +468,3 @@ public class GuiController {
     }
 
 }
-  /*  TranslateTransition transitionRightUpSide = new TranslateTransition();
-    TranslateTransition transitionRightDownSide = new TranslateTransition();
-    TranslateTransition transitionLeftSide = new TranslateTransition();
-       transitionLeftSide.setNode(activeModels);
-               transitionRightUpSide.setNode(modelTrans);
-               transitionRightDownSide.setNode(renderingModels);
-               transitionRightUpSide.setByX(270);
-               transitionRightDownSide.setByX(270);
-               transitionLeftSide.setByX(-230);
-               transitionLeftSide.play();
-               transitionRightUpSide.play();
-               transitionRightDownSide.play();
-               anchorPane.setOnMouseMoved(new EventHandler<MouseEvent>() {
-@Override
-public void handle(MouseEvent mouseEvent) {
-        double rightBorder = activeModels.getLayoutX();
-        double posRightBorder = activeModels.getLocalToParentTransform().getTx();
-        double leftUpBorder = modelTrans.getLayoutX() + 250;
-        double posLeftUpBorder = modelTrans.getLocalToParentTransform().getTx();
-        double leftDownBorder = renderingModels.getLayoutX() + 250;
-        double posLeftDownBorder = renderingModels.getLocalToParentTransform().getTx();
-        if (posLeftUpBorder == modelTrans.getLayoutX() || posLeftUpBorder == modelTrans.getLayoutX() + 270) {
-        if (modelIsSelected && !onActionParams && mouseEvent.getX() > leftUpBorder && mouseEvent.getX() < leftUpBorder + 17 && mouseEvent.getY() < 565) {
-        transitionRightUpSide.setByX(-270);
-        transitionRightUpSide.play();
-        onActionParams = true;
-        disable(false);
-        } else if (onActionParams && (mouseEvent.getX() < leftUpBorder - 250 || mouseEvent.getY() > 565)) {
-        transitionRightUpSide.setByX(270);
-        transitionRightUpSide.play();
-        onActionParams = false;
-        disable(true);
-        }
-        }
-        if (posLeftDownBorder == renderingModels.getLayoutX() || posLeftDownBorder == renderingModels.getLayoutX() + 270) {
-        if (modelIsSelected && !onActionModes && mouseEvent.getX() > leftDownBorder && mouseEvent.getX() < leftDownBorder + 17 && mouseEvent.getY() < 720 && mouseEvent.getY() > 568) {
-        transitionRightDownSide.setByX(-270);
-        transitionRightDownSide.play();
-        onActionModes = true;
-        } else if (onActionParams && (mouseEvent.getX() < leftDownBorder - 250 || mouseEvent.getY() < 568)) {
-        transitionRightDownSide.setByX(270);
-        transitionRightDownSide.play();
-        onActionModes = false;
-        }
-        }
-        if (posRightBorder == activeModels.getLayoutX() || posRightBorder == activeModels.getLayoutX() - 230) {
-        if (modelIsSelected && !onActionList && mouseEvent.getX() > rightBorder && mouseEvent.getX() < rightBorder + 5 && mouseEvent.getY() > 32 && mouseEvent.getY() < 330) {
-        transitionLeftSide.setByX(230);
-        transitionLeftSide.play();
-        onActionList = true;
-        } else if (onActionList && (mouseEvent.getX() > rightBorder + 225 || mouseEvent.getY() > 330 || mouseEvent.getY() <= 32)) {
-        transitionLeftSide.setByX(-230);
-        transitionLeftSide.play();
-        onActionList = false;
-        }
-        }
-        }
-        });*/
