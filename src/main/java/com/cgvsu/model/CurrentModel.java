@@ -1,6 +1,12 @@
 package com.cgvsu.model;
 
+import com.cgvsu.math.Matrix4f;
 import com.cgvsu.math.Vector3f;
+import com.cgvsu.math.Vector4f;
+
+import java.util.ArrayList;
+
+import static com.cgvsu.render_engine.GraphicConveyor.rotateScaleTranslate;
 
 public class CurrentModel extends Model{
     private Vector3f rotateV;
@@ -28,6 +34,22 @@ public class CurrentModel extends Model{
         translateV = this.translateV;
     }
 
+    public Matrix4f getModelMatrix(){
+        return rotateScaleTranslate(rotateV, scaleV, translateV);
+    }
+
+    public ArrayList<Vector3f> modifiedVertecies (){
+        ArrayList<Vector3f> newVertecies = new ArrayList<>();
+        for (int i = 0; i < super.getVertices().size(); i++) {
+            Vector4f vertexVecmath = new Vector4f(super.getVertices().get(i).getX(),super.getVertices().get(i).getY(), super.getVertices().get(i).getZ(), 1);
+            Vector4f multipliedVector = Matrix4f.multiplierVector(getModelMatrix(), vertexVecmath);
+            newVertecies.add(new Vector3f(
+                    multipliedVector.getX() / multipliedVector.getW(),
+                    multipliedVector.getY() / multipliedVector.getW(),
+                    multipliedVector.getZ() / multipliedVector.getW()));
+        }
+        return newVertecies;
+    }
     public Model toMesh(){
         return new Model(super.getVertices(), super.getTextureVertices(), super.getNormals(), super.getPolygons());
     }
