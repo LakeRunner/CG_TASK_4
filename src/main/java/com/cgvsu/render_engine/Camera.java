@@ -40,7 +40,7 @@ public class Camera {
     }
 
     public void moveTarget(final Vector3f translation) {
-        target = Vector3f.addition(target, target);
+        target = Vector3f.addition(target, translation);
     }
 
     Matrix4f getViewMatrix() {
