@@ -286,9 +286,13 @@ public class GuiController {
                 scene.getLoadedModels().get(scene.currentModel).setScaleV(new Vector3f(Double.parseDouble(scaleX.getText()), Double.parseDouble(scaleY.getText()), Double.parseDouble(scaleZ.getText())));
                 scene.getLoadedModels().get(scene.currentModel).setTranslateV(new Vector3f(-Double.parseDouble(translateX.getText()), Double.parseDouble(translateY.getText()), Double.parseDouble(translateZ.getText())));
                 if (scene.getLoadedModels().get(scene.currentModel) != null) {
-                    RenderEngine.render(canvas.getGraphicsContext2D(), scene.getCamera(), scene.getLoadedModels().get(scene.currentModel), (int) width, (int) height,
-                            scene.getLoadedModels().get(scene.currentModel).getRotateV(), scene.getLoadedModels().get(scene.currentModel).getScaleV(), scene.getLoadedModels().get(scene.currentModel).getTranslateV(), meshColor, drawPolygonMesh.isSelected(),
-                            drawTextures.isSelected(), drawLighting.isSelected(), polygonFillColor.getValue(), zBuffer);
+                    RenderEngine.render(canvas.getGraphicsContext2D(), scene.getCamera(),
+                            scene.getLoadedModels().get(scene.currentModel), (int) width, (int) height,
+                            scene.getLoadedModels().get(scene.currentModel).getRotateV(),
+                            scene.getLoadedModels().get(scene.currentModel).getScaleV(),
+                            scene.getLoadedModels().get(scene.currentModel).getTranslateV(),
+                            meshColor, drawPolygonMesh.isSelected(), drawTextures.isSelected(),
+                            drawLighting.isSelected(), polygonFillColor.getValue());
                 }
             }
         });

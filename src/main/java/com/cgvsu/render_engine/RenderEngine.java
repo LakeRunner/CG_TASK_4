@@ -16,9 +16,13 @@ public class RenderEngine {
     public static void render(final GraphicsContext graphicsContext, final Camera camera, final CurrentModel model,
                               final int width, final int height, final Vector3f rotateV, final Vector3f scaleV,
                               final Vector3f translateV, final Color meshColor, final boolean drawPolygonMesh,
-                              final boolean drawTextures, final boolean drawLighting, final Color polygonFillColor,
-                              final double[][] zBuffer) {
-
+                              final boolean drawTextures, final boolean drawLighting, final Color polygonFillColor) {
+        double[][] zBuffer = new double[width][height];
+        for (int i = 0; i < zBuffer.length; i++) {
+            for (int j = 0; j < zBuffer[0].length; j++) {
+                zBuffer[i][j] = Double.POSITIVE_INFINITY;
+            }
+        }
         Matrix4f modelMatrix = rotateScaleTranslate(rotateV, scaleV, translateV);
         Matrix4f viewMatrix = camera.getViewMatrix();
         Matrix4f projectionMatrix = camera.getProjectionMatrix();
@@ -52,7 +56,8 @@ public class RenderEngine {
 
             if (drawPolygonMesh) {
                 graphicsContext.setStroke(meshColor);
-                drawPolygon(resultPoints, graphicsContext);
+                graphicsContext.setLineWidth(1.3);
+                strokePolygon(resultPoints, originalVectors, graphicsContext, zBuffer);
             }
         }
     }
@@ -61,114 +66,58 @@ public class RenderEngine {
                                     final List<Vector3f> originalVectors,
                                     final GraphicsContext graphicsContext,
                                     double[][] zBuffer) {
-        for (int i = 1; i < resultPoints.size(); i++) {
-            Vector2f v2f1 = resultPoints.get(i);
-            Vector3f v3f1 = originalVectors.get(i);
-            for (int j = i; j > 0; j--) {
-                Vector2f v2f2 = resultPoints.get(j - 1);
-                Vector3f v3f2 = originalVectors.get(j - 1);
-                if (v2f1.getY() < v2f2.getY()) {
-                    resultPoints.set(j, v2f2);
-                    resultPoints.set(j - 1, v2f1);
-                    originalVectors.set(j, v3f2);
-                    originalVectors.set(j - 1, v3f1);
-                }
-            }
-        }
         final Vector2f p1 = resultPoints.get(0);
         final Vector2f p2 = resultPoints.get(1);
         final Vector2f p3 = resultPoints.get(2);
         final Vector3f o1 = originalVectors.get(0);
         final Vector3f o2 = originalVectors.get(1);
         final Vector3f o3 = originalVectors.get(2);
-        final double dx12;
-        final double dx23;
-        final double dx13;
-        if (Math.abs(p1.getY() - p2.getY()) > 1e-17) {
-            dx12 = (p2.getX() - p1.getX()) / (p2.getY() - p1.getY());
-        } else {
-            dx12 = 0;
-        }
-        if (Math.abs(p2.getY() - p3.getY()) > 1e-17) {
-            dx23 = (p3.getX() - p2.getX()) / (p3.getY() - p2.getY());
-        } else {
-            dx23 = 0;
-        }
-        if (Math.abs(p1.getY() - p3.getY()) > 1e-17) {
-            dx13 = (p3.getX() - p1.getX()) / (p3.getY() - p1.getY());
-        } else {
-            dx13 = 0;
-        }
-        double leftDx;
-        double rightDx;
-        if (dx12 < dx13) {
-            leftDx = dx12;
-            rightDx = dx13;
-        } else {
-            leftDx = dx13;
-            rightDx = dx12;
-        }
-        double leftX = p1.getX();
-        double rightX = leftX;
-        for (double i = p1.getY(); i <= p2.getY(); i++) {
-            for (double j = leftX; j < rightX; j++) {
-                graphicsContext.strokeLine(j, i, j, i);
-                /*
-                double s = (p2.getY() - p3.getY()) * (p1.getX() - p3.getX()) +
-                        (p3.getX() - p2.getX()) * (p1.getY() - p3.getY());
-
-                double u = ((p2.getY() - p3.getY()) * (j - p3.getX()) + (p3.getX() - p2.getX()) * (i - p3.getY())) / s;
-                double v = ((p3.getY() - p1.getY()) * (j - p3.getX()) + (p1.getX() - p3.getX()) * (i - p3.getY())) / s;
-                double w = 1 - u - v;
-                double z = u * o1.getZ() + v * o2.getZ() + w * o3.getZ();
-                if (z > zBuffer[(int) j][(int) i]) {
-                    graphicsContext.strokeLine(j, i, j, i);
-                    zBuffer[(int) j][(int) i] = z;
+        int minX = (int) Math.max(0, Math.min(p1.getX(), Math.min(p2.getX(), p3.getX())));
+        int maxX = (int) Math.min(zBuffer.length - 1, Math.max(p1.getX(), Math.max(p2.getX(), p3.getX())));
+        int minY = (int) Math.max(0, Math.min(p1.getY(), Math.min(p2.getY(), p3.getY())));
+        int maxY = (int) Math.min(zBuffer[0].length - 1, Math.max(p1.getY(), Math.max(p2.getY(), p3.getY())));
+        for (int y = minY; y <= maxY; y++) {
+            for (int x = minX; x <= maxX; x++) {
+                BarycentricCoordinates bc = new BarycentricCoordinates(p1, p2, p3, new Vector2f(x, y));
+                double z = bc.getU() * o1.getZ() + bc.getV() * o2.getZ() + bc.getW() * o3.getZ();
+                if (bc.belongsToTriangle() && z < zBuffer[x][y]) {
+                    graphicsContext.strokeLine(x, y, x, y);
+                    zBuffer[x][y] = z;
                 }
-                 */
             }
-            leftX += leftDx;
-            rightX += rightDx;
-        }
-        if (dx23 > dx13) {
-            leftDx = dx23;
-            rightDx = dx13;
-        } else {
-            leftDx = dx13;
-            rightDx = dx23;
-        }
-        leftX = p3.getX();
-        rightX = leftX;
-        for (double i = p3.getY(); i >= p2.getY(); i--) {
-            for (double j = leftX; j < rightX; j++) {
-                graphicsContext.strokeLine(j, i, j, i);
-                /*
-                double s = (p2.getY() - p3.getY()) * (p1.getX() - p3.getX()) +
-                        (p3.getX() - p2.getX()) * (p1.getY() - p3.getY());
-
-                double u = ((p2.getY() - p3.getY()) * (j - p3.getX()) + (p3.getX() - p2.getX()) * (i - p3.getY())) / s;
-                double v = ((p3.getY() - p1.getY()) * (j - p3.getX()) + (p1.getX() - p3.getX()) * (i - p3.getY())) / s;
-                double w = 1 - u - v;
-                double z = u * o1.getZ() + v * o2.getZ() + w * o3.getZ();
-                if (z > zBuffer[(int) j][(int) i]) {
-                    graphicsContext.strokeLine(j, i, j, i);
-                    zBuffer[(int) j][(int) i] = z;
-                }
-                 */
-            }
-            leftX -= leftDx;
-            rightX -= rightDx;
         }
     }
 
-    private static void drawPolygon(final List<Vector2f> resultPoints, final GraphicsContext graphicsContext) {
+    private static void strokePolygon(final List<Vector2f> resultPoints,
+                                      final List<Vector3f> originalVectors,
+                                      final GraphicsContext graphicsContext,
+                                      double[][] zBuffer) {
         for (int i = 0; i < resultPoints.size(); i++) {
             final int j = (i + 1) % 3;
-            graphicsContext.strokeLine(
-                    resultPoints.get(i).getX(),
-                    resultPoints.get(i).getY(),
-                    resultPoints.get(j).getX(),
-                    resultPoints.get(j).getY());
+            final int k = (j + 1) % 3;
+            Vector2f p1 = resultPoints.get(i);
+            Vector2f p2 = resultPoints.get(j);
+            Vector2f p3 = resultPoints.get(k);
+            Vector3f v1 = originalVectors.get(i);
+            Vector3f v2 = originalVectors.get(j);
+            Vector3f v3 = originalVectors.get(k);
+            double dx = p2.getX() - p1.getX();
+            double dy = p2.getY() - p1.getY();
+            double steps = Math.max(Math.abs(dx), Math.abs(dy));
+            double xStep = dx / steps;
+            double yStep = dy / steps;
+            double x1 = p1.getX();
+            double y1 = p1.getY();
+            for (double l = 0; l < steps; l += 1) {
+                int x = (int) (x1 + xStep * l);
+                int y = (int) (y1 + yStep * l);
+                boolean inArray = x >= 0 && y >= 0 && x < zBuffer.length && y < zBuffer[0].length;
+                BarycentricCoordinates bc = new BarycentricCoordinates(p1, p2, p3, new Vector2f(x, y));
+                double z = bc.getU() * v1.getZ() + bc.getV() * v2.getZ() + bc.getW() * v3.getZ();
+                if (inArray && z <= zBuffer[x][y]) {
+                    graphicsContext.strokeLine(x, y, x, y);
+                }
+            }
         }
     }
 }
