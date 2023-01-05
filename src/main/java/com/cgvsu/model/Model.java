@@ -12,7 +12,8 @@ public class Model {
     private ArrayList<Vector3f> normals;
     private ArrayList<Polygon> polygons;
 
-    public Model(final ArrayList<Vector3f> vertices, final ArrayList<Vector2f> textureVertices, final ArrayList<Vector3f> normals, final ArrayList<Polygon> polygons) {
+    public Model(final ArrayList<Vector3f> vertices, final ArrayList<Vector2f> textureVertices,
+                 final ArrayList<Vector3f> normals, final ArrayList<Polygon> polygons) {
         this.vertices = vertices;
         this.textureVertices = textureVertices;
         this.normals = normals;
@@ -27,12 +28,12 @@ public class Model {
     }
 
     public Model(Model model) {
-        if(model!=null) {
+        if (model != null) {
             vertices = model.vertices;
             textureVertices = model.textureVertices;
             normals = model.normals;
             polygons = model.polygons;
-        }else {
+        } else {
             vertices = new ArrayList<>();
             textureVertices = new ArrayList<>();
             normals = new ArrayList<>();
@@ -118,12 +119,16 @@ public class Model {
         ArrayList<Polygon> triangulatedPolygons = new ArrayList<>();
         for (Polygon polygon : polygons) {
             List<Integer> vertexIndices = polygon.getVertexIndices();
+            List<Integer> textureVertexIndices = polygon.getTextureVertexIndices();
             if (vertexIndices.size() > 3) {
                 for (int i = 2; i < vertexIndices.size(); i++) {
                     Polygon triangle = new Polygon();
                     triangle.getVertexIndices().add(vertexIndices.get(0));
                     triangle.getVertexIndices().add(vertexIndices.get(i - 1));
                     triangle.getVertexIndices().add(vertexIndices.get(i));
+                    triangle.getTextureVertexIndices().add(textureVertexIndices.get(0));
+                    triangle.getTextureVertexIndices().add(textureVertexIndices.get(i - 1));
+                    triangle.getTextureVertexIndices().add(textureVertexIndices.get(i));
                     triangulatedPolygons.add(triangle);
                 }
             } else {

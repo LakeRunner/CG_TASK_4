@@ -20,6 +20,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -31,12 +32,9 @@ import javafx.stage.FileChooser;
 import javafx.util.Duration;
 
 import java.awt.*;
-import java.awt.Button;
-import java.io.FileWriter;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.io.IOException;
-import java.io.File;
 import java.util.*;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -44,9 +42,6 @@ import java.util.regex.Pattern;
 
 import com.cgvsu.model.Model;
 import com.cgvsu.objreader.ObjReader;
-import com.cgvsu.render_engine.Camera;
-
-import static com.cgvsu.render_engine.GraphicConveyor.*;
 
 public class GuiController {
 
@@ -275,6 +270,14 @@ public class GuiController {
         timeline = new Timeline();
         timeline.setCycleCount(Animation.INDEFINITE);
 
+        Image img = null;
+        try {
+            img = new Image(new FileInputStream("C:\\Users\\TheNedis\\OneDrive\\Рабочий стол\\ObjModels\\Faceform\\AlexWithTexture\\NeutralWrapped.jpg"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        Image finalImg = img;
         KeyFrame frame = new KeyFrame(Duration.millis(15), event -> {
             if (TransformFieldsNotNull() && scene.currentModel != null) {
                 double width = canvas.getWidth();
@@ -292,7 +295,7 @@ public class GuiController {
                             scene.getLoadedModels().get(scene.currentModel).getScaleV(),
                             scene.getLoadedModels().get(scene.currentModel).getTranslateV(),
                             meshColor, drawPolygonMesh.isSelected(), drawTextures.isSelected(),
-                            drawLighting.isSelected(), polygonFillColor.getValue());
+                            drawLighting.isSelected(), polygonFillColor.getValue(), finalImg);
                 }
             }
         });
