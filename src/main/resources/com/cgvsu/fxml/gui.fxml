@@ -91,9 +91,9 @@
          <TextField fx:id="translateX" focusTraversable="false" layoutX="130.0" layoutY="456.0" prefHeight="26.0" prefWidth="100.0" text="0" />
          <TextField fx:id="translateY" focusTraversable="false" layoutX="130.0" layoutY="497.0" prefHeight="26.0" prefWidth="100.0" text="0" />
          <TextField fx:id="translateZ" focusTraversable="false" layoutX="130.0" layoutY="539.0" prefHeight="26.0" prefWidth="100.0" text="0" />
-         <Slider layoutX="130.0" layoutY="117.0" majorTickUnit="80.0" max="360.0" prefHeight="38.0" prefWidth="122.0" showTickLabels="true" showTickMarks="true" fx:id="xSlider" />
-         <Slider fx:id="ySlider" layoutX="130.0" layoutY="185.0" majorTickUnit="80.0" max="360.0" prefHeight="24.0" prefWidth="122.0" showTickLabels="true" showTickMarks="true" />
-         <Slider fx:id="zSlider" layoutX="130.0" layoutY="251.0" majorTickUnit="80.0" max="360.0" prefHeight="24.0" prefWidth="122.0" showTickLabels="true" showTickMarks="true" />
+         <Slider layoutX="130.0" layoutY="117.0" majorTickUnit="120.0" max="360.0" min="-360.0" prefHeight="38.0" prefWidth="122.0" showTickLabels="true" showTickMarks="true" fx:id="xSlider" />
+         <Slider fx:id="ySlider" layoutX="130.0" layoutY="185.0" majorTickUnit="120.0" max="360.0" min="-360.0" prefHeight="24.0" prefWidth="122.0" showTickLabels="true" showTickMarks="true" />
+         <Slider fx:id="zSlider" layoutX="130.0" layoutY="251.0" majorTickUnit="120.0" max="360.0" min="-360.0" prefHeight="24.0" prefWidth="122.0" showTickLabels="true" showTickMarks="true" />
          <Label layoutX="45.0" layoutY="54.0" prefHeight="38.0" prefWidth="82.0" text="Rotate:">
             <font>
                <Font size="15.0" />

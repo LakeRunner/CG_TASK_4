@@ -20,6 +20,8 @@ import javafx.event.ActionEvent;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
@@ -29,6 +31,7 @@ import javafx.stage.FileChooser;
 import javafx.util.Duration;
 
 import java.awt.*;
+import java.awt.Button;
 import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -36,6 +39,8 @@ import java.io.IOException;
 import java.io.File;
 import java.util.*;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.cgvsu.model.Model;
 import com.cgvsu.objreader.ObjReader;
@@ -126,6 +131,7 @@ public class GuiController {
     private Robot robot;
     private boolean modelIsSelected;
     private List<TextField> list;
+    private List <String> selectedModels = new ArrayList<>();
     private boolean onActionParams;
     private boolean onActionList;
     private boolean onActionModes;
@@ -140,7 +146,7 @@ public class GuiController {
                 zBuffer[i][j] = Double.NEGATIVE_INFINITY;
             }
         }
-
+        listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         scene.getLoadedModels().put("Mesh", new CurrentModel(mesh));
         scene.currentModel = "Mesh";
         list = getTextFields();
@@ -149,6 +155,10 @@ public class GuiController {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
                 String degrees = String.format(Locale.ENGLISH, "%(.2f", sliders.get(0).getValue());
+                if (degrees.contains("(")) {
+                    degrees = degrees.substring(1, degrees.length()-1);
+                    degrees = "-" + degrees;
+                }
                 list.get(0).setText(degrees);
             }
         });
@@ -156,6 +166,10 @@ public class GuiController {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
                 String degrees = String.format(Locale.ENGLISH, "%(.2f", sliders.get(1).getValue());
+                if (degrees.contains("(")) {
+                    degrees = degrees.substring(1, degrees.length()-1);
+                    degrees = "-" + degrees;
+                }
                 list.get(1).setText(degrees);
             }
         });
@@ -163,6 +177,10 @@ public class GuiController {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
                 String degrees = String.format(Locale.ENGLISH, "%(.2f", sliders.get(2).getValue());
+                if (degrees.contains("(")) {
+                    degrees = degrees.substring(1, degrees.length()-1);
+                    degrees = "-" + degrees;
+                }
                 list.get(2).setText(degrees);
             }
         });
@@ -258,7 +276,7 @@ public class GuiController {
         timeline.setCycleCount(Animation.INDEFINITE);
 
         KeyFrame frame = new KeyFrame(Duration.millis(15), event -> {
-            if (TransformFieldsNotNull()) {
+            if (TransformFieldsNotNull() && scene.currentModel != null) {
                 double width = canvas.getWidth();
                 double height = canvas.getHeight();
                 canvas.getGraphicsContext2D().clearRect(0, 0, width, height);
@@ -400,8 +418,10 @@ public class GuiController {
         zSlider.setDisable(disable);
     }
     public boolean TransformFieldsNotNull() {
+        String pattern = "^(-?\\d{1,3}(\\.\\d*))$";
         for (TextField field : list) {
-            if (field.getText().equals("")) {
+            Matcher matcher = Pattern.compile(pattern).matcher(field.getText());
+            if (!matcher.find()) {
                 return false;
             }
         }
@@ -421,12 +441,34 @@ public class GuiController {
         ySlider.setValue(scene.getLoadedModels().get(scene.currentModel).getRotateV().getY());
         zSlider.setValue(scene.getLoadedModels().get(scene.currentModel).getRotateV().getZ());
     }
-    public void modelSelected () throws IOException {
-        int index = listView.getSelectionModel().getSelectedIndex();
-        if (index != -1) {
-            String name = listView.getItems().get(index);
-            scene.currentModel = name;
-            cleanTransform();
+    public void modelSelected (MouseEvent event) throws IOException {
+        if (Objects.equals(event.getButton().toString(), "PRIMARY")) {
+            checkSelectedModels();
+            int index = listView.getSelectionModel().getSelectedIndex();
+            if (index != -1) {
+                String name = listView.getItems().get(index);
+                scene.currentModel = name;
+                cleanTransform();
+            }
+            anchorPane.setOnKeyPressed(new EventHandler<KeyEvent>() {
+                @Override
+                public void handle(KeyEvent event) {
+                    if (event.getCode() == KeyCode.DELETE) {
+                        for (String str : selectedModels) {
+                            listView.getItems().remove(str);
+                            scene.getLoadedModels().remove(str);
+                            scene.currentModel = listView.getItems().get(listView.getItems().size()-1);
+                        }
+                    }
+                }
+            });
+        }
+    }
+    public void checkSelectedModels () {
+        selectedModels = new ArrayList<>();
+        List<Integer> list = listView.getSelectionModel().getSelectedIndices();
+        for (Integer i : list) {
+            selectedModels.add(listView.getItems().get(i));
         }
     }
     public void darkTheme () {
