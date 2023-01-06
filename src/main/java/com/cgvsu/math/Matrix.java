@@ -33,8 +33,8 @@ public class Matrix {
         return matrix;
     }
 
-    public Matrix transpose(){
-        double[][] m = new double[3][3];
+    public static Matrix transpose(double[][] matrix, int n){
+        double[][] m = new double[n][n];
         for (int i = 0; i < matrix.length; i++) {
             for (int j = 0; j < matrix[0].length; j++) {
                 m[j][i] = matrix[i][j];
@@ -65,5 +65,55 @@ public class Matrix {
             }
         }
         return new Matrix(m);
+    }
+
+    public static Matrix inversion(double[][] matrixArray, int n) {
+        double temp;
+        float[][] E = new float[n][n];
+
+
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++) {
+                E[i][j] = 0f;
+
+                if (i == j)
+                    E[i][j] = 1f;
+            }
+
+        for (int k = 0; k < n; k++) {
+            temp = matrixArray[k][k];
+
+            for (int j = 0; j < n; j++) {
+                matrixArray[k][j] /= temp;
+                E[k][j] /= temp;
+            }
+
+            for (int i = k + 1; i < n; i++) {
+                temp = matrixArray[i][k];
+
+                for (int j = 0; j < n; j++) {
+                    matrixArray[i][j] -= matrixArray[k][j] * temp;
+                    E[i][j] -= E[k][j] * temp;
+                }
+            }
+        }
+
+        for (int k = n - 1; k > 0; k--) {
+            for (int i = k - 1; i >= 0; i--) {
+                temp = matrixArray[i][k];
+
+                for (int j = 0; j < n; j++) {
+                    matrixArray[i][j] -= matrixArray[k][j] * temp;
+                    E[i][j] -= E[k][j] * temp;
+                }
+            }
+        }
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                matrixArray[i][j] = E[i][j];
+            }
+        }
+        return new Matrix4f(matrixArray);
     }
 }
