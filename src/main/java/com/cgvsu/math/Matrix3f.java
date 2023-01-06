@@ -57,4 +57,12 @@ public class Matrix3f extends Matrix {
     public static Matrix3f getOneMatrix(){
         return new Matrix3f(Matrix.getOneMatrix(3).getMatrixArray());
     }
+
+    public Matrix3f transpose(){
+        return new Matrix3f(Matrix.transpose(super.getMatrixArray(), 3).getMatrixArray());
+    }
+
+    public Matrix3f inversion() {
+        return new Matrix3f(Matrix.inversion(super.getMatrixArray(), 3).getMatrixArray());
+    }
 }

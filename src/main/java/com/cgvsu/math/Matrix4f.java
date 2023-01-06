@@ -5,33 +5,33 @@ public class Matrix4f extends Matrix {
         super(matrix);
     }
 
-    public Matrix4f(double[] matrix, int num){
+    public Matrix4f(double[] matrix, int num) {
         super(matrix, num);
     }
 
-    public Matrix4f(){
+    public Matrix4f() {
         super(4);
     }
 
-    public Matrix4f(Matrix matrix){
+    public Matrix4f(Matrix matrix) {
         super(matrix);
     }
 
-    public static Matrix4f addition(Matrix4f m1, Matrix4f m2){
+    public static Matrix4f addition(Matrix4f m1, Matrix4f m2) {
         double[][] m = new double[4][4];
-        for(int i = 0; i < m1.getMatrixArray().length; i++){
-            for(int j = 0; j < m1.getMatrixArray()[0].length; j++){
-                m[i][j] =  m1.getMatrixArray()[i][j] + m2.getMatrixArray()[i][j];
+        for (int i = 0; i < m1.getMatrixArray().length; i++) {
+            for (int j = 0; j < m1.getMatrixArray()[0].length; j++) {
+                m[i][j] = m1.getMatrixArray()[i][j] + m2.getMatrixArray()[i][j];
             }
         }
         return new Matrix4f(m);
     }
 
-    public static Matrix4f subtraction(Matrix4f m1, Matrix4f m2 ){
+    public static Matrix4f subtraction(Matrix4f m1, Matrix4f m2) {
         double[][] m = new double[4][4];
-        for(int i = 0; i < m1.getMatrixArray().length; i++){
-            for(int j = 0; j < m1.getMatrixArray()[0].length; j++){
-                m[i][j] =  m1.getMatrixArray()[i][j] - m2.getMatrixArray()[i][j];
+        for (int i = 0; i < m1.getMatrixArray().length; i++) {
+            for (int j = 0; j < m1.getMatrixArray()[0].length; j++) {
+                m[i][j] = m1.getMatrixArray()[i][j] - m2.getMatrixArray()[i][j];
             }
         }
         return new Matrix4f(m);
@@ -59,7 +59,15 @@ public class Matrix4f extends Matrix {
         return new Matrix4f(m);
     }
 
-    public static Matrix4f getOneMatrix(){
+    public static Matrix4f getOneMatrix() {
         return new Matrix4f(Matrix.getOneMatrix(4).getMatrixArray());
+    }
+
+    public Matrix4f transpose() {
+        return new Matrix4f(Matrix.transpose(super.getMatrixArray(), 4).getMatrixArray());
+    }
+
+    public Matrix4f inversion() {
+        return new Matrix4f(Matrix.inversion(super.getMatrixArray(), 4).getMatrixArray());
     }
 }

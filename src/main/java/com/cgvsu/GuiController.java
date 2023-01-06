@@ -1,12 +1,10 @@
 package com.cgvsu;
 
-import com.cgvsu.math.Matrix4f;
-import com.cgvsu.math.Vector2f;
-import com.cgvsu.math.Vector3f;
-import com.cgvsu.math.Vector4f;
+import com.cgvsu.math.*;
 import com.cgvsu.model.CurrentModel;
 import com.cgvsu.model.Polygon;
 import com.cgvsu.objwriter.ObjWriter;
+import com.cgvsu.render_engine.GraphicConveyor;
 import com.cgvsu.render_engine.RenderEngine;
 import javafx.animation.TranslateTransition;
 import javafx.beans.value.ChangeListener;
@@ -37,6 +35,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.List;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -132,6 +131,8 @@ public class GuiController {
     private boolean onActionModes;
     private Model mesh = null;
     private Scene scene = new Scene();
+    private double startX;
+    private double startY;
 
     @FXML
     private void initialize() {
@@ -251,15 +252,53 @@ public class GuiController {
             }
         });
 
-        /*anchorPane.setOnMouseClicked(new EventHandler<MouseEvent>() {
+        anchorPane.setOnMousePressed(new EventHandler<MouseEvent>() {
+            @Override public void handle(MouseEvent mouseEvent) {
+                startX = mouseEvent.getX();
+                startY = mouseEvent.getY();
+            }
+        });
+
+        anchorPane.setOnMouseDragged(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
                 double deltaX = mouseEvent.getX();
                 double deltaY = mouseEvent.getY();
-                double deltaZ = mouseEvent.getZ();
-                camera.setTarget(new Vector3f(50, 50, deltaZ));
+                double xAngle;
+                double yAngle;
+                //double x = ((deltaX*2)-(anchorPane.getWidth()-1))/(anchorPane.getWidth()-1);
+                //double y = -(((deltaY*2)-(anchorPane.getHeight() - 1))/(anchorPane.getHeight() - 1));
+                /*Vector3f first = new Vector3f(scene.getCamera().getPosition().getX() - scene.getCamera().getTarget().getX(), scene.getCamera().getPosition().getY() - scene.getCamera().getTarget().getY(), scene.getCamera().getPosition().getZ() - scene.getCamera().getTarget().getZ());
+                Vector3f second = new Vector3f(scene.getCamera().getPosition().getX() - x, scene.getCamera().getPosition().getY() - y, scene.getCamera().getPosition().getZ());
+                double cos = (Vector3f.dotProduct(first, second)/ (first.length() * second.length()));
+                double sin = Math.sqrt(1-(cos * cos));
+                текущий з домножаем на лук эт поворачиваем с помощью матрицы поворота с помощью обратного лук эт в мировое простаранство и з прибавляем к позиции*/
+                Vector3f curZ = Vector3f.subtraction(scene.getCamera().getTarget(), scene.getCamera().getPosition());
+                Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
+                //double angle = Math.toDegrees(Math.atan2(y - startY, x - startX));
+                if(deltaX>startX){
+                    yAngle = 0.05;
+                }else if (deltaX<startX) {
+                    yAngle = -0.05;
+                }else {
+                    yAngle = 0;
+                }
+                if(deltaY>startY){
+                    xAngle = 0.05;
+                }else if (deltaY<startY)  {
+                    xAngle = -0.05;
+                }else {
+                    xAngle = 0;
+                }
+                Vector3f cameraTargetVis = GraphicConveyor.multiplierMatrixToVector(GraphicConveyor.rotate(new Vector3f(xAngle, yAngle, 0)), new Vector4f(oldCameraTargetVis.getX(), oldCameraTargetVis.getY(), oldCameraTargetVis.getZ(), 1));
+                Vector3f cameraTargetWorld = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix().inversion(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
+                scene.getCamera().setTarget(Vector3f.addition(cameraTargetWorld, scene.getCamera().getPosition()));
+                startY = deltaY;
+                startX = deltaX;
             }
-        });*/
+        });
+
+
 
         anchorPane.prefWidthProperty().addListener((ov, oldValue, newValue) -> canvas.setWidth(newValue.doubleValue()));
         anchorPane.prefHeightProperty().addListener((ov, oldValue, newValue) -> canvas.setHeight(newValue.doubleValue()));
