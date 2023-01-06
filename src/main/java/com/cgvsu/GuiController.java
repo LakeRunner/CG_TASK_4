@@ -272,7 +272,7 @@ public class GuiController {
 
         Image img = null;
         try {
-            img = new Image(new FileInputStream("C:\\Users\\TheNedis\\OneDrive\\Рабочий стол\\ObjModels\\Faceform\\AlexWithTexture\\NeutralWrapped.jpg"));
+            img = new Image(new FileInputStream("src\\main\\resources\\textures\\NeutralWrapped.jpg"));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
