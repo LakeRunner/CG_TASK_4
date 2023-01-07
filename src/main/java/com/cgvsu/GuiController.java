@@ -2,7 +2,6 @@ package com.cgvsu;
 
 import com.cgvsu.math.*;
 import com.cgvsu.model.CurrentModel;
-import com.cgvsu.model.Polygon;
 import com.cgvsu.objwriter.ObjWriter;
 import com.cgvsu.render_engine.GraphicConveyor;
 import com.cgvsu.render_engine.RenderEngine;
@@ -35,7 +34,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.List;
-import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -126,7 +124,7 @@ public class GuiController {
     private boolean modelIsSelected;
     private List<TextField> list;
     private List <String> selectedModels = new ArrayList<>();
-    private boolean onActionParams;
+    private boolean onActionTransform;
     private boolean onActionList;
     private boolean onActionModes;
     private Model mesh = null;
@@ -187,58 +185,58 @@ public class GuiController {
         transitionLeftSide.setNode(activeModels);
         transitionRightUpSide.setNode(modelTrans);
         transitionRightDownSide.setNode(renderingModels);
-        transitionRightUpSide.setByX(270);
-        transitionRightDownSide.setByX(270);
-        transitionLeftSide.setByX(-230);
+        transitionRightUpSide.setByX(260);
+        transitionRightDownSide.setByX(260);
+        transitionLeftSide.setByX(-235);
         transitionLeftSide.play();
         transitionRightUpSide.play();
         transitionRightDownSide.play();
         anchorPane.setOnMouseMoved(new EventHandler<MouseEvent>() {
             @Override
-        public void handle(MouseEvent mouseEvent) {
-            double rightBorder = activeModels.getLayoutX();
-            double posRightBorder = activeModels.getLocalToParentTransform().getTx();
-            double leftUpBorder = modelTrans.getLayoutX() + 260;
-            double posLeftUpBorder = modelTrans.getLocalToParentTransform().getTx();
-            double leftDownBorder = renderingModels.getLayoutX() + 260;
-            double posLeftDownBorder = renderingModels.getLocalToParentTransform().getTx();
-            if (posLeftUpBorder == modelTrans.getLayoutX() || posLeftUpBorder == modelTrans.getLayoutX() + 270) {
-                if (modelIsSelected && !onActionParams && mouseEvent.getX() > leftUpBorder && mouseEvent.getX() < leftUpBorder + 7 && mouseEvent.getY() < 565) {
-                    transitionRightUpSide.setByX(-270);
-                    transitionRightUpSide.play();
-                    onActionParams = true;
-                    disable(false);
-                } else if (onActionParams && (mouseEvent.getX() < leftUpBorder - 260 || mouseEvent.getY() > 565)) {
-                    transitionRightUpSide.setByX(270);
-                    transitionRightUpSide.play();
-                    onActionParams = false;
-                    disable(true);
+            public void handle(MouseEvent mouseEvent) {
+                double rightBorder = activeModels.getLayoutX();
+                double posRightBorder = activeModels.getLocalToParentTransform().getTx();
+                double leftUpBorder = modelTrans.getLayoutX() + 250;
+                double posLeftUpBorder = modelTrans.getLocalToParentTransform().getTx();
+                double leftDownBorder = renderingModels.getLayoutX() + 250;
+                double posLeftDownBorder = renderingModels.getLocalToParentTransform().getTx();
+                if (posLeftUpBorder == modelTrans.getLayoutX() || posLeftUpBorder == modelTrans.getLayoutX() + 260) {
+                    if (modelIsSelected && !onActionTransform && mouseEvent.getX() > leftUpBorder && mouseEvent.getX() < leftUpBorder + 5 && mouseEvent.getY() < 565) {
+                        transitionRightUpSide.setByX(-260);
+                        transitionRightUpSide.play();
+                        onActionTransform = true;
+                        disable(false);
+                    } else if (onActionTransform && (mouseEvent.getX() < leftUpBorder - 250 || mouseEvent.getY() > 565)) {
+                        transitionRightUpSide.setByX(260);
+                        transitionRightUpSide.play();
+                        onActionTransform = false;
+                        disable(true);
+                    }
+                }
+                if (posLeftDownBorder == renderingModels.getLayoutX() || posLeftDownBorder == renderingModels.getLayoutX() + 260) {
+                    if (modelIsSelected && !onActionModes && mouseEvent.getX() > leftDownBorder && mouseEvent.getX() < leftDownBorder + 5 && mouseEvent.getY() < 720 && mouseEvent.getY() > 568) {
+                        transitionRightDownSide.setByX(-260);
+                        transitionRightDownSide.play();
+                        onActionModes = true;
+                    } else if (onActionModes && (mouseEvent.getX() < leftDownBorder - 250 || mouseEvent.getY() < 568)) {
+                        transitionRightDownSide.setByX(260);
+                        transitionRightDownSide.play();
+                        onActionModes = false;
+                    }
+                }
+                if (posRightBorder == activeModels.getLayoutX() || posRightBorder == activeModels.getLayoutX() - 235) {
+                    if (modelIsSelected && !onActionList && mouseEvent.getX() > rightBorder && mouseEvent.getX() < rightBorder + 5 && mouseEvent.getY() > 28 && mouseEvent.getY() < 340) {
+                        transitionLeftSide.setByX(235);
+                        transitionLeftSide.play();
+                        onActionList = true;
+                    } else if (onActionList && (mouseEvent.getX() > rightBorder + 235 || mouseEvent.getY() > 340 || mouseEvent.getY() <= 28)) {
+                        transitionLeftSide.setByX(-235);
+                        transitionLeftSide.play();
+                        onActionList = false;
+                    }
                 }
             }
-            if (posLeftDownBorder == renderingModels.getLayoutX() || posLeftDownBorder == renderingModels.getLayoutX() + 270) {
-                if (modelIsSelected && !onActionModes && mouseEvent.getX() > leftDownBorder && mouseEvent.getX() < leftDownBorder + 7 && mouseEvent.getY() < 720 && mouseEvent.getY() > 568) {
-                    transitionRightDownSide.setByX(-270);
-                    transitionRightDownSide.play();
-                    onActionModes = true;
-                } else if (onActionModes && (mouseEvent.getX() < leftDownBorder - 260 || mouseEvent.getY() < 568)) {
-                    transitionRightDownSide.setByX(270);
-                    transitionRightDownSide.play();
-                    onActionModes = false;
-                }
-            }
-            if (posRightBorder == activeModels.getLayoutX() || posRightBorder == activeModels.getLayoutX() - 230) {
-                if (modelIsSelected && !onActionList && mouseEvent.getX() > rightBorder && mouseEvent.getX() < rightBorder + 5 && mouseEvent.getY() > 32 && mouseEvent.getY() < 330) {
-                    transitionLeftSide.setByX(230);
-                    transitionLeftSide.play();
-                    onActionList = true;
-                } else if (onActionList && (mouseEvent.getX() > rightBorder + 225 || mouseEvent.getY() > 330 || mouseEvent.getY() <= 32)) {
-                    transitionLeftSide.setByX(-230);
-                    transitionLeftSide.play();
-                    onActionList = false;
-                }
-            }
-        }
-    });
+        });
 
         anchorPane.setOnScroll(new EventHandler<>() {
             @Override
@@ -262,39 +260,41 @@ public class GuiController {
         anchorPane.setOnMouseDragged(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
-                double deltaX = mouseEvent.getX();
-                double deltaY = mouseEvent.getY();
-                double xAngle;
-                double yAngle;
-                //double x = ((deltaX*2)-(anchorPane.getWidth()-1))/(anchorPane.getWidth()-1);
-                //double y = -(((deltaY*2)-(anchorPane.getHeight() - 1))/(anchorPane.getHeight() - 1));
+                if (!onActionModes && !onActionList && !onActionTransform) {
+                    double deltaX = mouseEvent.getX();
+                    double deltaY = mouseEvent.getY();
+                    double xAngle;
+                    double yAngle;
+                    //double x = ((deltaX*2)-(anchorPane.getWidth()-1))/(anchorPane.getWidth()-1);
+                    //double y = -(((deltaY*2)-(anchorPane.getHeight() - 1))/(anchorPane.getHeight() - 1));
                 /*Vector3f first = new Vector3f(scene.getCamera().getPosition().getX() - scene.getCamera().getTarget().getX(), scene.getCamera().getPosition().getY() - scene.getCamera().getTarget().getY(), scene.getCamera().getPosition().getZ() - scene.getCamera().getTarget().getZ());
                 Vector3f second = new Vector3f(scene.getCamera().getPosition().getX() - x, scene.getCamera().getPosition().getY() - y, scene.getCamera().getPosition().getZ());
                 double cos = (Vector3f.dotProduct(first, second)/ (first.length() * second.length()));
                 double sin = Math.sqrt(1-(cos * cos));
                 текущий з домножаем на лук эт поворачиваем с помощью матрицы поворота с помощью обратного лук эт в мировое простаранство и з прибавляем к позиции*/
-                Vector3f curZ = Vector3f.subtraction(scene.getCamera().getTarget(), scene.getCamera().getPosition());
-                Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
-                //double angle = Math.toDegrees(Math.atan2(y - startY, x - startX));
-                if(deltaX>startX){
-                    yAngle = 0.05;
-                }else if (deltaX<startX) {
-                    yAngle = -0.05;
-                }else {
-                    yAngle = 0;
+                    Vector3f curZ = Vector3f.subtraction(scene.getCamera().getTarget(), scene.getCamera().getPosition());
+                    Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
+                    //double angle = Math.toDegrees(Math.atan2(y - startY, x - startX));
+                    if (deltaX > startX) {
+                        yAngle = 0.05;
+                    } else if (deltaX < startX) {
+                        yAngle = -0.05;
+                    } else {
+                        yAngle = 0;
+                    }
+                    if (deltaY > startY) {
+                        xAngle = 0.05;
+                    } else if (deltaY < startY) {
+                        xAngle = -0.05;
+                    } else {
+                        xAngle = 0;
+                    }
+                    Vector3f cameraTargetVis = GraphicConveyor.multiplierMatrixToVector(GraphicConveyor.rotate(new Vector3f(xAngle, yAngle, 0)), new Vector4f(oldCameraTargetVis.getX(), oldCameraTargetVis.getY(), oldCameraTargetVis.getZ(), 1));
+                    Vector3f cameraTargetWorld = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix().inversion(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
+                    scene.getCamera().setTarget(Vector3f.addition(cameraTargetWorld, scene.getCamera().getPosition()));
+                    startY = deltaY;
+                    startX = deltaX;
                 }
-                if(deltaY>startY){
-                    xAngle = 0.05;
-                }else if (deltaY<startY)  {
-                    xAngle = -0.05;
-                }else {
-                    xAngle = 0;
-                }
-                Vector3f cameraTargetVis = GraphicConveyor.multiplierMatrixToVector(GraphicConveyor.rotate(new Vector3f(xAngle, yAngle, 0)), new Vector4f(oldCameraTargetVis.getX(), oldCameraTargetVis.getY(), oldCameraTargetVis.getZ(), 1));
-                Vector3f cameraTargetWorld = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix().inversion(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
-                scene.getCamera().setTarget(Vector3f.addition(cameraTargetWorld, scene.getCamera().getPosition()));
-                startY = deltaY;
-                startX = deltaX;
             }
         });
 
