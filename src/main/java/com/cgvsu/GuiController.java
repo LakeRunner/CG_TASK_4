@@ -40,9 +40,11 @@ import java.util.regex.Pattern;
 import com.cgvsu.model.Model;
 import com.cgvsu.objreader.ObjReader;
 
+import static com.cgvsu.render_engine.GraphicConveyor.rotateScaleTranslate;
+
 public class GuiController {
 
-    final private float TRANSLATION = 1.5F ;
+    private float TRANSLATION = 1.5F ;
 
     @FXML
     private AnchorPane anchorPane;
@@ -128,6 +130,9 @@ public class GuiController {
     @FXML
     private ColorPicker polygonFillColor;
 
+    @FXML
+    private Slider rotateSpeed;
+
     private Timeline timeline;
     private Robot robot;
     private boolean modelIsSelected;
@@ -143,6 +148,11 @@ public class GuiController {
     private Scene scene = new Scene();
     private double startX;
     private double startY;
+    private double endX;
+    private double endY;
+    private double xAngle;
+    private double yAngle;
+    private double angleListenerValue = 0.05;
 
     @FXML
     private void initialize() {
@@ -195,19 +205,26 @@ public class GuiController {
         transSlider.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
-
+                TRANSLATION = (float) (transSlider.getValue()*4);
             }
         });
         fovSlider.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
-
+                scene.getCamera().setFov((float) (fovSlider.getValue()*2));
             }
         });
         aspectSlider.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
+                scene.getCamera().setAspectRatio((float) (aspectSlider.getValue()*20));
+            }
+        });
 
+        rotateSpeed.valueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
+                angleListenerValue = rotateSpeed.getValue();
             }
         });
         TranslateTransition transitionRightUpSide = new TranslateTransition();
@@ -308,47 +325,48 @@ public class GuiController {
         anchorPane.setOnMouseDragged(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
-                if (!onActionModes && !onActionListModels && !onActionTransform) {
-                    startX = anchorPane.getWidth()/2;
-                    startY = anchorPane.getHeight()/2;
-                    double endX = mouseEvent.getX();
-                    double endY = mouseEvent.getY();
-                    double xAngle;
-                    double yAngle;
-                    //double x = ((endX*2)-(anchorPane.getWidth()-1))/(anchorPane.getWidth()-1);
-                    //double y = -(((endY*2)-(anchorPane.getHeight() - 1))/(anchorPane.getHeight() - 1));
+                endX = mouseEvent.getX();
+                endY = mouseEvent.getY();
+                // startX = anchorPane.getWidth() / 2;
+                //startY = anchorPane.getHeight() / 2;
+                //double x = ((endX*2)-(anchorPane.getWidth()-1))/(anchorPane.getWidth()-1);
+                //double y = -(((endY*2)-(anchorPane.getHeight() - 1))/(anchorPane.getHeight() - 1));
                 /*Vector3f first = new Vector3f(scene.getCamera().getPosition().getX() - scene.getCamera().getTarget().getX(), scene.getCamera().getPosition().getY() - scene.getCamera().getTarget().getY(), scene.getCamera().getPosition().getZ() - scene.getCamera().getTarget().getZ());
                 Vector3f second = new Vector3f(scene.getCamera().getPosition().getX() - x, scene.getCamera().getPosition().getY() - y, scene.getCamera().getPosition().getZ());
                 double cos = (Vector3f.dotProduct(first, second)/ (first.length() * second.length()));
                 double sin = Math.sqrt(1-(cos * cos));
                 текущий з домножаем на лук эт поворачиваем с помощью матрицы поворота с помощью обратного лук эт в мировое простаранство и з прибавляем к позиции*/
+                //oldCameraTargetVis.normalize();
+                //double angle = Math.toDegrees(Math.atan2(y - startY, x - startX));
+                //double deltaX = (endX - startX)/anchorPane.getWidth();
+                //double deltaY = (endY - startY)/anchorPane.getHeight();
+                //xAngle = deltaX * 0.1;
+                //yAngle = deltaY * 0.1;
+                // Vector3f cameraTargetVis = GraphicConveyor.multiplierMatrixToVector(GraphicConveyor.rotate(new Vector3f(yAngle, xAngle, 0)), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
+                //Vector3f cameraTargetCam = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
+                //Vector3f cameraTargetWindow = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getProjectionMatrix(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
+                if (!onActionModes && !onActionListModels && !onActionTransform) {
                     Vector3f curZ = Vector3f.subtraction(scene.getCamera().getTarget(), scene.getCamera().getPosition());
                     Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
-                    //oldCameraTargetVis.normalize();
-                    //double angle = Math.toDegrees(Math.atan2(y - startY, x - startX));
-                    double deltaX = (endX - startX)/anchorPane.getWidth();
-                    double deltaY = (endY - startY)/anchorPane.getHeight();
-                    xAngle = deltaX * 0.1;
-                    yAngle = deltaY * 0.1;
-                    /*if (endX > startX) {
-                        yAngle = 0.05;
+                    if (endX > startX) {
+                        yAngle = angleListenerValue;
                     } else if (endX < startX) {
-                        yAngle = -0.05;
+                        yAngle = -angleListenerValue;
                     } else {
                         yAngle = 0;
                     }
                     if (endY > startY) {
-                        xAngle = 0.05;
+                        xAngle = angleListenerValue;
                     } else if (endY < startY) {
-                        xAngle = -0.05;
+                        xAngle = -angleListenerValue;
                     } else {
                         xAngle = 0;
-                    }*/
-                    Vector3f cameraTargetVis = GraphicConveyor.multiplierMatrixToVector(GraphicConveyor.rotate(new Vector3f(yAngle, xAngle, 0)), new Vector4f(oldCameraTargetVis.getX(), oldCameraTargetVis.getY(), oldCameraTargetVis.getZ(), 1));
+                    }
+                    Vector3f cameraTargetVis = GraphicConveyor.multiplierMatrixToVector(GraphicConveyor.rotate(new Vector3f(xAngle, yAngle, 0)), new Vector4f(oldCameraTargetVis.getX(), oldCameraTargetVis.getY(), oldCameraTargetVis.getZ(), 1));
                     Vector3f cameraTargetWorld = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix().inversion(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
                     scene.getCamera().setTarget(Vector3f.addition(cameraTargetWorld, scene.getCamera().getPosition()));
-                    //startY = endY;
-                    //startX = endX;
+                    startY = endY;
+                    startX = endX;
                 }
             }
         });
@@ -379,7 +397,8 @@ public class GuiController {
             canvas.getGraphicsContext2D().clearRect(0, 0, width, height);
             Color meshColor = dark.isSelected() ? Color.LIGHTGRAY : Color.BLACK;
             if (TransformFieldsNotNull() && scene.currentModel != null) {
-                scene.getCamera().setAspectRatio((float) (width / height));
+                //scene.getCamera().setAspectRatio((float) (width / height));
+                scene.getCamera().setAspectRatio((float) ((width / height) * aspectSlider.getValue()*2));
                 scene.getLoadedModels().get(scene.currentModel).setRotateV(new Vector3f(Double.parseDouble(rotateX.getText()), Double.parseDouble(rotateY.getText()), Double.parseDouble(rotateZ.getText())));
                 scene.getLoadedModels().get(scene.currentModel).setScaleV(new Vector3f(Double.parseDouble(scaleX.getText()), Double.parseDouble(scaleY.getText()), Double.parseDouble(scaleZ.getText())));
                 scene.getLoadedModels().get(scene.currentModel).setTranslateV(new Vector3f(-Double.parseDouble(translateX.getText()), Double.parseDouble(translateY.getText()), Double.parseDouble(translateZ.getText())));
@@ -395,7 +414,34 @@ public class GuiController {
             }
         });
 
+        /*KeyFrame frame2 = new KeyFrame(Duration.millis(1), event -> {
+            if (!onActionModes && !onActionListModels && !onActionTransform) {
+                Vector3f curZ = Vector3f.subtraction(scene.getCamera().getTarget(), scene.getCamera().getPosition());
+                Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
+                if (endX > startX) {
+                    yAngle = angleListenerValue;
+                } else if (endX < startX) {
+                    yAngle = -angleListenerValue;
+                } else {
+                    yAngle = 0;
+                }
+                if (endY > startY) {
+                    xAngle = angleListenerValue;
+                } else if (endY < startY) {
+                    xAngle = -angleListenerValue;
+                } else {
+                    xAngle = 0;
+                }
+                Vector3f cameraTargetVis = GraphicConveyor.multiplierMatrixToVector(GraphicConveyor.rotate(new Vector3f(xAngle, yAngle, 0)), new Vector4f(oldCameraTargetVis.getX(), oldCameraTargetVis.getY(), oldCameraTargetVis.getZ(), 1));
+                Vector3f cameraTargetWorld = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix().inversion(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
+                scene.getCamera().setTarget(Vector3f.addition(cameraTargetWorld, scene.getCamera().getPosition()));
+                startY = endY;
+                startX = endX;
+            }
+        });*/
+
         timeline.getKeyFrames().add(frame);
+       // timeline.getKeyFrames().add(frame2);
         timeline.play();
     }
 
