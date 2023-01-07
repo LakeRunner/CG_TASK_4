@@ -40,8 +40,6 @@ import java.util.regex.Pattern;
 import com.cgvsu.model.Model;
 import com.cgvsu.objreader.ObjReader;
 
-import static com.cgvsu.render_engine.GraphicConveyor.rotateScaleTranslate;
-
 public class GuiController {
 
     private float TRANSLATION = 1.5F ;
@@ -60,8 +58,10 @@ public class GuiController {
 
     @FXML
     private AnchorPane loadedModels;
+
     @FXML
     private AnchorPane loadedTextures;
+
     @FXML
     private Canvas canvas;
 
@@ -105,10 +105,13 @@ public class GuiController {
 
     @FXML
     private Slider zSlider;
+
     @FXML
     private Slider transSlider;
+
     @FXML
     private Slider fovSlider;
+
     @FXML
     private Slider aspectSlider;
 
@@ -126,6 +129,9 @@ public class GuiController {
 
     @FXML
     private CheckBox drawLighting;
+
+    @FXML
+    private CheckBox drawFilling;
 
     @FXML
     private ColorPicker polygonFillColor;
@@ -156,12 +162,6 @@ public class GuiController {
 
     @FXML
     private void initialize() {
-        double[][] zBuffer = new double[(int) canvas.getWidth()][(int) canvas.getHeight()];
-        for (int i = 0; i < zBuffer.length; i++) {
-            for (int j = 0; j < zBuffer[0].length; j++) {
-                zBuffer[i][j] = Double.NEGATIVE_INFINITY;
-            }
-        }
         listViewModels.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         scene.getLoadedModels().put("Mesh", new LodedModel(mesh));
         scene.currentModel = "Mesh";
@@ -409,7 +409,8 @@ public class GuiController {
                             scene.getLoadedModels().get(scene.currentModel).getScaleV(),
                             scene.getLoadedModels().get(scene.currentModel).getTranslateV(),
                             meshColor, drawPolygonMesh.isSelected(), drawTextures.isSelected(),
-                            drawLighting.isSelected(), polygonFillColor.getValue(), finalImg);
+                            drawLighting.isSelected(), drawFilling.isSelected(), polygonFillColor.getValue(),
+                            finalImg);
                 }
             }
         });

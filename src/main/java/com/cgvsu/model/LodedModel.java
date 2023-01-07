@@ -39,8 +39,8 @@ public class LodedModel extends Model{
         return rotateScaleTranslate(rotateV, scaleV, translateV);
     }
 
-    public List<Vector3f> modifiedVertecies (){
-        List<Vector3f> newVertecies = new ArrayList<>();
+    public ArrayList<Vector3f> modifiedVertecies (){
+        ArrayList<Vector3f> newVertecies = new ArrayList<>();
         for (int i = 0; i < super.getVertices().size(); i++) {
             Vector4f vertexVecmath = new Vector4f(super.getVertices().get(i).getX(),super.getVertices().get(i).getY(), super.getVertices().get(i).getZ(), 1);
             Vector4f multipliedVector = Matrix4f.multiplierVector(getModelMatrix(), vertexVecmath);
