@@ -48,7 +48,7 @@ public class GuiController {
     private AnchorPane anchorPane;
 
     @FXML
-    private AnchorPane selection;
+    private AnchorPane saveSelection;
 
     @FXML
     private AnchorPane modelTrans;
@@ -57,13 +57,16 @@ public class GuiController {
     private AnchorPane renderingModels;
 
     @FXML
-    private AnchorPane activeModels;
-
+    private AnchorPane loadedModels;
+    @FXML
+    private AnchorPane loadedTextures;
     @FXML
     private Canvas canvas;
 
     @FXML
-    private ListView<String> listView;
+    private ListView<String> listViewModels;
+    @FXML
+    private ListView<String> listViewTextures;
 
     @FXML
     private TextField rotateX;
@@ -100,6 +103,12 @@ public class GuiController {
 
     @FXML
     private Slider zSlider;
+    @FXML
+    private Slider transSlider;
+    @FXML
+    private Slider fovSlider;
+    @FXML
+    private Slider aspectSlider;
 
     @FXML
     private RadioMenuItem light;
@@ -124,9 +133,12 @@ public class GuiController {
     private boolean modelIsSelected;
     private List<TextField> list;
     private List <String> selectedModels = new ArrayList<>();
+    private List <String> selectedTextures = new ArrayList<>();
+    private Map<String, Image> textures = new HashMap<>();
     private boolean onActionTransform;
-    private boolean onActionList;
+    private boolean onActionListModels;
     private boolean onActionModes;
+    private boolean onActionListTextures;
     private Model mesh = null;
     private Scene scene = new Scene();
     private double startX;
@@ -140,7 +152,7 @@ public class GuiController {
                 zBuffer[i][j] = Double.NEGATIVE_INFINITY;
             }
         }
-        listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        listViewModels.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         scene.getLoadedModels().put("Mesh", new CurrentModel(mesh));
         scene.currentModel = "Mesh";
         list = getTextFields();
@@ -179,34 +191,59 @@ public class GuiController {
             }
         });
 
+
+        transSlider.valueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
+
+            }
+        });
+        fovSlider.valueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
+
+            }
+        });
+        aspectSlider.valueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
+
+            }
+        });
         TranslateTransition transitionRightUpSide = new TranslateTransition();
         TranslateTransition transitionRightDownSide = new TranslateTransition();
-        TranslateTransition transitionLeftSide = new TranslateTransition();
-        transitionLeftSide.setNode(activeModels);
+        TranslateTransition transitionLeftUpSide = new TranslateTransition();
+        TranslateTransition transitionLeftDownSide = new TranslateTransition();
+        transitionLeftUpSide.setNode(loadedModels);
         transitionRightUpSide.setNode(modelTrans);
         transitionRightDownSide.setNode(renderingModels);
+        transitionLeftDownSide.setNode(loadedTextures);
         transitionRightUpSide.setByX(260);
         transitionRightDownSide.setByX(260);
-        transitionLeftSide.setByX(-235);
-        transitionLeftSide.play();
+        transitionLeftUpSide.setByX(-235);
+        transitionLeftDownSide.setByX(-235);
+        transitionLeftUpSide.play();
         transitionRightUpSide.play();
         transitionRightDownSide.play();
+        transitionLeftDownSide.play();
         anchorPane.setOnMouseMoved(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
-                double rightBorder = activeModels.getLayoutX();
-                double posRightBorder = activeModels.getLocalToParentTransform().getTx();
-                double leftUpBorder = modelTrans.getLayoutX() + 250;
+                double rightUpBorder = loadedModels.getLayoutX();
+                double posRightUpBorder = loadedModels.getLocalToParentTransform().getTx();
+                double rightDownBorder = loadedTextures.getLayoutX();
+                double posRightDownBorder = loadedTextures.getLocalToParentTransform().getTx();
+                double leftUpBorder = modelTrans.getLayoutX();
                 double posLeftUpBorder = modelTrans.getLocalToParentTransform().getTx();
-                double leftDownBorder = renderingModels.getLayoutX() + 250;
+                double leftDownBorder = renderingModels.getLayoutX();
                 double posLeftDownBorder = renderingModels.getLocalToParentTransform().getTx();
                 if (posLeftUpBorder == modelTrans.getLayoutX() || posLeftUpBorder == modelTrans.getLayoutX() + 260) {
-                    if (modelIsSelected && !onActionTransform && mouseEvent.getX() > leftUpBorder && mouseEvent.getX() < leftUpBorder + 5 && mouseEvent.getY() < 565) {
+                    if (modelIsSelected && !onActionTransform && mouseEvent.getX() > leftUpBorder + 260 && mouseEvent.getX() < leftUpBorder + 285 && mouseEvent.getY() < 520) {
                         transitionRightUpSide.setByX(-260);
                         transitionRightUpSide.play();
                         onActionTransform = true;
                         disable(false);
-                    } else if (onActionTransform && (mouseEvent.getX() < leftUpBorder - 250 || mouseEvent.getY() > 565)) {
+                    } else if (onActionTransform && (mouseEvent.getX() < leftUpBorder || mouseEvent.getY() > 520)) {
                         transitionRightUpSide.setByX(260);
                         transitionRightUpSide.play();
                         onActionTransform = false;
@@ -214,25 +251,36 @@ public class GuiController {
                     }
                 }
                 if (posLeftDownBorder == renderingModels.getLayoutX() || posLeftDownBorder == renderingModels.getLayoutX() + 260) {
-                    if (modelIsSelected && !onActionModes && mouseEvent.getX() > leftDownBorder && mouseEvent.getX() < leftDownBorder + 5 && mouseEvent.getY() < 720 && mouseEvent.getY() > 568) {
+                    if (modelIsSelected && !onActionModes && mouseEvent.getX() > leftDownBorder + 260 && mouseEvent.getX() < leftDownBorder + 285 && mouseEvent.getY() > 525) {
                         transitionRightDownSide.setByX(-260);
                         transitionRightDownSide.play();
                         onActionModes = true;
-                    } else if (onActionModes && (mouseEvent.getX() < leftDownBorder - 250 || mouseEvent.getY() < 568)) {
+                    } else if (onActionModes && (mouseEvent.getX() < leftDownBorder|| mouseEvent.getY() < 525)) {
                         transitionRightDownSide.setByX(260);
                         transitionRightDownSide.play();
                         onActionModes = false;
                     }
                 }
-                if (posRightBorder == activeModels.getLayoutX() || posRightBorder == activeModels.getLayoutX() - 235) {
-                    if (modelIsSelected && !onActionList && mouseEvent.getX() > rightBorder && mouseEvent.getX() < rightBorder + 5 && mouseEvent.getY() > 28 && mouseEvent.getY() < 340) {
-                        transitionLeftSide.setByX(235);
-                        transitionLeftSide.play();
-                        onActionList = true;
-                    } else if (onActionList && (mouseEvent.getX() > rightBorder + 235 || mouseEvent.getY() > 340 || mouseEvent.getY() <= 28)) {
-                        transitionLeftSide.setByX(-235);
-                        transitionLeftSide.play();
-                        onActionList = false;
+                if (posRightUpBorder == loadedModels.getLayoutX() || posRightUpBorder == loadedModels.getLayoutX() - 235) {
+                    if (modelIsSelected && !onActionListModels && mouseEvent.getX() > rightUpBorder && mouseEvent.getX() < rightUpBorder + 25 && mouseEvent.getY() > 30 && mouseEvent.getY() < 375) {
+                        transitionLeftUpSide.setByX(235);
+                        transitionLeftUpSide.play();
+                        onActionListModels = true;
+                    } else if (onActionListModels && (mouseEvent.getX() > rightUpBorder + 235 || mouseEvent.getY() > 375 || mouseEvent.getY() < 30)) {
+                        transitionLeftUpSide.setByX(-235);
+                        transitionLeftUpSide.play();
+                        onActionListModels = false;
+                    }
+                }
+                if (posRightDownBorder == loadedTextures.getLayoutX() || posRightDownBorder == loadedTextures.getLayoutX() - 235) {
+                    if (modelIsSelected && !onActionListTextures && mouseEvent.getX() > rightDownBorder && mouseEvent.getX() < rightDownBorder + 25 && mouseEvent.getY() > 385) {
+                        transitionLeftDownSide.setByX(235);
+                        transitionLeftDownSide.play();
+                        onActionListTextures = true;
+                    } else if (onActionListTextures && (mouseEvent.getX() > rightDownBorder + 235 || mouseEvent.getY() < 385)) {
+                        transitionLeftDownSide.setByX(-235);
+                        transitionLeftDownSide.play();
+                        onActionListTextures = false;
                     }
                 }
             }
@@ -260,7 +308,7 @@ public class GuiController {
         anchorPane.setOnMouseDragged(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
-                if (!onActionModes && !onActionList && !onActionTransform) {
+                if (!onActionModes && !onActionListModels && !onActionTransform) {
                     startX = anchorPane.getWidth()/2;
                     startY = anchorPane.getHeight()/2;
                     double endX = mouseEvent.getX();
@@ -310,9 +358,10 @@ public class GuiController {
         anchorPane.prefWidthProperty().addListener((ov, oldValue, newValue) -> canvas.setWidth(newValue.doubleValue()));
         anchorPane.prefHeightProperty().addListener((ov, oldValue, newValue) -> canvas.setHeight(newValue.doubleValue()));
         modelTrans.setStyle("-fx-background-color: lightgray;");
-        activeModels.setStyle("-fx-background-color: lightgray;");
-        selection.setStyle("-fx-background-color: lightgray;");
+        loadedModels.setStyle("-fx-background-color: lightgray;");
+        saveSelection.setStyle("-fx-background-color: lightgray;");
         renderingModels.setStyle("-fx-background-color: lightgray;");
+        loadedTextures.setStyle("-fx-background-color: lightgray;");
         timeline = new Timeline();
         timeline.setCycleCount(Animation.INDEFINITE);
 
@@ -325,11 +374,11 @@ public class GuiController {
 
         Image finalImg = img;
         KeyFrame frame = new KeyFrame(Duration.millis(15), event -> {
+            double width = canvas.getWidth();
+            double height = canvas.getHeight();
+            canvas.getGraphicsContext2D().clearRect(0, 0, width, height);
+            Color meshColor = dark.isSelected() ? Color.LIGHTGRAY : Color.BLACK;
             if (TransformFieldsNotNull() && scene.currentModel != null) {
-                double width = canvas.getWidth();
-                double height = canvas.getHeight();
-                canvas.getGraphicsContext2D().clearRect(0, 0, width, height);
-                Color meshColor = dark.isSelected() ? Color.LIGHTGRAY : Color.BLACK;
                 scene.getCamera().setAspectRatio((float) (width / height));
                 scene.getLoadedModels().get(scene.currentModel).setRotateV(new Vector3f(Double.parseDouble(rotateX.getText()), Double.parseDouble(rotateY.getText()), Double.parseDouble(rotateZ.getText())));
                 scene.getLoadedModels().get(scene.currentModel).setScaleV(new Vector3f(Double.parseDouble(scaleX.getText()), Double.parseDouble(scaleY.getText()), Double.parseDouble(scaleZ.getText())));
@@ -368,10 +417,12 @@ public class GuiController {
             Model model = ObjReader.read(fileContent, true);
             model.triangulate();
             //model.calcNormals();
-            scene.getLoadedModels().put(file.getName(), new CurrentModel(model));
-            scene.currentModel = file.getName();
-            listView.getItems().add(scene.currentModel);
-            listView.scrollTo(scene.currentModel);
+            String name = file.getName();
+            name = checkContainsModel(name);
+            scene.getLoadedModels().put(name, new CurrentModel(model));
+            scene.currentModel = name;
+            listViewModels.getItems().add(scene.currentModel);
+            listViewModels.scrollTo(scene.currentModel);
             cleanTransform();
             // todo: обработка ошибок
         } catch (IOException exception) {
@@ -394,7 +445,7 @@ public class GuiController {
             writer.close();
         } catch (IOException ignored) {
         }
-        selection.setVisible(false);
+        saveSelection.setVisible(false);
     }
 
     public void onOpenSaveWithChangesModel() {
@@ -412,7 +463,21 @@ public class GuiController {
             writer.close();
         } catch (IOException ignored) {
         }
-        selection.setVisible(false);
+        saveSelection.setVisible(false);
+    }
+    public void onOpenLoadTextureMenuItemClick () {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Texture (*.jpg)", "*.jpg"));
+        fileChooser.setTitle("Load Texture");
+
+        File file = fileChooser.showOpenDialog((Stage) canvas.getScene().getWindow());
+        if (file == null) {
+            return;
+        }
+        String name = file.getName();
+        name = checkContainsTexture(name);
+        textures.put(name, new Image(new File(file.getAbsolutePath()).toURI().toString()));
+        listViewTextures.getItems().add(name);
     }
 
     @FXML
@@ -494,12 +559,36 @@ public class GuiController {
         ySlider.setValue(scene.getLoadedModels().get(scene.currentModel).getRotateV().getY());
         zSlider.setValue(scene.getLoadedModels().get(scene.currentModel).getRotateV().getZ());
     }
+    public String checkContainsModel (String str) {
+        int count = 0;
+        for (String name : scene.getLoadedModels().keySet()) {
+            if (name.contains(str)) {
+                count++;
+            }
+        }
+        if (count > 0) {
+            str += "(" + count + ")";
+        }
+        return str;
+    }
+    public String checkContainsTexture (String str) {
+        int count = 0;
+        for (String name : textures.keySet()) {
+            if (name.contains(str)) {
+                count++;
+            }
+        }
+        if (count > 0) {
+            str += "(" + count + ")";
+        }
+        return str;
+    }
     public void modelSelected (MouseEvent event) throws IOException {
         if (Objects.equals(event.getButton().toString(), "PRIMARY")) {
             checkSelectedModels();
-            int index = listView.getSelectionModel().getSelectedIndex();
+            int index = listViewModels.getSelectionModel().getSelectedIndex();
             if (index != -1) {
-                String name = listView.getItems().get(index);
+                String name = listViewModels.getItems().get(index);
                 scene.currentModel = name;
                 cleanTransform();
             }
@@ -508,9 +597,10 @@ public class GuiController {
                 public void handle(KeyEvent event) {
                     if (event.getCode() == KeyCode.DELETE) {
                         for (String str : selectedModels) {
-                            listView.getItems().remove(str);
+                            listViewModels.getItems().remove(str);
                             scene.getLoadedModels().remove(str);
-                            scene.currentModel = listView.getItems().get(listView.getItems().size()-1);
+                            boolean flag = listViewModels.getItems().size() > 0;
+                            scene.currentModel = flag ? listViewModels.getItems().get(listViewModels.getItems().size()-1) : null;
                         }
                     }
                 }
@@ -519,9 +609,36 @@ public class GuiController {
     }
     public void checkSelectedModels () {
         selectedModels = new ArrayList<>();
-        List<Integer> list = listView.getSelectionModel().getSelectedIndices();
+        List<Integer> list = listViewModels.getSelectionModel().getSelectedIndices();
         for (Integer i : list) {
-            selectedModels.add(listView.getItems().get(i));
+            selectedModels.add(listViewModels.getItems().get(i));
+        }
+    }
+    public void textureSelected (MouseEvent event) throws IOException {
+        if (Objects.equals(event.getButton().toString(), "PRIMARY")) {
+            checkSelectedTextures();
+//            int index = listViewTextures.getSelectionModel().getSelectedIndex();
+//            if (index != -1) {
+//                String name = listViewTextures.getItems().get(index);
+//            }
+            anchorPane.setOnKeyPressed(new EventHandler<KeyEvent>() {
+                @Override
+                public void handle(KeyEvent event) {
+                    if (event.getCode() == KeyCode.DELETE) {
+                        for (String str : selectedTextures) {
+                            listViewTextures.getItems().remove(str);
+                            textures.remove(str);
+                        }
+                    }
+                }
+            });
+        }
+    }
+    public void checkSelectedTextures () {
+        selectedTextures = new ArrayList<>();
+        List<Integer> list = listViewTextures.getSelectionModel().getSelectedIndices();
+        for (Integer i : list) {
+            selectedTextures.add(listViewTextures.getItems().get(i));
         }
     }
     public void darkTheme () {
@@ -535,13 +652,20 @@ public class GuiController {
         dark.setSelected(false);
         anchorPane.setStyle("-fx-background-color: white;");
     }
-    public void saveSelection () {
+    public void openSaveSelection() {
         if (modelIsSelected) {
-            selection.setVisible(true);
+            saveSelection.setVisible(true);
         }
     }
     public void closeSaveSelection () {
-        selection.setVisible(false);
+        saveSelection.setVisible(false);
+    }
+    public static void exception(String text) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Reader Exception");
+        alert.setHeaderText(text);
+        alert.setContentText("Please fix the input file.");
+        alert.showAndWait();
     }
 
 }

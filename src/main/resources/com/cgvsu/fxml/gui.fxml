@@ -15,7 +15,9 @@
 <?import javafx.scene.input.KeyCodeCombination?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.paint.Color?>
+<?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
 <AnchorPane fx:id="anchorPane" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cgvsu.GuiController">
     <MenuBar>
@@ -25,7 +27,12 @@
                 <KeyCodeCombination alt="UP" code="F" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
             </accelerator>
             </MenuItem>
-         <MenuItem mnemonicParsing="false" onAction="#saveSelection" text="Save Model">
+         <MenuItem mnemonicParsing="false" onAction="#onOpenLoadTextureMenuItemClick" text="Load Texture">
+            <accelerator>
+               <KeyCodeCombination alt="UP" code="W" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+            </accelerator>
+         </MenuItem>
+         <MenuItem mnemonicParsing="false" onAction="#openSaveSelection" text="Save Model">
             <accelerator>
                <KeyCodeCombination alt="UP" code="D" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
             </accelerator></MenuItem>
@@ -63,96 +70,102 @@
             </MenuItem>
          <MenuItem mnemonicParsing="false" text="Translation">
             <graphic>
-               <Slider prefHeight="14.0" prefWidth="71.0" />
+               <Slider fx:id="transSlider" prefHeight="14.0" prefWidth="71.0" />
             </graphic>
          </MenuItem>
          <MenuItem mnemonicParsing="false" text="FOV">
             <graphic>
-               <Slider prefHeight="14.0" prefWidth="71.0" />
+               <Slider fx:id="fovSlider" prefHeight="14.0" prefWidth="71.0" />
             </graphic>
          </MenuItem>
          <MenuItem mnemonicParsing="false" text="Aspect ratio">
             <graphic>
-               <Slider prefHeight="14.0" prefWidth="71.0" />
+               <Slider fx:id="aspectSlider" prefHeight="14.0" prefWidth="71.0" />
             </graphic>
          </MenuItem>
         </Menu>
     </MenuBar>
 
-    <Canvas fx:id="canvas" focusTraversable="true" height="695.0" layoutY="27.0" width="1280.0" />
-   <AnchorPane fx:id="modelTrans" layoutX="1020.0" prefHeight="565.0" prefWidth="260.0">
+    <Canvas fx:id="canvas" focusTraversable="true" height="694.0" layoutX="-7.0" layoutY="26.0" width="1280.0" />
+   <AnchorPane fx:id="modelTrans" layoutX="995.0" prefHeight="520.0" prefWidth="285.0">
       <children>
-         <TextField fx:id="rotateX" focusTraversable="false" layoutX="130.0" layoutY="88.0" prefHeight="26.0" prefWidth="122.0" text="0" />
-         <TextField fx:id="rotateY" focusTraversable="false" layoutX="130.0" layoutY="156.0" prefHeight="26.0" prefWidth="122.0" text="0" />
-         <TextField fx:id="rotateZ" focusTraversable="false" layoutX="130.0" layoutY="222.0" prefHeight="26.0" prefWidth="122.0" text="0" />
-         <TextField fx:id="scaleX" focusTraversable="false" layoutX="130.0" layoutY="305.0" prefHeight="26.0" prefWidth="100.0" text="1" />
-         <TextField fx:id="scaleY" focusTraversable="false" layoutX="130.0" layoutY="345.0" prefHeight="26.0" prefWidth="100.0" text="1" />
-         <TextField fx:id="scaleZ" focusTraversable="false" layoutX="130.0" layoutY="385.0" prefHeight="26.0" prefWidth="100.0" text="1" />
-         <TextField fx:id="translateX" focusTraversable="false" layoutX="130.0" layoutY="456.0" prefHeight="26.0" prefWidth="100.0" text="0" />
-         <TextField fx:id="translateY" focusTraversable="false" layoutX="130.0" layoutY="497.0" prefHeight="26.0" prefWidth="100.0" text="0" />
-         <TextField fx:id="translateZ" focusTraversable="false" layoutX="130.0" layoutY="539.0" prefHeight="26.0" prefWidth="100.0" text="0" />
-         <Slider layoutX="130.0" layoutY="117.0" majorTickUnit="120.0" max="360.0" min="-360.0" prefHeight="38.0" prefWidth="122.0" showTickLabels="true" showTickMarks="true" fx:id="xSlider" />
-         <Slider fx:id="ySlider" layoutX="130.0" layoutY="185.0" majorTickUnit="120.0" max="360.0" min="-360.0" prefHeight="24.0" prefWidth="122.0" showTickLabels="true" showTickMarks="true" />
-         <Slider fx:id="zSlider" layoutX="130.0" layoutY="251.0" majorTickUnit="120.0" max="360.0" min="-360.0" prefHeight="24.0" prefWidth="122.0" showTickLabels="true" showTickMarks="true" />
-         <Label layoutX="45.0" layoutY="54.0" prefHeight="38.0" prefWidth="82.0" text="Rotate:">
+         <TextField fx:id="rotateX" focusTraversable="false" layoutX="130.0" layoutY="65.0" prefHeight="26.0" prefWidth="122.0" text="0" />
+         <TextField fx:id="rotateY" focusTraversable="false" layoutX="130.0" layoutY="130.0" prefHeight="26.0" prefWidth="122.0" text="0" />
+         <TextField fx:id="rotateZ" focusTraversable="false" layoutX="130.0" layoutY="195.0" prefHeight="26.0" prefWidth="122.0" text="0" />
+         <TextField fx:id="scaleX" focusTraversable="false" layoutX="130.0" layoutY="285.0" prefHeight="26.0" prefWidth="100.0" text="1" />
+         <TextField fx:id="scaleY" focusTraversable="false" layoutX="130.0" layoutY="320.0" prefHeight="26.0" prefWidth="100.0" text="1" />
+         <TextField fx:id="scaleZ" focusTraversable="false" layoutX="130.0" layoutY="355.0" prefHeight="26.0" prefWidth="100.0" text="1" />
+         <TextField fx:id="translateX" focusTraversable="false" layoutX="130.0" layoutY="415.0" prefHeight="26.0" prefWidth="100.0" text="0" />
+         <TextField fx:id="translateY" focusTraversable="false" layoutX="130.0" layoutY="450.0" prefHeight="26.0" prefWidth="100.0" text="0" />
+         <TextField fx:id="translateZ" focusTraversable="false" layoutX="130.0" layoutY="485.0" prefHeight="26.0" prefWidth="100.0" text="0" />
+         <Slider layoutX="130.0" layoutY="92.0" majorTickUnit="120.0" max="360.0" min="-360.0" prefHeight="38.0" prefWidth="122.0" showTickLabels="true" showTickMarks="true" fx:id="xSlider" />
+         <Slider fx:id="ySlider" layoutX="130.0" layoutY="157.0" majorTickUnit="120.0" max="360.0" min="-360.0" prefHeight="24.0" prefWidth="122.0" showTickLabels="true" showTickMarks="true" />
+         <Slider fx:id="zSlider" layoutX="130.0" layoutY="222.0" majorTickUnit="120.0" max="360.0" min="-360.0" prefHeight="24.0" prefWidth="122.0" showTickLabels="true" showTickMarks="true" />
+         <Label layoutX="45.0" layoutY="40.0" prefHeight="26.0" prefWidth="82.0" text="Rotate:">
             <font>
                <Font size="15.0" />
             </font></Label>
-         <Label layoutX="45.0" layoutY="284.0" prefHeight="22.0" prefWidth="47.0" text="Scale:">
+         <Label layoutX="45.0" layoutY="260.0" prefHeight="26.0" prefWidth="47.0" text="Scale:">
             <font>
                <Font size="15.0" />
             </font></Label>
-         <Label layoutX="45.0" layoutY="430.0" prefHeight="22.0" prefWidth="82.0" text="Translate:">
+         <Label layoutX="45.0" layoutY="390.0" prefHeight="26.0" prefWidth="82.0" text="Translate:">
             <font>
                <Font size="15.0" />
             </font></Label>
-         <Label layoutX="100.0" layoutY="453.0" prefHeight="32.0" prefWidth="32.0" text="X:">
+         <Label layoutX="100.0" layoutY="415.0" prefHeight="26.0" prefWidth="32.0" text="X:">
             <font>
                <Font size="15.0" />
             </font></Label>
-         <Label layoutX="100.0" layoutY="494.0" prefHeight="32.0" prefWidth="32.0" text="Y:">
+         <Label layoutX="100.0" layoutY="450.0" prefHeight="26.0" prefWidth="32.0" text="Y:">
             <font>
                <Font size="15.0" />
             </font></Label>
-         <Label layoutX="100.0" layoutY="536.0" prefHeight="32.0" prefWidth="32.0" text="Z:">
+         <Label layoutX="100.0" layoutY="485.0" prefHeight="26.0" prefWidth="32.0" text="Z:">
             <font>
                <Font size="15.0" />
             </font></Label>
-         <Label layoutX="100.0" layoutY="85.0" prefHeight="32.0" prefWidth="32.0" text="X:">
+         <Label layoutX="100.0" layoutY="65.0" prefHeight="26.0" prefWidth="32.0" text="X:">
             <font>
                <Font size="15.0" />
             </font>
          </Label>
-         <Label layoutX="100.0" layoutY="302.0" prefHeight="32.0" prefWidth="32.0" text="X:">
+         <Label layoutX="100.0" layoutY="285.0" prefHeight="26.0" prefWidth="32.0" text="X:">
             <font>
                <Font size="15.0" />
             </font>
          </Label>
-         <Label layoutX="100.0" layoutY="342.0" prefHeight="32.0" prefWidth="32.0" text="Y:">
+         <Label layoutX="100.0" layoutY="320.0" prefHeight="26.0" prefWidth="32.0" text="Y:">
             <font>
                <Font size="15.0" />
             </font>
          </Label>
-         <Label layoutX="100.0" layoutY="153.0" prefHeight="32.0" prefWidth="32.0" text="Y:">
+         <Label layoutX="100.0" layoutY="130.0" prefHeight="26.0" prefWidth="32.0" text="Y:">
             <font>
                <Font size="15.0" />
             </font>
          </Label>
-         <Label layoutX="100.0" layoutY="219.0" prefHeight="32.0" prefWidth="32.0" text="Z:">
+         <Label layoutX="100.0" layoutY="195.0" prefHeight="26.0" prefWidth="32.0" text="Z:">
             <font>
                <Font size="15.0" />
             </font>
          </Label>
-         <Label layoutX="100.0" layoutY="382.0" prefHeight="32.0" prefWidth="32.0" text="Z:">
+         <Label layoutX="100.0" layoutY="355.0" prefHeight="26.0" prefWidth="32.0" text="Z:">
             <font>
                <Font size="15.0" />
             </font>
          </Label>
-         <Label layoutX="100.0" layoutY="14.0" prefHeight="38.0" prefWidth="122.0" text="Model Transform">
+         <Label layoutX="100.0" layoutY="5.0" prefHeight="38.0" prefWidth="122.0" text="Model Transform">
             <font>
                <Font size="15.0" />
             </font>
          </Label>
+         <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#2197ff21" height="520.0" layoutX="1.0" stroke="BLACK" strokeType="INSIDE" width="25.0" />
+         <Text layoutX="8.0" layoutY="210.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Transform" wrappingWidth="7.200036621093716">
+            <font>
+               <Font size="15.0" />
+            </font>
+         </Text>
       </children>
    </AnchorPane>
    <MenuBar layoutX="156.0">
@@ -165,17 +178,23 @@
        </Menu>
      </menus>
    </MenuBar>
-   <AnchorPane fx:id="activeModels" layoutY="28.0" prefHeight="310.0" prefWidth="227.0">
+   <AnchorPane fx:id="loadedModels" layoutY="30.0" prefHeight="350.0" prefWidth="260.0">
       <children>
-         <ListView fx:id="listView" focusTraversable="false" layoutY="39.0" onMouseClicked="#modelSelected" prefHeight="280.0" prefWidth="235.0" />
-         <Label alignment="CENTER" layoutX="49.0" layoutY="2.0" prefHeight="32.0" prefWidth="129.0" text="Active models">
+         <ListView fx:id="listViewModels" focusTraversable="false" layoutY="40.0" onMouseClicked="#modelSelected" prefHeight="310.0" prefWidth="235.0" />
+         <Label alignment="CENTER" layoutX="49.0" layoutY="2.0" prefHeight="32.0" prefWidth="129.0" text="Loaded models">
             <font>
                <Font size="19.0" />
             </font>
          </Label>
+         <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#61d42421" height="350.0" layoutX="235.0" stroke="BLACK" strokeType="INSIDE" width="25.0" />
+         <Text layoutX="242.0" layoutY="118.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Models" wrappingWidth="7.200036621093659">
+            <font>
+               <Font size="15.0" />
+            </font>
+         </Text>
       </children>
    </AnchorPane>
-   <AnchorPane fx:id="selection" layoutX="414.0" layoutY="237.0" prefHeight="222.0" prefWidth="471.0" visible="false">
+   <AnchorPane fx:id="saveSelection" layoutX="414.0" layoutY="237.0" prefHeight="222.0" prefWidth="471.0" visible="false">
       <children>
          <Button layoutX="39.0" layoutY="150.0" mnemonicParsing="false" onAction="#onOpenSaveWithChangesModel" text="Save with changes">
             <font>
@@ -194,29 +213,56 @@
             </font></Label>
       </children>
    </AnchorPane>
-   <AnchorPane fx:id="renderingModels" layoutX="1020.0" layoutY="569.0" prefHeight="153.0" prefWidth="260.0">
+   <AnchorPane fx:id="renderingModels" layoutX="995.0" layoutY="525.0" prefHeight="195.0" prefWidth="285.0">
       <children>
-         <CheckBox fx:id="drawPolygonMesh" focusTraversable="false" layoutX="48.0" layoutY="30.0" mnemonicParsing="false" selected="true" text="Polygon mesh">
+         <CheckBox fx:id="drawPolygonMesh" focusTraversable="false" layoutX="48.0" layoutY="40.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="125.0" selected="true" text="Polygon mesh">
             <font>
                <Font size="15.0" />
             </font></CheckBox>
-         <CheckBox fx:id="drawLighting" focusTraversable="false" layoutX="48.0" layoutY="90.0" mnemonicParsing="false" text="Lighting">
+         <CheckBox fx:id="drawLighting" focusTraversable="false" layoutX="48.0" layoutY="130.0" mnemonicParsing="false" text="Lighting">
             <font>
                <Font size="15.0" />
             </font></CheckBox>
-         <CheckBox fx:id="drawTextures" focusTraversable="false" layoutX="47.0" layoutY="60.0" mnemonicParsing="false" text="Textures">
+         <CheckBox fx:id="drawTextures" focusTraversable="false" layoutX="48.0" layoutY="100.0" mnemonicParsing="false" text="Textures">
             <font>
                <Font size="15.0" />
             </font></CheckBox>
-         <Label focusTraversable="false" layoutX="89.0" prefHeight="26.0" prefWidth="122.0" text="Rendering modes:">
+         <Label focusTraversable="false" layoutX="89.0" layoutY="4.0" prefHeight="26.0" prefWidth="122.0" text="Rendering modes:">
             <font>
                <Font size="15.0" />
             </font>
          </Label>
-         <ColorPicker fx:id="polygonFillColor" focusTraversable="false" layoutX="47.0" layoutY="120.0">
+         <ColorPicker fx:id="polygonFillColor" focusTraversable="false" layoutX="47.0" layoutY="160.0">
             <value>
                <Color red="0.4000000059604645" green="0.501960813999176" blue="0.9019607901573181" />
             </value></ColorPicker>
+         <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#61d42440" height="196.0" layoutX="1.0" stroke="BLACK" strokeType="INSIDE" width="25.0" />
+         <Text layoutX="7.0" layoutY="66.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Modes" wrappingWidth="7.200036621093659">
+            <font>
+               <Font size="15.0" />
+            </font>
+         </Text>
+         <CheckBox layoutX="48.0" layoutY="70.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="125.0" text="Fill">
+            <font>
+               <Font size="15.0" />
+            </font>
+         </CheckBox>
+      </children>
+   </AnchorPane>
+   <AnchorPane fx:id="loadedTextures" layoutY="385.0" prefHeight="335.0" prefWidth="260.0">
+      <children>
+         <ListView fx:id="listViewTextures" layoutY="40.0" onMouseClicked="#textureSelected" prefHeight="295.0" prefWidth="235.0" />
+         <Label alignment="CENTER" layoutX="49.0" layoutY="2.0" prefHeight="32.0" prefWidth="137.0" text="Loaded textures">
+            <font>
+               <Font size="19.0" />
+            </font>
+         </Label>
+         <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#2197ff21" height="336.0" layoutX="235.0" stroke="BLACK" strokeType="INSIDE" width="25.0" />
+         <Text layoutX="242.0" layoutY="100.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Textures" wrappingWidth="7.200036621093659">
+            <font>
+               <Font size="15.0" />
+            </font>
+         </Text>
       </children>
    </AnchorPane>
 </AnchorPane>
