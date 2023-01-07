@@ -6,6 +6,7 @@ import com.cgvsu.model.Model;
 import com.cgvsu.model.Polygon;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ObjWriter {
     private static final String OBJ_VERTEX_TOKEN = "v";
@@ -13,8 +14,8 @@ public class ObjWriter {
     private static final String OBJ_NORMAL_TOKEN = "vn";
     private static final String OBJ_FACE_TOKEN = "f";
 
-    public static ArrayList<String> write(Model mesh) {
-        ArrayList<String> listFileContent = new ArrayList<>();
+    public static List<String> write(Model mesh) {
+        List<String> listFileContent = new ArrayList<>();
 
         writeVertices(mesh.getVertices(), listFileContent);
         listFileContent.add("# " + mesh.getVertices().size() + " vertices");
@@ -30,7 +31,7 @@ public class ObjWriter {
         return listFileContent;
     }
 
-    public static void writeVertices(final ArrayList<Vector3f> vertices, ArrayList<String> outListFileContent) { //try? exception?
+    public static void writeVertices(final List<Vector3f> vertices, List<String> outListFileContent) { //try? exception?
         for (Vector3f vertex : vertices) {
             outListFileContent.add(OBJ_VERTEX_TOKEN + " " + vertex.getX()
                     + " " + vertex.getY() + " " + vertex.getZ());
@@ -38,27 +39,27 @@ public class ObjWriter {
 
     }
 
-    public static void writeTextureVertices(final ArrayList<Vector2f> textureVertices, ArrayList<String> outListFileContent) {
+    public static void writeTextureVertices(final List<Vector2f> textureVertices, List<String> outListFileContent) {
         for (Vector2f textureVertex : textureVertices) {
             outListFileContent.add(OBJ_TEXTURE_TOKEN + " " + textureVertex.getX()
                     + " " + textureVertex.getY());
         }
     }
 
-    public static void writeNormals(final ArrayList<Vector3f> normals, ArrayList<String> outListFileContent) {
+    public static void writeNormals(final List<Vector3f> normals, List<String> outListFileContent) {
         for (Vector3f normal : normals) {
             outListFileContent.add(OBJ_NORMAL_TOKEN + " " + normal.getX()
                     + " " + normal.getY() + " " + normal.getZ());
         }
     }
 
-    public static void writePolygons(final ArrayList<Polygon> polygons, ArrayList<String> outListFileContent) {
+    public static void writePolygons(final List<Polygon> polygons, List<String> outListFileContent) {
         for (int i = 0; i < polygons.size(); i++) {
             writeOnePolygon(polygons, i, outListFileContent);
         }
     }
 
-    public static void writeOnePolygon(final ArrayList<Polygon> polygons, int i, ArrayList<String> outListFileContent) {
+    public static void writeOnePolygon(final List<Polygon> polygons, int i, List<String> outListFileContent) {
 
         // f 1/2/3 v/vt/vn
 

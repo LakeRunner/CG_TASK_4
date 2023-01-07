@@ -5,29 +5,30 @@ import com.cgvsu.math.Vector3f;
 import com.cgvsu.math.Vector4f;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.cgvsu.render_engine.GraphicConveyor.rotateScaleTranslate;
 
-public class CurrentModel extends Model{
+public class LodedModel extends Model{
     private Vector3f rotateV;
     private Vector3f scaleV;
     private Vector3f translateV;
 
-    public CurrentModel(Model model){
+    public LodedModel(Model model){
         super(model);
         rotateV = new Vector3f(0, 0, 0);
         scaleV = new Vector3f(1, 1, 1);
         translateV = new Vector3f(0, 0, 0);
     }
 
-    public CurrentModel(CurrentModel model){
+    public LodedModel(LodedModel model){
         super(model);
         rotateV = model.getRotateV();
         scaleV = model.getScaleV();
         translateV = model.getTranslateV();
     }
 
-    public CurrentModel(Model model, Vector3f rotateV, Vector3f scaleV, Vector3f translateV){
+    public LodedModel(Model model, Vector3f rotateV, Vector3f scaleV, Vector3f translateV){
         super(model);
         rotateV = this.rotateV;
         scaleV = this.scaleV;
@@ -38,8 +39,8 @@ public class CurrentModel extends Model{
         return rotateScaleTranslate(rotateV, scaleV, translateV);
     }
 
-    public ArrayList<Vector3f> modifiedVertecies (){
-        ArrayList<Vector3f> newVertecies = new ArrayList<>();
+    public List<Vector3f> modifiedVertecies (){
+        List<Vector3f> newVertecies = new ArrayList<>();
         for (int i = 0; i < super.getVertices().size(); i++) {
             Vector4f vertexVecmath = new Vector4f(super.getVertices().get(i).getX(),super.getVertices().get(i).getY(), super.getVertices().get(i).getZ(), 1);
             Vector4f multipliedVector = Matrix4f.multiplierVector(getModelMatrix(), vertexVecmath);

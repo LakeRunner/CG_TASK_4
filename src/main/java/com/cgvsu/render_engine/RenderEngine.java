@@ -1,12 +1,10 @@
 package com.cgvsu.render_engine;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.cgvsu.math.*;
-import com.cgvsu.model.CurrentModel;
+import com.cgvsu.model.LodedModel;
 import com.cgvsu.model.Polygon;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
@@ -16,7 +14,7 @@ import static com.cgvsu.render_engine.GraphicConveyor.*;
 
 public class RenderEngine {
 
-    public static void render(final GraphicsContext graphicsContext, final Camera camera, final CurrentModel model,
+    public static void render(final GraphicsContext graphicsContext, final Camera camera, final LodedModel model,
                               final int width, final int height, final Vector3f rotateV, final Vector3f scaleV,
                               final Vector3f translateV, final Color meshColor, final boolean drawPolygonMesh,
                               final boolean drawTextures, final boolean drawLighting, final Color polygonFillColor,

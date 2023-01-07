@@ -1,7 +1,7 @@
 package com.cgvsu;
 
 import com.cgvsu.math.*;
-import com.cgvsu.model.CurrentModel;
+import com.cgvsu.model.LodedModel;
 import com.cgvsu.objwriter.ObjWriter;
 import com.cgvsu.render_engine.GraphicConveyor;
 import com.cgvsu.render_engine.RenderEngine;
@@ -153,7 +153,7 @@ public class GuiController {
             }
         }
         listViewModels.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        scene.getLoadedModels().put("Mesh", new CurrentModel(mesh));
+        scene.getLoadedModels().put("Mesh", new LodedModel(mesh));
         scene.currentModel = "Mesh";
         list = getTextFields();
         List<Slider> sliders = Arrays.asList(xSlider, ySlider, zSlider);
@@ -419,7 +419,7 @@ public class GuiController {
             //model.calcNormals();
             String name = file.getName();
             name = checkContainsModel(name);
-            scene.getLoadedModels().put(name, new CurrentModel(model));
+            scene.getLoadedModels().put(name, new LodedModel(model));
             scene.currentModel = name;
             listViewModels.getItems().add(scene.currentModel);
             listViewModels.scrollTo(scene.currentModel);
@@ -436,7 +436,7 @@ public class GuiController {
         File file = fileChooser.showSaveDialog((Stage) canvas.getScene().getWindow());
 
         try {
-            ArrayList<String> fileContent2 = ObjWriter.write(scene.getLoadedModels().get(scene.currentModel));
+            List<String> fileContent2 = ObjWriter.write(scene.getLoadedModels().get(scene.currentModel));
             FileWriter writer = new FileWriter(file);
             for (String s : fileContent2) {
                 writer.write(s + "\n");
@@ -454,7 +454,7 @@ public class GuiController {
         File file = fileChooser.showSaveDialog((Stage) canvas.getScene().getWindow());
         try {
             Model changedModel = new Model(scene.getLoadedModels().get(scene.currentModel).modifiedVertecies(), scene.getLoadedModels().get(scene.currentModel).getTextureVertices(), scene.getLoadedModels().get(scene.currentModel).getNormals(), scene.getLoadedModels().get(scene.currentModel).getPolygons());
-            ArrayList<String> fileContent2 = ObjWriter.write(changedModel);
+            List<String> fileContent2 = ObjWriter.write(changedModel);
             FileWriter writer = new FileWriter(file);
             for (String s : fileContent2) {
                 writer.write(s + "\n");
