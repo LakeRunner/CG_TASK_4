@@ -51,6 +51,18 @@ public class Camera {
         return GraphicConveyor.perspective(fov, aspectRatio, nearPlane, farPlane);
     }
 
+    public float getFov() {
+        return fov;
+    }
+
+    public void setFov(float fov) {
+        this.fov = fov;
+    }
+
+    public float getAspectRatio() {
+        return aspectRatio;
+    }
+
     private Vector3f position;
     private Vector3f target;
     private float fov;

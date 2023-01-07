@@ -70,17 +70,22 @@
             </MenuItem>
          <MenuItem mnemonicParsing="false" text="Translation">
             <graphic>
-               <Slider fx:id="transSlider" prefHeight="14.0" prefWidth="71.0" />
+               <Slider fx:id="transSlider" max="1.0" prefHeight="14.0" prefWidth="71.0" value="0.5" />
             </graphic>
          </MenuItem>
          <MenuItem mnemonicParsing="false" text="FOV">
             <graphic>
-               <Slider fx:id="fovSlider" prefHeight="14.0" prefWidth="71.0" />
+               <Slider fx:id="fovSlider" max="1.0" prefHeight="14.0" prefWidth="71.0" value="0.5" />
             </graphic>
          </MenuItem>
          <MenuItem mnemonicParsing="false" text="Aspect ratio">
             <graphic>
-               <Slider fx:id="aspectSlider" prefHeight="14.0" prefWidth="71.0" />
+               <Slider fx:id="aspectSlider" max="1.0" min="0.01" prefHeight="14.0" prefWidth="71.0" value="0.5" />
+            </graphic>
+         </MenuItem>
+         <MenuItem mnemonicParsing="false" text="Rotate speed">
+            <graphic>
+               <Slider fx:id="rotateSpeed" max="0.1" prefHeight="14.0" prefWidth="71.0" value="0.05" />
             </graphic>
          </MenuItem>
         </Menu>
