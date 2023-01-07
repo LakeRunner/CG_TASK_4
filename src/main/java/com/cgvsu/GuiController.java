@@ -261,12 +261,14 @@ public class GuiController {
             @Override
             public void handle(MouseEvent mouseEvent) {
                 if (!onActionModes && !onActionList && !onActionTransform) {
-                    double deltaX = mouseEvent.getX();
-                    double deltaY = mouseEvent.getY();
+                    startX = anchorPane.getWidth()/2;
+                    startY = anchorPane.getHeight()/2;
+                    double endX = mouseEvent.getX();
+                    double endY = mouseEvent.getY();
                     double xAngle;
                     double yAngle;
-                    //double x = ((deltaX*2)-(anchorPane.getWidth()-1))/(anchorPane.getWidth()-1);
-                    //double y = -(((deltaY*2)-(anchorPane.getHeight() - 1))/(anchorPane.getHeight() - 1));
+                    //double x = ((endX*2)-(anchorPane.getWidth()-1))/(anchorPane.getWidth()-1);
+                    //double y = -(((endY*2)-(anchorPane.getHeight() - 1))/(anchorPane.getHeight() - 1));
                 /*Vector3f first = new Vector3f(scene.getCamera().getPosition().getX() - scene.getCamera().getTarget().getX(), scene.getCamera().getPosition().getY() - scene.getCamera().getTarget().getY(), scene.getCamera().getPosition().getZ() - scene.getCamera().getTarget().getZ());
                 Vector3f second = new Vector3f(scene.getCamera().getPosition().getX() - x, scene.getCamera().getPosition().getY() - y, scene.getCamera().getPosition().getZ());
                 double cos = (Vector3f.dotProduct(first, second)/ (first.length() * second.length()));
@@ -274,26 +276,31 @@ public class GuiController {
                 текущий з домножаем на лук эт поворачиваем с помощью матрицы поворота с помощью обратного лук эт в мировое простаранство и з прибавляем к позиции*/
                     Vector3f curZ = Vector3f.subtraction(scene.getCamera().getTarget(), scene.getCamera().getPosition());
                     Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
+                    //oldCameraTargetVis.normalize();
                     //double angle = Math.toDegrees(Math.atan2(y - startY, x - startX));
-                    if (deltaX > startX) {
+                    double deltaX = (endX - startX)/anchorPane.getWidth();
+                    double deltaY = (endY - startY)/anchorPane.getHeight();
+                    xAngle = deltaX * 0.1;
+                    yAngle = deltaY * 0.1;
+                    /*if (endX > startX) {
                         yAngle = 0.05;
-                    } else if (deltaX < startX) {
+                    } else if (endX < startX) {
                         yAngle = -0.05;
                     } else {
                         yAngle = 0;
                     }
-                    if (deltaY > startY) {
+                    if (endY > startY) {
                         xAngle = 0.05;
-                    } else if (deltaY < startY) {
+                    } else if (endY < startY) {
                         xAngle = -0.05;
                     } else {
                         xAngle = 0;
-                    }
-                    Vector3f cameraTargetVis = GraphicConveyor.multiplierMatrixToVector(GraphicConveyor.rotate(new Vector3f(xAngle, yAngle, 0)), new Vector4f(oldCameraTargetVis.getX(), oldCameraTargetVis.getY(), oldCameraTargetVis.getZ(), 1));
+                    }*/
+                    Vector3f cameraTargetVis = GraphicConveyor.multiplierMatrixToVector(GraphicConveyor.rotate(new Vector3f(yAngle, xAngle, 0)), new Vector4f(oldCameraTargetVis.getX(), oldCameraTargetVis.getY(), oldCameraTargetVis.getZ(), 1));
                     Vector3f cameraTargetWorld = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix().inversion(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
                     scene.getCamera().setTarget(Vector3f.addition(cameraTargetWorld, scene.getCamera().getPosition()));
-                    startY = deltaY;
-                    startX = deltaX;
+                    //startY = endY;
+                    //startX = endX;
                 }
             }
         });
