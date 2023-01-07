@@ -57,19 +57,19 @@ public class Model {
         return polygons;
     }
 
-    public void setVertices(final ArrayList<Vector3f> vertices) {
+    public void setVertices(final List<Vector3f> vertices) {
         this.vertices = vertices;
     }
 
-    public void setTextureVertices(final ArrayList<Vector2f> vertices) {
+    public void setTextureVertices(final List<Vector2f> vertices) {
         this.textureVertices = vertices;
     }
 
-    public void setNormals(final ArrayList<Vector3f> vertices) {
+    public void setNormals(final List<Vector3f> vertices) {
         this.normals = vertices;
     }
 
-    public void setPolygons(final ArrayList<Polygon> vertices) {
+    public void setPolygons(final List<Polygon> vertices) {
         this.polygons = vertices;
     }
 
@@ -118,7 +118,7 @@ public class Model {
 
 
     public void triangulate() {
-        ArrayList<Polygon> triangulatedPolygons = new ArrayList<>();
+        List<Polygon> triangulatedPolygons = new ArrayList<>();
         for (Polygon polygon : polygons) {
             List<Integer> vertexIndices = polygon.getVertexIndices();
             List<Integer> textureVertexIndices = polygon.getTextureVertexIndices();
