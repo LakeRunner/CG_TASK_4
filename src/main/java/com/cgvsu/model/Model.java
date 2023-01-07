@@ -7,13 +7,13 @@ import com.cgvsu.objreader.ReaderExceptions;
 import java.util.*;
 
 public class Model {
-    private ArrayList<Vector3f> vertices;
-    private ArrayList<Vector2f> textureVertices;
-    private ArrayList<Vector3f> normals;
-    private ArrayList<Polygon> polygons;
+    private List<Vector3f> vertices;
+    private List<Vector2f> textureVertices;
+    private List<Vector3f> normals;
+    private List<Polygon> polygons;
 
-    public Model(final ArrayList<Vector3f> vertices, final ArrayList<Vector2f> textureVertices,
-                 final ArrayList<Vector3f> normals, final ArrayList<Polygon> polygons) {
+    public Model(final List<Vector3f> vertices, final List<Vector2f> textureVertices,
+                 final List<Vector3f> normals, final List<Polygon> polygons) {
         this.vertices = vertices;
         this.textureVertices = textureVertices;
         this.normals = normals;
@@ -41,19 +41,19 @@ public class Model {
         }
     }
 
-    public ArrayList<Vector3f> getVertices() {
+    public List<Vector3f> getVertices() {
         return vertices;
     }
 
-    public ArrayList<Vector2f> getTextureVertices() {
+    public List<Vector2f> getTextureVertices() {
         return textureVertices;
     }
 
-    public ArrayList<Vector3f> getNormals() {
+    public List<Vector3f> getNormals() {
         return normals;
     }
 
-    public ArrayList<Polygon> getPolygons() {
+    public List<Polygon> getPolygons() {
         return polygons;
     }
 
@@ -73,7 +73,7 @@ public class Model {
         this.polygons = vertices;
     }
 
-    public void checkConsistency() {
+    public boolean checkConsistency() {
         for (int i = 0; i < polygons.size(); i++) {
             List<Integer> vertexIndices = polygons.get(i).getVertexIndices();
             List<Integer> textureVertexIndices = polygons.get(i).getTextureVertexIndices();
@@ -112,7 +112,9 @@ public class Model {
                 }
             }
         }
+        return true;
     }
+
 
 
     public void triangulate() {

@@ -343,20 +343,20 @@ class ObjReaderTest {
 
     @Test
     public void testCheckConsistency01() {
-        List<Vector3f> vertices = new ArrayList<>(Arrays.asList(
+        ArrayList<Vector3f> vertices = new ArrayList<>(Arrays.asList(
                 new Vector3f(5f, 8f, 6f), new Vector3f(8f, 8f, 5f),
                 new Vector3f(7f, 8f, 5f), new Vector3f(7f, 5f, 5f),
                 new Vector3f(5f, 8f, 6f)));
-        List<Vector2f> textureVertices = new ArrayList<>(Arrays.asList(
+        ArrayList<Vector2f> textureVertices = new ArrayList<>(Arrays.asList(
                 new Vector2f(1f, 2f), new Vector2f(4f, 5f),
                 new Vector2f(7f, 8f)));
-        List<Vector3f> normalVertices = new ArrayList<>(Arrays.asList(
+        ArrayList<Vector3f> normalVertices = new ArrayList<>(Arrays.asList(
                 new Vector3f(9f, 8f, 7f), new Vector3f(6f, 5f, 4f),
                 new Vector3f(3f, 2f, 1f)));
-        List<Polygon> polygons = new ArrayList<>(Arrays.asList(
-                new Polygon(Arrays.asList(0,1,2), Arrays.asList(1,2,1), Arrays.asList(1,1,0)),
-                new Polygon(Arrays.asList(4,3,2), Arrays.asList(2,1,1), Arrays.asList(0,0,10)),
-                new Polygon(Arrays.asList(1,2,4), Arrays.asList(1,1,2), Arrays.asList(1,2,2))));
+        ArrayList<Polygon> polygons = new ArrayList<>(Arrays.asList(
+                new Polygon((ArrayList<Integer>)Arrays.asList(0,1,2), (ArrayList<Integer>)Arrays.asList(1,2,1), (ArrayList<Integer>)Arrays.asList(1,1,0)),
+                new Polygon((ArrayList<Integer>)Arrays.asList(4,3,2), (ArrayList<Integer>)Arrays.asList(2,1,1), (ArrayList<Integer>)Arrays.asList(0,0,10)),
+                new Polygon((ArrayList<Integer>)Arrays.asList(1,2,4), (ArrayList<Integer>)Arrays.asList(1,1,2), (ArrayList<Integer>)Arrays.asList(1,2,2))));
         Model model = new Model(vertices, textureVertices, normalVertices, polygons);
         try {
             Assertions.assertTrue(model.checkConsistency());
@@ -372,16 +372,16 @@ class ObjReaderTest {
                 new Vector3f(5f, 8f, 6f), new Vector3f(8f, 8f, 5f),
                 new Vector3f(7f, 8f, 5f), new Vector3f(7f, 5f, 5f),
                 new Vector3f(5f, 8f, 6f)));
-        List<Vector2f> textureVertices = new ArrayList<>(Arrays.asList(
+        ArrayList<Vector2f> textureVertices = new ArrayList<>(Arrays.asList(
                 new Vector2f(1f, 2f), new Vector2f(4f, 5f),
                 new Vector2f(7f, 8f)));
         List<Vector3f> normalVertices = new ArrayList<>(Arrays.asList(
                 new Vector3f(9f, 8f, 7f), new Vector3f(6f, 5f, 4f),
                 new Vector3f(3f, 2f, 1f)));
         List<Polygon> polygons = new ArrayList<>(Arrays.asList(
-                new Polygon(Arrays.asList(0,1,2), Arrays.asList(1,1), Arrays.asList(1,1,0)),
-                new Polygon(Arrays.asList(4,3,2), Arrays.asList(2,1,1), new ArrayList<>()),
-                new Polygon(Arrays.asList(1,2,4), Arrays.asList(1,1,2), Arrays.asList(1,2,2))));
+                new Polygon((ArrayList<Integer>)Arrays.asList(0,1,2), (ArrayList<Integer>)Arrays.asList(1,1), (ArrayList<Integer>)Arrays.asList(1,1,0)),
+                new Polygon((ArrayList<Integer>)Arrays.asList(4,3,2), (ArrayList<Integer>)Arrays.asList(2,1,1), new ArrayList<>()),
+                new Polygon((ArrayList<Integer>)Arrays.asList(1,2,4), (ArrayList<Integer>)Arrays.asList(1,1,2), (ArrayList<Integer>)Arrays.asList(1,2,2))));
         Model model = new Model(vertices, textureVertices, normalVertices, polygons);
         try {
             Assertions.assertTrue(model.checkConsistency());
@@ -416,9 +416,9 @@ class ObjReaderTest {
                 new Vector3f(9f, 8f, 7f), new Vector3f(6f, 5f, 4f),
                 new Vector3f(3f, 2f, 1f)));
         List<Polygon> polygons = new ArrayList<>(Arrays.asList(
-                new Polygon(Arrays.asList(0,1,2), Arrays.asList(1,2,1), Arrays.asList(1,1,0)),
-                new Polygon(Arrays.asList(4,3,2), Arrays.asList(2,1,1), Arrays.asList(0,0,1)),
-                new Polygon(Arrays.asList(1,2,4), Arrays.asList(1,1,2), Arrays.asList(1,2,2))));
+                new Polygon((ArrayList<Integer>)Arrays.asList(0,1,2), (ArrayList<Integer>)Arrays.asList(1,2,1), (ArrayList<Integer>)Arrays.asList(1,1,0)),
+                new Polygon((ArrayList<Integer>)Arrays.asList(4,3,2), (ArrayList<Integer>)Arrays.asList(2,1,1), (ArrayList<Integer>)Arrays.asList(0,0,1)),
+                new Polygon((ArrayList<Integer>)Arrays.asList(1,2,4), (ArrayList<Integer>)Arrays.asList(1,1,2), (ArrayList<Integer>)Arrays.asList(1,2,2))));
         Model model = ObjReader.read(
                 "v 5 8 6\n" +
                         "v 8 8 5\n" +
