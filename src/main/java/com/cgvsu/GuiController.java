@@ -203,19 +203,19 @@ public class GuiController {
         transSlider.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
-                TRANSLATION = (float) (transSlider.getValue()*4);
+                TRANSLATION = (float) (transSlider.getValue());
             }
         });
         fovSlider.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
-                scene.getCamera().setFov((float) (fovSlider.getValue()*2));
+                scene.getCamera().setFov((float) (fovSlider.getValue()));
             }
         });
         aspectSlider.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
-                scene.getCamera().setAspectRatio((float) (aspectSlider.getValue()*20));
+                scene.getCamera().setAspectRatio((float) (aspectSlider.getValue()));
             }
         });
 
@@ -518,9 +518,91 @@ public class GuiController {
         listViewTextures.getItems().add(name);
     }
 
-    public void ctrlC(KeyEvent event) {
-        if (event.isControlDown() && (event.getCode() == KeyCode.C)) {
-            fovSlider.setValue(fovSlider.getValue()+0.1);
+    public void hotkeys(KeyEvent event) {
+        if (event.isShiftDown() && (event.getCode() == KeyCode.T)) {
+            if(transSlider.getValue()<=1) {
+                transSlider.setValue(transSlider.getValue() + 0.1);
+            }else {
+                transSlider.setValue(1);
+            }
+        }
+        if (event.isShiftDown() && (event.getCode() == KeyCode.F)) {
+            if(fovSlider.getValue()<=1) {
+                fovSlider.setValue(fovSlider.getValue() + 0.1);
+            }else {
+                fovSlider.setValue(1);
+            }
+        }
+        if (event.isShiftDown() && (event.getCode() == KeyCode.A)) {
+            if(aspectSlider.getValue()<=1) {
+                aspectSlider.setValue(aspectSlider.getValue() + 0.1);
+            }else {
+                aspectSlider.setValue(1);
+            }
+        }
+        if (event.isShiftDown() && (event.getCode() == KeyCode.R)) {
+            if(rotateSpeed.getValue()<=1) {
+                rotateSpeed.setValue(rotateSpeed.getValue() + 0.01);
+            }else {
+                rotateSpeed.setValue(1);
+            }
+        }
+        if (event.isControlDown() && (event.getCode() == KeyCode.T)) {
+            if(transSlider.getValue()>=0) {
+                transSlider.setValue(transSlider.getValue() - 0.1);
+            }else {
+                transSlider.setValue(0);
+            }
+        }
+        if (event.isControlDown() && (event.getCode() == KeyCode.F)) {
+            if(fovSlider.getValue()>=0.01) {
+                fovSlider.setValue(fovSlider.getValue() - 0.1);
+            }else {
+                fovSlider.setValue(0.01);
+            }
+        }
+        if (event.isControlDown() && (event.getCode() == KeyCode.A)) {
+            if(aspectSlider.getValue()>=0.01) {
+                aspectSlider.setValue(aspectSlider.getValue() - 0.1);
+            }else {
+                aspectSlider.setValue(0.01);
+            }
+        }
+        if (event.isControlDown() && (event.getCode() == KeyCode.R)) {
+            if(rotateSpeed.getValue()>=0) {
+                rotateSpeed.setValue(rotateSpeed.getValue() - 0.01);
+            }else {
+                rotateSpeed.setValue(0);
+            }
+        }
+        if (event.isShiftDown() && (event.getCode() == KeyCode.X)) {
+            Vector3f curZ = Vector3f.subtraction(scene.getCamera().getTarget(), scene.getCamera().getPosition());
+            Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
+            Vector3f cameraTargetVis = GraphicConveyor.multiplierMatrixToVector(GraphicConveyor.rotate(new Vector3f(0, 2, 0)), new Vector4f(oldCameraTargetVis.getX(), oldCameraTargetVis.getY(), oldCameraTargetVis.getZ(), 1));
+            Vector3f cameraTargetWorld = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix().inversion(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
+            scene.getCamera().setTarget(Vector3f.addition(cameraTargetWorld, scene.getCamera().getPosition()));
+        }
+        if (event.isControlDown() && (event.getCode() == KeyCode.X)) {
+            Vector3f curZ = Vector3f.subtraction(scene.getCamera().getTarget(), scene.getCamera().getPosition());
+            Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
+            Vector3f cameraTargetVis = GraphicConveyor.multiplierMatrixToVector(GraphicConveyor.rotate(new Vector3f(0, -2, 0)), new Vector4f(oldCameraTargetVis.getX(), oldCameraTargetVis.getY(), oldCameraTargetVis.getZ(), 1));
+            Vector3f cameraTargetWorld = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix().inversion(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
+            scene.getCamera().setTarget(Vector3f.addition(cameraTargetWorld, scene.getCamera().getPosition()));
+            System.out.println(scene.getCamera().getTarget().getX() + " " + scene.getCamera().getTarget().getY() + " " + scene.getCamera().getTarget().getZ());
+        }
+        if (event.isShiftDown() && (event.getCode() == KeyCode.Y)) {
+            Vector3f curZ = Vector3f.subtraction(scene.getCamera().getTarget(), scene.getCamera().getPosition());
+            Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
+            Vector3f cameraTargetVis = GraphicConveyor.multiplierMatrixToVector(GraphicConveyor.rotate(new Vector3f(-2, 0, 0)), new Vector4f(oldCameraTargetVis.getX(), oldCameraTargetVis.getY(), oldCameraTargetVis.getZ(), 1));
+            Vector3f cameraTargetWorld = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix().inversion(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
+            scene.getCamera().setTarget(Vector3f.addition(cameraTargetWorld, scene.getCamera().getPosition()));
+        }
+        if (event.isControlDown() && (event.getCode() == KeyCode.Y)) {
+            Vector3f curZ = Vector3f.subtraction(scene.getCamera().getTarget(), scene.getCamera().getPosition());
+            Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
+            Vector3f cameraTargetVis = GraphicConveyor.multiplierMatrixToVector(GraphicConveyor.rotate(new Vector3f(2, 0, 0)), new Vector4f(oldCameraTargetVis.getX(), oldCameraTargetVis.getY(), oldCameraTargetVis.getZ(), 1));
+            Vector3f cameraTargetWorld = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix().inversion(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
+            scene.getCamera().setTarget(Vector3f.addition(cameraTargetWorld, scene.getCamera().getPosition()));
         }
     }
 

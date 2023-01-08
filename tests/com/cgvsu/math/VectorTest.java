@@ -10,9 +10,9 @@ class MyVectorTest {
     void getCoords() {
         Vector3f myVector3 = new Vector3f(4, 6, 8);
         double[] answer = {4, 6, 8};
-        assertEquals(answer[0], myVector3.getCoords()[0]);
-        assertEquals(answer[1], myVector3.getCoords()[1]);
-        assertEquals(answer[2], myVector3.getCoords()[2]);
+        assertEquals(answer[0], myVector3.getCoordinates()[0]);
+        assertEquals(answer[1], myVector3.getCoordinates()[1]);
+        assertEquals(answer[2], myVector3.getCoordinates()[2]);
     }
 
     @Test
@@ -28,7 +28,7 @@ class MyVectorTest {
     void normal() {
         Vector2f myVector2 = new Vector2f(4, 3);
         Vector ans = new Vector(0.8, 0.6);
-        assertEquals(myVector2.normal().getCoords()[0], ans.getCoords()[0]);
-        assertEquals(myVector2.normal().getCoords()[1], ans.getCoords()[1]);
+        assertEquals(myVector2.normal().getCoordinates()[0], ans.getCoordinates()[0]);
+        assertEquals(myVector2.normal().getCoordinates()[1], ans.getCoordinates()[1]);
     }
 }

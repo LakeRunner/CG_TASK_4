@@ -130,10 +130,10 @@ class MyMatrix4Test {
         Vector4f answer3 = new Vector4f(90, 226, 362, 498);
 
         Vector4f answer4 = Matrix4f.multiplierVector(answer, answer2);
-        assertEquals(answer3.getCoords()[0], answer4.getCoords()[0]);
-        assertEquals(answer3.getCoords()[1], answer4.getCoords()[1]);
-        assertEquals(answer3.getCoords()[2], answer4.getCoords()[2]);
-        assertEquals(answer3.getCoords()[3], answer4.getCoords()[3]);
+        assertEquals(answer3.getCoordinates()[0], answer4.getCoordinates()[0]);
+        assertEquals(answer3.getCoordinates()[1], answer4.getCoordinates()[1]);
+        assertEquals(answer3.getCoordinates()[2], answer4.getCoordinates()[2]);
+        assertEquals(answer3.getCoordinates()[3], answer4.getCoordinates()[3]);
     }
 
     @Test
