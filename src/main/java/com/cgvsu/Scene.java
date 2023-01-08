@@ -5,26 +5,31 @@ import com.cgvsu.model.LoadedModel;
 import com.cgvsu.render_engine.Camera;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class Scene {
-    String currentModel;
 
-    private HashMap<String, LoadedModel> loadedModels = new HashMap<>();
+    String currentModelName;
+    String currentCameraName;
 
-    private Camera camera = new Camera(
+    private Map<String, LoadedModel> loadedModels = new HashMap<>();
+    private Map<String, Camera> addedCameras = new HashMap<>();
+
+    private final Camera mainCamera = new Camera(
             new Vector3f(0, 0, 200),
             new Vector3f(0, 0, 0),
             1.0F, 1, 0.01F, 100);
+    private Camera currentCamera = mainCamera;
 
-    public String getCurrentModel() {
-        return currentModel;
+    public String getCurrentModelName() {
+        return currentModelName;
     }
 
-    public void setCurrentModel(String currentModel) {
-        this.currentModel = currentModel;
+    public void setCurrentModelName(String currentModelName) {
+        this.currentModelName = currentModelName;
     }
 
-    public HashMap<String, LoadedModel> getLoadedModels() {
+    public Map<String, LoadedModel> getLoadedModels() {
         return loadedModels;
     }
 
@@ -32,11 +37,23 @@ public class Scene {
         this.loadedModels = loadedModels;
     }
 
-    public Camera getCamera() {
-        return camera;
+    public Camera getCurrentCamera() {
+        return currentCamera;
     }
 
-    public void setCamera(Camera camera) {
-        this.camera = camera;
+    public Map<String, Camera> getAddedCameras() {
+        return addedCameras;
+    }
+
+    public String getCurrentCameraName() {
+        return currentCameraName;
+    }
+
+    public void setCurrentCamera(Camera currentCamera) {
+        this.currentCamera = currentCamera;
+    }
+
+    public Camera getMainCamera() {
+        return mainCamera;
     }
 }
