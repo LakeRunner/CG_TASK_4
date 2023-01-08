@@ -53,7 +53,7 @@ public class GraphicConveyor {
     }
 
     public static Matrix4f rotateScaleTranslate(final Vector3f rotateV, final Vector3f scaleV, final Vector3f translateV) {
-        return Matrix4f.matrixMultiplier(Matrix4f.matrixMultiplier(translate(translateV), scale(scaleV)), rotate(rotateV) );
+        return Matrix4f.matrixMultiplier(Matrix4f.matrixMultiplier(translate(translateV), scale(scaleV)), rotate(rotateV));
     }
 
     public static Matrix4f lookAt(final Vector3f eye, final Vector3f target) {

@@ -1,7 +1,7 @@
 package com.cgvsu;
 
 import com.cgvsu.math.Vector3f;
-import com.cgvsu.model.LodedModel;
+import com.cgvsu.model.LoadedModel;
 import com.cgvsu.render_engine.Camera;
 
 import java.util.HashMap;
@@ -9,7 +9,7 @@ import java.util.HashMap;
 public class Scene {
     String currentModel;
 
-    private HashMap<String, LodedModel> loadedModels = new HashMap<>();
+    private HashMap<String, LoadedModel> loadedModels = new HashMap<>();
 
     private Camera camera = new Camera(
             new Vector3f(0, 0, 200),
@@ -24,11 +24,11 @@ public class Scene {
         this.currentModel = currentModel;
     }
 
-    public HashMap<String, LodedModel> getLoadedModels() {
+    public HashMap<String, LoadedModel> getLoadedModels() {
         return loadedModels;
     }
 
-    public void setLoadedModels(HashMap<String, LodedModel> loadedModels) {
+    public void setLoadedModels(HashMap<String, LoadedModel> loadedModels) {
         this.loadedModels = loadedModels;
     }
 

@@ -1,13 +1,14 @@
 package com.cgvsu.math;
 
 public class Matrix {
+
     private double[][] matrix;
 
-    protected Matrix(double[][] matrix){
+    protected Matrix(double[][] matrix) {
         this.matrix = matrix;
     }
 
-    protected Matrix(double[] curMatrix, double num){
+    protected Matrix(double[] curMatrix, double num) {
         double[][] matrix = new double[(int) num][(int) num];
         for (int i = 0; i<curMatrix.length; i++){
             int page = (int) Math.floor(i/num);
@@ -25,7 +26,7 @@ public class Matrix {
         this.matrix = getZeroMatrix(num).getMatrixArray();
     }
 
-    protected Matrix(Matrix matrix){
+    protected Matrix(Matrix matrix) {
         this.matrix = matrix.matrix;
     }
 
@@ -33,7 +34,7 @@ public class Matrix {
         return matrix;
     }
 
-    public static Matrix transpose(double[][] matrix, int n){
+    public static Matrix transpose(double[][] matrix, int n) {
         double[][] m = new double[n][n];
         for (int i = 0; i < matrix.length; i++) {
             for (int j = 0; j < matrix[0].length; j++) {
@@ -53,7 +54,7 @@ public class Matrix {
         return new Matrix(m);
     }
 
-    public static Matrix getOneMatrix(int size){
+    public static Matrix getOneMatrix(int size) {
         double[][] m = new double[size][size];
         for (int i = 0; i < m.length; i++) {
             for (int j = 0; j < m[0].length; j++) {

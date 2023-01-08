@@ -1,6 +1,7 @@
 package com.cgvsu.math;
 
 public class Matrix4f extends Matrix {
+
     public Matrix4f(double[][] matrix) {
         super(matrix);
     }
@@ -41,7 +42,7 @@ public class Matrix4f extends Matrix {
         Vector4f v = new Vector4f(0, 0, 0, 0);
         for (int i = 0; i < m1.getMatrixArray().length; i++) {
             for (int j = 0; j < m1.getMatrixArray()[0].length; j++) {
-                v.getCoords()[i] += m1.getMatrixArray()[i][j] * v1.getCoords()[j];
+                v.getCoordinates()[i] += m1.getMatrixArray()[i][j] * v1.getCoordinates()[j];
             }
         }
         return v;

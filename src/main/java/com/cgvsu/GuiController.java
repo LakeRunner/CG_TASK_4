@@ -1,7 +1,7 @@
 package com.cgvsu;
 
 import com.cgvsu.math.*;
-import com.cgvsu.model.LodedModel;
+import com.cgvsu.model.LoadedModel;
 import com.cgvsu.objwriter.ObjWriter;
 import com.cgvsu.render_engine.GraphicConveyor;
 import com.cgvsu.render_engine.RenderEngine;
@@ -156,12 +156,12 @@ public class GuiController {
     private double xAngle;
     private double yAngle;
     private double angleListenerValue = 0.05;
-    Image img = null;
+    private Image texture;
 
     @FXML
     private void initialize() {
         listViewModels.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        scene.getLoadedModels().put("Mesh", new LodedModel(mesh));
+        scene.getLoadedModels().put("Mesh", new LoadedModel(mesh));
         scene.currentModel = "Mesh";
         list = getTextFields();
         List<Slider> sliders = Arrays.asList(xSlider, ySlider, zSlider);
@@ -381,14 +381,6 @@ public class GuiController {
         timeline = new Timeline();
         timeline.setCycleCount(Animation.INDEFINITE);
 
-
-        try {
-            img = new Image(new FileInputStream("src\\main\\resources\\textures\\NeutralWrapped.jpg"));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        Image finalImg = img;
         KeyFrame frame = new KeyFrame(Duration.millis(15), event -> {
             double width = canvas.getWidth();
             double height = canvas.getHeight();
@@ -408,7 +400,7 @@ public class GuiController {
                             scene.getLoadedModels().get(model).getTranslateV(),
                             meshColor, drawPolygonMesh.isSelected(), drawTextures.isSelected(),
                             drawLighting.isSelected(), drawFilling.isSelected(), polygonFillColor.getValue(),
-                            finalImg);
+                            texture);
                 }
             }
         });
@@ -464,7 +456,7 @@ public class GuiController {
             //model.calcNormals();
             String name = file.getName();
             name = checkContainsModel(name);
-            scene.getLoadedModels().put(name, new LodedModel(model));
+            scene.getLoadedModels().put(name, new LoadedModel(model));
             scene.currentModel = name;
             listViewModels.getItems().add(scene.currentModel);
             listViewModels.scrollTo(scene.currentModel);
@@ -499,7 +491,7 @@ public class GuiController {
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Model (*.obj)", "*.obj"));
         File file = fileChooser.showSaveDialog((Stage) canvas.getScene().getWindow());
         try {
-            Model changedModel = new Model(scene.getLoadedModels().get(scene.currentModel).modifiedVertecies(), scene.getLoadedModels().get(scene.currentModel).getTextureVertices(), scene.getLoadedModels().get(scene.currentModel).getNormals(), scene.getLoadedModels().get(scene.currentModel).getPolygons());
+            Model changedModel = new Model(scene.getLoadedModels().get(scene.currentModel).modifiedVertices(), scene.getLoadedModels().get(scene.currentModel).getTextureVertices(), scene.getLoadedModels().get(scene.currentModel).getNormals(), scene.getLoadedModels().get(scene.currentModel).getPolygons());
             List<String> fileContent2 = ObjWriter.write(changedModel);
             FileWriter writer = new FileWriter(file);
             for (String s : fileContent2) {
@@ -560,10 +552,6 @@ public class GuiController {
     @FXML
     public void handleCameraDown(ActionEvent actionEvent) {
         scene.getCamera().movePosition(new Vector3f(0, -TRANSLATION, 0));
-    }
-    @FXML
-    public void triangulation() {
-        mesh.triangulate();
     }
 
     public List<TextField> getTextFields () {
@@ -664,7 +652,7 @@ public class GuiController {
                         Model changedModel = new Model();
                         String changeModelName = "";
                         for (String model : selectedModels) {
-                            changedModel.getVertices().addAll(scene.getLoadedModels().get(model).modifiedVertecies());
+                            changedModel.getVertices().addAll(scene.getLoadedModels().get(model).modifiedVertices());
                             changedModel.getTextureVertices().addAll(scene.getLoadedModels().get(model).getTextureVertices());
                             changedModel.getNormals().addAll(scene.getLoadedModels().get(model).getNormals());
                             changedModel.getPolygons().addAll(scene.getLoadedModels().get(model).getPolygons());
@@ -679,7 +667,7 @@ public class GuiController {
                         Model model = ObjReader.read(fileContent.toString(), true);
                         //model.calcNormals();
                         changeModelName = checkContainsModel(changeModelName);
-                        scene.getLoadedModels().put(changeModelName, new LodedModel(model));
+                        scene.getLoadedModels().put(changeModelName, new LoadedModel(model));
                         scene.currentModel = changeModelName;
                         listViewModels.getItems().add(scene.currentModel);
                         listViewModels.scrollTo(scene.currentModel);
@@ -700,7 +688,7 @@ public class GuiController {
         if (Objects.equals(event.getButton().toString(), "PRIMARY")) {
             checkSelectedTextures();
             int index = listViewTextures.getSelectionModel().getSelectedIndex();
-            Image image = textures.get(listViewTextures.getItems().get(index));
+            texture = textures.get(listViewTextures.getItems().get(index));
 
             anchorPane.setOnKeyPressed(new EventHandler<KeyEvent>() {
                 @Override

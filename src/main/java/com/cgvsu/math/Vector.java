@@ -2,7 +2,7 @@ package com.cgvsu.math;
 
 public class Vector {
 
-    private double[] coords;
+    private double[] coordinates;
 
     protected final float EQUAL_EPS = 1e-7f;
 
@@ -10,65 +10,65 @@ public class Vector {
     }
 
     protected Vector(int num){
-        double[] coords =  new double[num];
+        double[] coordinates =  new double[num];
         for(int i = 0; i<num; i++){
-            coords[i] = 0;
+            coordinates[i] = 0;
         }
-        this.coords = coords;
+        this.coordinates = coordinates;
     }
 
     protected Vector(double a, double b) {
-        coords = new double[2];
-        this.coords[0] = a;
-        this.coords[1] = b;
+        coordinates = new double[2];
+        this.coordinates[0] = a;
+        this.coordinates[1] = b;
     }
 
     protected Vector(double a, double b, double c) {
-        coords = new double[3];
-        this.coords[0] = a;
-        this.coords[1] = b;
-        this.coords[2] = c;
+        coordinates = new double[3];
+        this.coordinates[0] = a;
+        this.coordinates[1] = b;
+        this.coordinates[2] = c;
     }
 
     protected Vector(double a, double b, double c, double d) {
-        coords = new double[4];
-        this.coords[0] = a;
-        this.coords[1] = b;
-        this.coords[2] = c;
-        this.coords[3] = d;
+        coordinates = new double[4];
+        this.coordinates[0] = a;
+        this.coordinates[1] = b;
+        this.coordinates[2] = c;
+        this.coordinates[3] = d;
     }
 
-    protected double[] getCoords() {
-        return coords;
+    protected double[] getCoordinates() {
+        return coordinates;
     }
 
-    public void setCoords(double[] coords) {
-        this.coords = coords;
+    public void setCoordinates(Vector vector) {
+        this.coordinates = vector.getCoordinates();
     }
 
-    public void setCoords(Vector vector) {
-        this.coords = vector.getCoords();
+    public double getX() {
+        return coordinates[0];
     }
 
-    public double getX() {return coords[0]; }
+    public double getY() {
+        return coordinates[1];
+    }
 
-    public double getY() {return coords[1]; }
-
-    public double length(){
+    public double length() {
         double cur = 0;
-        for (double coord : coords) {
-            cur += coord * coord;
+        for (double coordinate : this.coordinates) {
+            cur += coordinate * coordinate;
         }
         return Math.sqrt(cur);
     }
 
     public Vector normal() {
-        int length = coords.length;
+        int length = coordinates.length;
         new Vector(length);
         return switch (length) {
-            case 2 -> new Vector(coords[0] / length(), coords[1] / length());
-            case 3 -> new Vector(coords[0] / length(), coords[1] / length(), coords[2] / length());
-            case 4 -> new Vector(coords[0] / length(), coords[1] / length(), coords[2] / length(), coords[3] / length());
+            case 2 -> new Vector(coordinates[0] / length(), coordinates[1] / length());
+            case 3 -> new Vector(coordinates[0] / length(), coordinates[1] / length(), coordinates[2] / length());
+            case 4 -> new Vector(coordinates[0] / length(), coordinates[1] / length(), coordinates[2] / length(), coordinates[3] / length());
             default -> new Vector(length);
         };
     }

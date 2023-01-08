@@ -2,17 +2,15 @@ package com.cgvsu.math;
 
 public class Matrix3f extends Matrix {
 
-
     public Matrix3f(double[][] matrix) {
         super(matrix);
     }
 
-    public Matrix3f(){
+    public Matrix3f() {
         super(3);
     }
 
-
-    public static Matrix3f addition(Matrix3f m1, Matrix3f m2){
+    public static Matrix3f addition(Matrix3f m1, Matrix3f m2) {
         double[][] m = new double[3][3];
         for(int i = 0; i < m1.getMatrixArray().length; i++){
             for(int j = 0; j < m1.getMatrixArray()[0].length; j++){
@@ -22,7 +20,7 @@ public class Matrix3f extends Matrix {
         return new Matrix3f(m);
     }
 
-    public static Matrix3f subtraction(Matrix3f m1, Matrix3f m2 ){
+    public static Matrix3f subtraction(Matrix3f m1, Matrix3f m2) {
         double[][] m = new double[3][3];
         for(int i = 0; i < m1.getMatrixArray().length; i++){
             for(int j = 0; j < m1.getMatrixArray()[0].length; j++){
@@ -36,7 +34,7 @@ public class Matrix3f extends Matrix {
         Vector3f v = new Vector3f(0, 0, 0);
         for (int i = 0; i < m1.getMatrixArray().length; i++) {
             for (int j = 0; j < m1.getMatrixArray()[0].length; j++) {
-                v.getCoords()[i] += m1.getMatrixArray()[i][j] * v1.getCoords()[j];
+                v.getCoordinates()[i] += m1.getMatrixArray()[i][j] * v1.getCoordinates()[j];
             }
         }
         return v;
@@ -54,11 +52,11 @@ public class Matrix3f extends Matrix {
         return new Matrix3f(m);
     }
 
-    public static Matrix3f getOneMatrix(){
+    public static Matrix3f getOneMatrix() {
         return new Matrix3f(Matrix.getOneMatrix(3).getMatrixArray());
     }
 
-    public Matrix3f transpose(){
+    public Matrix3f transpose() {
         return new Matrix3f(Matrix.transpose(super.getMatrixArray(), 3).getMatrixArray());
     }
 

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.cgvsu.math.*;
-import com.cgvsu.model.LodedModel;
+import com.cgvsu.model.LoadedModel;
 import com.cgvsu.model.Polygon;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
@@ -14,10 +14,10 @@ import static com.cgvsu.render_engine.GraphicConveyor.*;
 
 public class RenderEngine {
 
-    public static void render(final GraphicsContext graphicsContext, final Camera camera, final LodedModel model,
+    public static void render(final GraphicsContext graphicsContext, final Camera camera, final LoadedModel model,
                               final int width, final int height, final Vector3f rotateV, final Vector3f scaleV,
                               final Vector3f translateV, final Color meshColor, final boolean drawPolygonMesh,
-                              final boolean drawTextures, final boolean drawLighting, final boolean drawFilling,
+                              boolean drawTextures, final boolean drawLighting, final boolean drawFilling,
                               final Color polygonFillColor, final Image img) {
         double[][] zBuffer = new double[width][height];
         for (int i = 0; i < zBuffer.length; i++) {
@@ -48,18 +48,22 @@ public class RenderEngine {
                 Vector3f vertex = model.getVertices().get(vertexIndex);
                 Vector3f normal = model.getNormals().get(vertexIndex);
 
-                Vector4f vertexVecmath = new Vector4f(vertex.getX(), vertex.getY(), vertex.getZ(), 1);
+                Vector4f vertex4f = new Vector4f(vertex.getX(), vertex.getY(), vertex.getZ(), 1);
 
                 if (!model.getTextureVertices().isEmpty()) {
                     Vector2f texturePoint = model.getTextureVertices().get(textureVertexIndices.get(i));
                     texturePoints.add(texturePoint);
                 }
-                Vector3f originalVector = multiplierMatrixToVector(modelViewProjectionMatrix, vertexVecmath);
+                Vector3f originalVector = multiplierMatrixToVector(modelViewProjectionMatrix, vertex4f);
                 Vector2f resultPoint = vertexToPoint(originalVector, width, height);
                 resultPoints.add(resultPoint);
                 originalVectors.add(originalVector);
                 normals.add(normal);
                 i++;
+            }
+
+            if (img == null) {
+                drawTextures = false;
             }
 
             if (drawFilling || drawTextures) {
@@ -157,9 +161,16 @@ public class RenderEngine {
                                 bc.getU() * n1.getZ() + bc.getV() * n2.getZ() + bc.getW() * n3.getZ());
                         direction.normalize();
                         normal.normalize();
-                        double dotProduct = Math.abs(Vector3f.dotProduct(direction, normal));
-                        double light = dotProduct > 0 ? dotProduct : 0;
-                        color = Color.color(color.getRed() * light, color.getGreen() * light, color.getBlue() * light);
+                        double diffuseDotProduct = Vector3f.dotProduct(direction, normal);
+                        double diffuse = Math.max(0, diffuseDotProduct);
+                        /*
+                        Vector3f d = Vector3f.multiplier(normal, diffuse);
+                        Vector3f s = Vector3f.multiplier(d, 2);
+                        double specularDotProduct = Vector3f.dotProduct(Vector3f.subtraction(direction, s), direction);
+                        double specular = Math.max(0, specularDotProduct);
+                        double coefficient = Math.min(1, specular + diffuse);
+                         */
+                        color = Color.color(color.getRed() * diffuse, color.getGreen() * diffuse, color.getBlue() * diffuse);
                     }
                     graphicsContext.setStroke(color);
                     graphicsContext.strokeLine(x, y, x, y);

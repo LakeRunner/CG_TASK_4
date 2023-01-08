@@ -5,6 +5,13 @@ import com.cgvsu.math.Vector3f;
 
 public class Camera {
 
+    private Vector3f position;
+    private Vector3f target;
+    private float fov;
+    private float aspectRatio;
+    private float nearPlane;
+    private float farPlane;
+
     public Camera(final Vector3f position, final Vector3f target, final float fov,
                   final float aspectRatio, final float nearPlane, final float farPlane) {
         this.position = position;
@@ -62,11 +69,4 @@ public class Camera {
     public float getAspectRatio() {
         return aspectRatio;
     }
-
-    private Vector3f position;
-    private Vector3f target;
-    private float fov;
-    private float aspectRatio;
-    private float nearPlane;
-    private float farPlane;
 }
