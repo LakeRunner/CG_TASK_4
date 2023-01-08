@@ -923,6 +923,8 @@ public class GuiController {
         }
         light.setSelected(false);
         anchorPane.setStyle("-fx-background-color: #454444;");
+        saveSelection.setStyle("-fx-background-color: #707070;");
+        enterModelName.setStyle("-fx-background-color: #707070;");
         listViewModels.setStyle("-fx-control-inner-background: #616161;");
         listViewTextures.setStyle("-fx-control-inner-background: #616161;");
         listViewCameras.setStyle("-fx-control-inner-background: #616161;");
@@ -930,6 +932,8 @@ public class GuiController {
 
     public void lightTheme () {
         dark.setSelected(false);
+        saveSelection.setStyle("-fx-background-color: lightgray;");
+        enterModelName.setStyle("-fx-background-color: lightgray;");
         anchorPane.setStyle("-fx-background-color: white;");
         listViewModels.setStyle("-fx-control-inner-background: white;");
         listViewTextures.setStyle("-fx-control-inner-background: white;");
@@ -969,7 +973,6 @@ public class GuiController {
             loadedModels.setStyle(colors[0]);
             renderingModels.setStyle(colors[0]);
             loadedCameras.setStyle(colors[0]);
-
         } else {
             rightUpRect.setVisible(true);
             rightUpText.setVisible(true);
