@@ -2,6 +2,7 @@ package com.cgvsu;
 
 import com.cgvsu.math.*;
 import com.cgvsu.model.LoadedModel;
+import com.cgvsu.model.Polygon;
 import com.cgvsu.objwriter.ObjWriter;
 import com.cgvsu.render_engine.GraphicConveyor;
 import com.cgvsu.render_engine.RenderEngine;
@@ -21,6 +22,8 @@ import javafx.scene.image.Image;
 import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
@@ -46,6 +49,8 @@ public class GuiController {
 
     @FXML
     private AnchorPane saveSelection;
+    @FXML
+    private AnchorPane enterModelName;
 
     @FXML
     private AnchorPane modelTrans;
@@ -58,6 +63,9 @@ public class GuiController {
 
     @FXML
     private AnchorPane loadedTextures;
+    @FXML
+    private AnchorPane loadedCameras;
+
 
     @FXML
     private Canvas canvas;
@@ -93,6 +101,30 @@ public class GuiController {
 
     @FXML
     private TextField translateZ;
+    @FXML
+    private TextField modelName;
+    @FXML
+    private javafx.scene.shape.Rectangle rightUpRect;
+
+    @FXML
+    private javafx.scene.shape.Rectangle rightDownRect;
+
+    @FXML
+    private javafx.scene.shape.Rectangle leftUpRect;
+    @FXML
+    private javafx.scene.shape.Rectangle leftMediumRect;
+    @FXML
+    private Rectangle leftDownRect;
+    @FXML
+    private Text rightUpText;
+    @FXML
+    private Text rightDownText;
+    @FXML
+    private Text leftUpText;
+    @FXML
+    private Text leftDownText;
+    @FXML
+    private Text leftMediumText;
 
     @FXML
     private Slider xSlider;
@@ -138,11 +170,13 @@ public class GuiController {
 
     private Timeline timeline;
     private Robot robot;
-    private boolean modelIsSelected;
+    private boolean modelIsLoaded;
     private List<TextField> list;
     private List <String> selectedModels = new ArrayList<>();
     private List <String> selectedTextures = new ArrayList<>();
     private Map<String, Image> textures = new HashMap<>();
+    private boolean textureIsLoaded;
+    private boolean onActionListCameras;
     private boolean onActionTransform;
     private boolean onActionListModels;
     private boolean onActionModes;
@@ -229,23 +263,29 @@ public class GuiController {
         TranslateTransition transitionRightDownSide = new TranslateTransition();
         TranslateTransition transitionLeftUpSide = new TranslateTransition();
         TranslateTransition transitionLeftDownSide = new TranslateTransition();
+        TranslateTransition transitionLeftMediumSide = new TranslateTransition();
         transitionLeftUpSide.setNode(loadedModels);
         transitionRightUpSide.setNode(modelTrans);
         transitionRightDownSide.setNode(renderingModels);
         transitionLeftDownSide.setNode(loadedTextures);
+        transitionLeftMediumSide.setNode(loadedCameras);
         transitionRightUpSide.setByX(260);
         transitionRightDownSide.setByX(260);
         transitionLeftUpSide.setByX(-235);
         transitionLeftDownSide.setByX(-235);
+        transitionLeftMediumSide.setByX(-235);
         transitionLeftUpSide.play();
         transitionRightUpSide.play();
         transitionRightDownSide.play();
         transitionLeftDownSide.play();
+        transitionLeftMediumSide.play();
         anchorPane.setOnMouseMoved(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
                 double rightUpBorder = loadedModels.getLayoutX();
                 double posRightUpBorder = loadedModels.getLocalToParentTransform().getTx();
+                double rightMediumBorder = loadedCameras.getLayoutX();
+                double posRightMediumBorder = loadedCameras.getLocalToParentTransform().getTx();
                 double rightDownBorder = loadedTextures.getLayoutX();
                 double posRightDownBorder = loadedTextures.getLocalToParentTransform().getTx();
                 double leftUpBorder = modelTrans.getLayoutX();
@@ -253,7 +293,7 @@ public class GuiController {
                 double leftDownBorder = renderingModels.getLayoutX();
                 double posLeftDownBorder = renderingModels.getLocalToParentTransform().getTx();
                 if (posLeftUpBorder == modelTrans.getLayoutX() || posLeftUpBorder == modelTrans.getLayoutX() + 260) {
-                    if (modelIsSelected && !onActionTransform && mouseEvent.getX() > leftUpBorder + 260 && mouseEvent.getX() < leftUpBorder + 285 && mouseEvent.getY() < 520) {
+                    if (modelIsLoaded && !onActionTransform && mouseEvent.getX() > leftUpBorder + 260 && mouseEvent.getX() < leftUpBorder + 285 && mouseEvent.getY() < 520) {
                         transitionRightUpSide.setByX(-260);
                         transitionRightUpSide.play();
                         onActionTransform = true;
@@ -266,7 +306,7 @@ public class GuiController {
                     }
                 }
                 if (posLeftDownBorder == renderingModels.getLayoutX() || posLeftDownBorder == renderingModels.getLayoutX() + 260) {
-                    if (modelIsSelected && !onActionModes && mouseEvent.getX() > leftDownBorder + 260 && mouseEvent.getX() < leftDownBorder + 285 && mouseEvent.getY() > 525) {
+                    if (modelIsLoaded && !onActionModes && mouseEvent.getX() > leftDownBorder + 260 && mouseEvent.getX() < leftDownBorder + 285 && mouseEvent.getY() > 525) {
                         transitionRightDownSide.setByX(-260);
                         transitionRightDownSide.play();
                         onActionModes = true;
@@ -277,22 +317,33 @@ public class GuiController {
                     }
                 }
                 if (posRightUpBorder == loadedModels.getLayoutX() || posRightUpBorder == loadedModels.getLayoutX() - 235) {
-                    if (modelIsSelected && !onActionListModels && mouseEvent.getX() > rightUpBorder && mouseEvent.getX() < rightUpBorder + 25 && mouseEvent.getY() > 30 && mouseEvent.getY() < 375) {
+                    if (modelIsLoaded && !onActionListModels && mouseEvent.getX() > rightUpBorder && mouseEvent.getX() < rightUpBorder + 25 && mouseEvent.getY() > 30 && mouseEvent.getY() < 265) {
                         transitionLeftUpSide.setByX(235);
                         transitionLeftUpSide.play();
                         onActionListModels = true;
-                    } else if (onActionListModels && (mouseEvent.getX() > rightUpBorder + 235 || mouseEvent.getY() > 375 || mouseEvent.getY() < 30)) {
+                    } else if (onActionListModels && (mouseEvent.getX() > rightUpBorder + 235 || mouseEvent.getY() > 265 || mouseEvent.getY() < 30)) {
                         transitionLeftUpSide.setByX(-235);
                         transitionLeftUpSide.play();
                         onActionListModels = false;
                     }
                 }
+                if (posRightMediumBorder == loadedCameras.getLayoutX() || posRightMediumBorder == loadedCameras.getLayoutX() - 235) {
+                    if (modelIsLoaded && !onActionListCameras && mouseEvent.getX() > rightMediumBorder && mouseEvent.getX() < rightMediumBorder + 25 && mouseEvent.getY() > 275 && mouseEvent.getY() < 475) {
+                        transitionLeftMediumSide.setByX(235);
+                        transitionLeftMediumSide.play();
+                        onActionListCameras = true;
+                    } else if (onActionListCameras && (mouseEvent.getX() > rightUpBorder + 235 || mouseEvent.getY() < 275 || mouseEvent.getY() > 475)) {
+                        transitionLeftMediumSide.setByX(-235);
+                        transitionLeftMediumSide.play();
+                        onActionListCameras = false;
+                    }
+                }
                 if (posRightDownBorder == loadedTextures.getLayoutX() || posRightDownBorder == loadedTextures.getLayoutX() - 235) {
-                    if (modelIsSelected && !onActionListTextures && mouseEvent.getX() > rightDownBorder && mouseEvent.getX() < rightDownBorder + 25 && mouseEvent.getY() > 385) {
+                    if (textureIsLoaded && modelIsLoaded && !onActionListTextures && mouseEvent.getX() > rightDownBorder && mouseEvent.getX() < rightDownBorder + 25 && mouseEvent.getY() > 485) {
                         transitionLeftDownSide.setByX(235);
                         transitionLeftDownSide.play();
                         onActionListTextures = true;
-                    } else if (onActionListTextures && (mouseEvent.getX() > rightDownBorder + 235 || mouseEvent.getY() < 385)) {
+                    } else if (onActionListTextures && (mouseEvent.getX() > rightDownBorder + 235 || mouseEvent.getY() < 485)) {
                         transitionLeftDownSide.setByX(-235);
                         transitionLeftDownSide.play();
                         onActionListTextures = false;
@@ -373,15 +424,13 @@ public class GuiController {
 
         anchorPane.prefWidthProperty().addListener((ov, oldValue, newValue) -> canvas.setWidth(newValue.doubleValue()));
         anchorPane.prefHeightProperty().addListener((ov, oldValue, newValue) -> canvas.setHeight(newValue.doubleValue()));
-        modelTrans.setStyle("-fx-background-color: lightgray;");
-        loadedModels.setStyle("-fx-background-color: lightgray;");
         saveSelection.setStyle("-fx-background-color: lightgray;");
-        renderingModels.setStyle("-fx-background-color: lightgray;");
-        loadedTextures.setStyle("-fx-background-color: lightgray;");
+        enterModelName.setStyle("-fx-background-color: lightgray;");
         timeline = new Timeline();
         timeline.setCycleCount(Animation.INDEFINITE);
 
         KeyFrame frame = new KeyFrame(Duration.millis(15), event -> {
+            checkModelLoading(modelIsLoaded, textureIsLoaded);
             double width = canvas.getWidth();
             double height = canvas.getHeight();
             canvas.getGraphicsContext2D().clearRect(0, 0, width, height);
@@ -460,13 +509,14 @@ public class GuiController {
             scene.currentModel = name;
             listViewModels.getItems().add(scene.currentModel);
             listViewModels.scrollTo(scene.currentModel);
+            selectedModels = new ArrayList<>();
             selectedModels.add(scene.currentModel);
             cleanTransform();
             // todo: обработка ошибок
         } catch (IOException exception) {
 
         }
-        modelIsSelected = true;
+        modelIsLoaded = true;
     }
     public void onOpenSaveUnchangedModel() {
         FileChooser fileChooser = new FileChooser();
@@ -516,6 +566,7 @@ public class GuiController {
         name = checkContainsTexture(name);
         textures.put(name, new Image(new File(file.getAbsolutePath()).toURI().toString()));
         listViewTextures.getItems().add(name);
+        textureIsLoaded = true;
     }
 
     public void hotkeys(KeyEvent event) {
@@ -707,64 +758,85 @@ public class GuiController {
     }
     public void modelSelected (MouseEvent event) throws IOException {
         if (Objects.equals(event.getButton().toString(), "PRIMARY")) {
-            checkSelectedModels();
-             int index = listViewModels.getSelectionModel().getSelectedIndex();
+            int index = listViewModels.getSelectionModel().getSelectedIndex();
             if (index != -1) {
+                addSelectedModels();
                 String name = listViewModels.getItems().get(index);
                 scene.currentModel = name;
                 cleanTransform();
+                anchorPane.setOnKeyPressed(new EventHandler<KeyEvent>() {
+                    @Override
+                    public void handle(KeyEvent event) {
+                        if (event.getCode() == KeyCode.ENTER && selectedModels.size() > 1) {
+                            enterModelName.setVisible(true);
+                        }
+                        if (event.getCode() == KeyCode.DELETE) {
+                            for (String str : selectedModels) {
+                                listViewModels.getItems().remove(str);
+                                selectedModels.remove(str);
+                                scene.getLoadedModels().remove(str);
+                                boolean flag = listViewModels.getItems().size() > 0;
+                                scene.currentModel = flag ? selectedModels.get(selectedModels.size() - 1) : null;
+                            }
+                        }
+                    }
+                });
             }
-            anchorPane.setOnKeyPressed(new EventHandler<KeyEvent>() {
-                @Override
-                public void handle(KeyEvent event) {
-                    if (event.getCode() == KeyCode.DELETE) {
-                        for (String str : selectedModels) {
-                            listViewModels.getItems().remove(str);
-                            scene.getLoadedModels().remove(str);
-                            boolean flag = listViewModels.getItems().size() > 0;
-                            scene.currentModel = flag ? listViewModels.getItems().get(listViewModels.getItems().size()-1) : null;
-                        }
-                    }
-                }
-            });
-            anchorPane.setOnKeyPressed(new EventHandler<KeyEvent>() {
-                @Override
-                public void handle(KeyEvent event) {
-                    if (event.getCode() == KeyCode.ENTER && selectedModels.size() > 1) {
-                        Model changedModel = new Model();
-                        String changeModelName = "";
-                        for (String model : selectedModels) {
-                            changedModel.getVertices().addAll(scene.getLoadedModels().get(model).modifiedVertices());
-                            changedModel.getTextureVertices().addAll(scene.getLoadedModels().get(model).getTextureVertices());
-                            changedModel.getNormals().addAll(scene.getLoadedModels().get(model).getNormals());
-                            changedModel.getPolygons().addAll(scene.getLoadedModels().get(model).getPolygons());
-                            changeModelName += model.substring(0, 3);
-                        }
-                        changeModelName += ".obj";
-                        List<String> data = ObjWriter.write(changedModel);
-                        StringBuilder fileContent = new StringBuilder();
-                        for (String s : data) {
-                            fileContent.append(s).append("\n");
-                        }
-                        Model model = ObjReader.read(fileContent.toString(), true);
-                        //model.calcNormals();
-                        changeModelName = checkContainsModel(changeModelName);
-                        scene.getLoadedModels().put(changeModelName, new LoadedModel(model));
-                        scene.currentModel = changeModelName;
-                        listViewModels.getItems().add(scene.currentModel);
-                        listViewModels.scrollTo(scene.currentModel);
-                        cleanTransform();
-                    }
-                }
-            });
         }
     }
-    public void checkSelectedModels () {
+    public void okButton() {
+        Model gigaModel = createGigaModel(selectedModels);
+        boolean flag = modelName.getText().contains(".obj");
+        String changeModelName = flag ? modelName.getText() : modelName.getText() + ".obj";
+        List<String> data = ObjWriter.write(gigaModel);
+        StringBuilder fileContent = new StringBuilder();
+        for (String s : data) {
+            fileContent.append(s).append("\n");
+        }
+        Model model = ObjReader.read(fileContent.toString(), true);
+        //model.calcNormals();
+        changeModelName = checkContainsModel(changeModelName);
+        scene.getLoadedModels().put(changeModelName, new LoadedModel(model));
+        scene.currentModel = changeModelName;
+        listViewModels.getItems().add(scene.currentModel);
+        listViewModels.scrollTo(scene.currentModel);
+        cleanTransform();
+        enterModelName.setVisible(false);
+    }
+    public void closeEnterFileName () {
+        enterModelName.setVisible(false);
+    }
+    public void addSelectedModels() {
         selectedModels = new ArrayList<>();
         List<Integer> list = listViewModels.getSelectionModel().getSelectedIndices();
         for (Integer i : list) {
-            selectedModels.add(listViewModels.getItems().get(i));
+            String model = listViewModels.getItems().get(i);
+            selectedModels.add(model);
         }
+    }
+    public Model createGigaModel(List<String> selectedModels) {
+        Model model = new Model();
+        int amountOfVertices = 0, amountOfTextureVertices = 0, amountOfNormals = 0;
+        for (String modelName : selectedModels) {
+            model.getVertices().addAll(scene.getLoadedModels().get(modelName).getVertices());
+            model.getNormals().addAll(scene.getLoadedModels().get(modelName).getNormals());
+            model.getTextureVertices().addAll(scene.getLoadedModels().get(modelName).getTextureVertices());
+            model.getPolygons().addAll(changePolygonsNumeration(scene.getLoadedModels().get(modelName).getPolygons(), amountOfVertices, amountOfTextureVertices, amountOfNormals));
+
+            amountOfVertices += model.getVertices().size();
+            amountOfTextureVertices += model.getTextureVertices().size();
+            amountOfNormals += model.getNormals().size();
+        }
+        return model;
+    }
+    public static List<com.cgvsu.model.Polygon> changePolygonsNumeration(List<com.cgvsu.model.Polygon> polygonList, int amountOfVertices, int amountOfTextureVertices, int amountOfNormals) {
+        List<com.cgvsu.model.Polygon> polygons = new ArrayList<>();
+        for (com.cgvsu.model.Polygon oldPolygon : polygonList) {
+            com.cgvsu.model.Polygon newPolygon = new Polygon();
+            newPolygon.changePolygonNumeration(oldPolygon, amountOfVertices, amountOfTextureVertices, amountOfNormals);
+            polygons.add(newPolygon);
+        }
+        return polygons;
     }
     public void textureSelected (MouseEvent event) throws IOException {
         if (Objects.equals(event.getButton().toString(), "PRIMARY")) {
@@ -804,7 +876,7 @@ public class GuiController {
         anchorPane.setStyle("-fx-background-color: white;");
     }
     public void openSaveSelection() {
-        if (modelIsSelected) {
+        if (modelIsLoaded) {
             saveSelection.setVisible(true);
         }
     }
@@ -815,8 +887,47 @@ public class GuiController {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Reader Exception");
         alert.setHeaderText(text);
-        alert.setContentText("Please fix the input file.");
+        alert.setContentText("Please correct the data.");
         alert.showAndWait();
+    }
+    public void checkModelLoading (boolean visibleM, boolean visibleT) {
+        if (!visibleM) {
+            rightUpRect.setVisible(false);
+            rightUpText.setVisible(false);
+            rightDownRect.setVisible(false);
+            rightDownText.setVisible(false);
+            leftUpRect.setVisible(false);
+            leftUpText.setVisible(false);
+            leftMediumRect.setVisible(false);
+            leftMediumText.setVisible(false);
+            modelTrans.setStyle("-fx-background-color: white;");
+            loadedModels.setStyle("-fx-background-color: white;");
+            renderingModels.setStyle("-fx-background-color: white;");
+            loadedCameras.setStyle("-fx-background-color: white;");
+
+        } else {
+            rightUpRect.setVisible(true);
+            rightUpText.setVisible(true);
+            rightDownRect.setVisible(true);
+            rightDownText.setVisible(true);
+            leftUpRect.setVisible(true);
+            leftUpText.setVisible(true);
+            leftMediumRect.setVisible(true);
+            leftMediumText.setVisible(true);
+            modelTrans.setStyle("-fx-background-color: lightgray;");
+            loadedModels.setStyle("-fx-background-color: lightgray;");
+            renderingModels.setStyle("-fx-background-color: lightgray;");
+            loadedCameras.setStyle("-fx-background-color: lightgray;");
+        }
+        if (!visibleT) {
+            leftDownRect.setVisible(false);
+            leftDownText.setVisible(false);
+            loadedTextures.setStyle("-fx-background-color: white;");
+        } else {
+            leftDownRect.setVisible(true);
+            leftDownText.setVisible(true);
+            loadedTextures.setStyle("-fx-background-color: lightgray;");
+        }
     }
 
 }
