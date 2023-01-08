@@ -19,7 +19,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane fx:id="anchorPane" onKeyPressed="#hotkeys" prefHeight="693.0" prefWidth="1281.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cgvsu.GuiController">
+<AnchorPane fx:id="anchorPane" onKeyPressed="#hotkeys" prefHeight="695.0" prefWidth="1281.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cgvsu.GuiController">
     <MenuBar>
         <Menu mnemonicParsing="false" text="File">
             <MenuItem mnemonicParsing="false" onAction="#onOpenLoadModelMenuItemClick" text="Load Model">
@@ -36,6 +36,7 @@
                 <accelerator>
                     <KeyCodeCombination alt="UP" code="D" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                 </accelerator></MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#onAddCameraMenuItemClick" text="Add camera" />
         </Menu>
         <Menu mnemonicParsing="false" text="Camera Options">
             <MenuItem mnemonicParsing="false" onAction="#handleCameraForward" text="Forward" visible="false">
@@ -91,8 +92,8 @@
         </Menu>
     </MenuBar>
 
-    <Canvas fx:id="canvas" focusTraversable="true" height="695.0" layoutX="-7.0" layoutY="26.0" width="1280.0" />
-    <AnchorPane fx:id="modelTrans" layoutX="995.0" prefHeight="520.0" prefWidth="285.0">
+    <Canvas fx:id="canvas" focusTraversable="true" height="695.0" layoutY="25.0" width="1280.0" />
+    <AnchorPane fx:id="modelTrans" layoutX="996.0" prefHeight="520.0" prefWidth="285.0">
         <children>
             <TextField fx:id="rotateX" focusTraversable="false" layoutX="130.0" layoutY="65.0" prefHeight="26.0" prefWidth="122.0" text="0" />
             <TextField fx:id="rotateY" focusTraversable="false" layoutX="130.0" layoutY="130.0" prefHeight="26.0" prefWidth="122.0" text="0" />
@@ -165,7 +166,7 @@
                     <Font size="15.0" />
                 </font>
             </Label>
-            <Rectangle fx:id="rightUpRect" arcHeight="5.0" arcWidth="5.0" fill="#2197ff21" height="520.0" layoutX="1.0" stroke="BLACK" strokeType="INSIDE" width="25.0" />
+            <Rectangle fx:id="rightUpRect" arcHeight="5.0" arcWidth="5.0" fill="#2197ff21" height="520.0" stroke="BLACK" strokeType="INSIDE" width="25.0" />
             <Text fx:id="rightUpText" layoutX="8.0" layoutY="210.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Transform" wrappingWidth="7.200036621093716">
                 <font>
                     <Font size="15.0" />
@@ -173,25 +174,25 @@
             </Text>
         </children>
     </AnchorPane>
-    <MenuBar layoutX="156.0">
+    <MenuBar layoutX="156.0" prefHeight="25.0" prefWidth="71.0">
         <menus>
-            <Menu mnemonicParsing="false" text="Params">
+            <Menu mnemonicParsing="false" text="Theme">
                 <items>
-                    <RadioMenuItem fx:id="light" mnemonicParsing="false" onAction="#lightTheme" selected="true" text="Light theme" />
-                    <RadioMenuItem fx:id="dark" mnemonicParsing="false" onAction="#darkTheme" text="Dark theme" />
+                    <RadioMenuItem fx:id="light" mnemonicParsing="false" onAction="#lightTheme" selected="true" text="Bright" />
+                    <RadioMenuItem fx:id="dark" mnemonicParsing="false" onAction="#darkTheme" text="Dark" />
                 </items>
             </Menu>
         </menus>
     </MenuBar>
-    <AnchorPane fx:id="loadedModels" layoutY="28.0" prefHeight="238.0" prefWidth="260.0">
+    <AnchorPane fx:id="loadedModels" layoutX="-1.0" layoutY="28.0" prefHeight="238.0" prefWidth="260.0">
         <children>
-            <ListView fx:id="listViewModels" focusTraversable="false" layoutY="34.0" onMouseClicked="#modelSelected" prefHeight="203.0" prefWidth="235.0" />
+            <ListView fx:id="listViewModels" focusTraversable="false" layoutY="34.0" onMouseClicked="#modelSelected" prefHeight="203.0" prefWidth="236.0" />
             <Label alignment="CENTER" layoutX="49.0" layoutY="2.0" prefHeight="30.0" prefWidth="135.0" text="Loaded models">
                 <font>
                     <Font size="19.0" />
                 </font>
             </Label>
-            <Rectangle fx:id="leftUpRect" arcHeight="5.0" arcWidth="5.0" fill="#61d42421" height="238.0" layoutX="235.0" stroke="BLACK" strokeType="INSIDE" width="25.0" />
+            <Rectangle fx:id="leftUpRect" arcHeight="5.0" arcWidth="5.0" fill="#61d42421" height="238.0" layoutX="236.0" stroke="BLACK" strokeType="INSIDE" width="25.0" />
             <Text fx:id="leftUpText" layoutX="244.0" layoutY="74.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Models" wrappingWidth="7.200036621093659">
                 <font>
                     <Font size="15.0" />
@@ -218,7 +219,7 @@
                 </font></Label>
         </children>
     </AnchorPane>
-    <AnchorPane fx:id="renderingModels" layoutX="995.0" layoutY="525.0" prefHeight="196.0" prefWidth="285.0">
+    <AnchorPane fx:id="renderingModels" layoutX="996.0" layoutY="525.0" prefHeight="196.0" prefWidth="285.0">
         <children>
             <CheckBox fx:id="drawPolygonMesh" focusTraversable="false" layoutX="48.0" layoutY="40.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="125.0" selected="true" text="Polygon mesh">
                 <font>
@@ -241,7 +242,7 @@
                 <value>
                     <Color red="0.4000000059604645" green="0.501960813999176" blue="0.9019607901573181" />
                 </value></ColorPicker>
-            <Rectangle fx:id="rightDownRect" arcHeight="5.0" arcWidth="5.0" fill="#61d42440" height="196.0" layoutX="1.0" stroke="BLACK" strokeType="INSIDE" width="25.0" />
+            <Rectangle fx:id="rightDownRect" arcHeight="5.0" arcWidth="5.0" fill="#61d42421" height="196.0" stroke="BLACK" strokeType="INSIDE" width="25.0" />
             <Text fx:id="rightDownText" layoutX="7.0" layoutY="66.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Modes" wrappingWidth="7.200036621093659">
                 <font>
                     <Font size="15.0" />
@@ -254,15 +255,15 @@
             </CheckBox>
         </children>
     </AnchorPane>
-    <AnchorPane fx:id="loadedTextures" layoutY="485.0" prefHeight="229.0" prefWidth="260.0">
+    <AnchorPane fx:id="loadedTextures" layoutX="-1.0" layoutY="485.0" prefHeight="229.0" prefWidth="260.0">
         <children>
-            <ListView fx:id="listViewTextures" layoutY="34.0" onMouseClicked="#textureSelected" prefHeight="201.0" prefWidth="235.0" />
+            <ListView fx:id="listViewTextures" focusTraversable="false" layoutY="34.0" onMouseClicked="#textureSelected" prefHeight="201.0" prefWidth="236.0" />
             <Label alignment="CENTER" layoutX="49.0" layoutY="2.0" prefHeight="30.0" prefWidth="135.0" text="Loaded textures">
                 <font>
                     <Font size="19.0" />
                 </font>
             </Label>
-            <Rectangle fx:id="leftDownRect" arcHeight="5.0" arcWidth="5.0" fill="#2197ff21" height="236.0" layoutX="235.0" stroke="BLACK" strokeType="INSIDE" width="25.0" />
+            <Rectangle fx:id="leftDownRect" arcHeight="5.0" arcWidth="5.0" fill="#2197ff21" height="235.0" layoutX="236.0" stroke="BLACK" strokeType="INSIDE" width="25.0" />
             <Text fx:id="leftDownText" layoutX="245.0" layoutY="42.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Textures" wrappingWidth="7.200036621093659">
                 <font>
                     <Font size="15.0" />
@@ -272,7 +273,7 @@
     </AnchorPane>
     <AnchorPane fx:id="enterModelName" layoutX="478.0" layoutY="261.0" prefHeight="222.0" prefWidth="308.0" visible="false">
         <children>
-            <Button layoutX="139.0" layoutY="153.0" mnemonicParsing="false" onAction="#okButton" text="OK">
+            <Button layoutX="139.0" layoutY="153.0" mnemonicParsing="false" onAction="#okGigaModelPane" text="OK">
                 <font>
                     <Font size="18.0" />
                 </font>
@@ -308,15 +309,15 @@
             </Menu>
         </menus>
     </MenuBar>
-    <AnchorPane fx:id="loadedCameras" layoutY="275.0" prefHeight="196.0" prefWidth="260.0">
+    <AnchorPane fx:id="loadedCameras" layoutX="-1.0" layoutY="275.0" prefHeight="196.0" prefWidth="260.0">
         <children>
-            <ListView layoutY="34.0" prefHeight="166.0" prefWidth="235.0" />
-            <Label alignment="CENTER" layoutX="46.0" layoutY="2.0" prefHeight="30.0" prefWidth="144.0" text="Loaded cameras">
+            <ListView fx:id="listViewCameras" focusTraversable="false" layoutY="34.0" prefHeight="166.0" prefWidth="236.0" />
+            <Label alignment="CENTER" layoutX="46.0" layoutY="2.0" prefHeight="30.0" prefWidth="144.0" text="Added cameras">
                 <font>
                     <Font size="19.0" />
                 </font>
             </Label>
-            <Rectangle fx:id="leftMediumRect" arcHeight="5.0" arcWidth="5.0" fill="#ffdd1f4d" height="201.0" layoutX="235.0" stroke="BLACK" strokeType="INSIDE" width="25.0" />
+            <Rectangle fx:id="leftMediumRect" arcHeight="5.0" arcWidth="5.0" fill="#ffdd1f4d" height="201.0" layoutX="236.0" stroke="BLACK" strokeType="INSIDE" width="25.0" />
             <Text fx:id="leftMediumText" layoutX="244.0" layoutY="50.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Cameras" wrappingWidth="7.200036621093659">
                 <font>
                     <Font size="15.0" />
@@ -324,4 +325,43 @@
             </Text>
         </children>
     </AnchorPane>
+   <AnchorPane fx:id="enterCameraData" layoutX="440.0" layoutY="267.0" prefHeight="212.0" prefWidth="418.0" visible="false">
+      <children>
+         <Label alignment="CENTER" contentDisplay="TOP" layoutX="115.0" layoutY="20.0" prefHeight="38.0" prefWidth="195.0" text="Enter camera data. ">
+            <font>
+               <Font size="20.0" />
+            </font>
+         </Label>
+         <TextField fx:id="cameraName" layoutX="40.0" layoutY="128.0" />
+         <TextField fx:id="cameraX" layoutX="242.0" layoutY="127.0" prefHeight="26.0" prefWidth="32.0" />
+         <Label layoutX="65.0" layoutY="93.0" prefHeight="30.0" prefWidth="100.0" text="Camera name">
+            <font>
+               <Font size="15.0" />
+            </font>
+         </Label>
+         <Label layoutX="254.0" layoutY="99.0" text="X">
+            <font>
+               <Font size="15.0" />
+            </font>
+         </Label>
+         <TextField fx:id="cameraZ" layoutX="352.0" layoutY="127.0" prefHeight="26.0" prefWidth="32.0" />
+         <TextField fx:id="cameraY" layoutX="294.0" layoutY="127.0" prefHeight="26.0" prefWidth="32.0" />
+         <Label layoutX="361.0" layoutY="98.0" prefHeight="18.0" prefWidth="7.0" text="Z">
+            <font>
+               <Font size="15.0" />
+            </font>
+         </Label>
+         <Label layoutX="307.0" layoutY="99.0" text="Y">
+            <font>
+               <Font size="15.0" />
+            </font>
+         </Label>
+         <Button layoutX="370.0" layoutY="1.0" mnemonicParsing="false" onAction="#closeCameraPane" prefHeight="26.0" prefWidth="47.0" style="-fx-background-color: red;" text="✖" />
+         <Button layoutX="189.0" layoutY="173.0" mnemonicParsing="false" onAction="#okCameraPane" prefHeight="38.0" prefWidth="47.0" text="OK">
+            <font>
+               <Font size="15.0" />
+            </font>
+         </Button>
+      </children>
+   </AnchorPane>
 </AnchorPane>

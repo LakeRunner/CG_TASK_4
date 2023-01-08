@@ -3,40 +3,57 @@ package com.cgvsu;
 import com.cgvsu.math.Vector3f;
 import com.cgvsu.model.LoadedModel;
 import com.cgvsu.render_engine.Camera;
+import javafx.scene.image.Image;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class Scene {
-    String currentModel;
 
-    private HashMap<String, LoadedModel> loadedModels = new HashMap<>();
+    String currentModelName;
+    String currentCameraName;
+    String currentTextureName;
 
-    private Camera camera = new Camera(
-            new Vector3f(0, 0, 200),
-            new Vector3f(0, 0, 0),
-            1.0F, 1, 0.01F, 100);
+    private Map<String, LoadedModel> loadedModels = new HashMap<>();
+    private Map<String, Camera> addedCameras = new HashMap<>();
+    private Map<String, Image> loadedTextures = new HashMap<>();
 
-    public String getCurrentModel() {
-        return currentModel;
+
+    private Camera currentCamera;
+
+    public String getCurrentModelName() {
+        return currentModelName;
     }
 
-    public void setCurrentModel(String currentModel) {
-        this.currentModel = currentModel;
+    public void setCurrentModelName(String currentModelName) {
+        this.currentModelName = currentModelName;
     }
 
-    public HashMap<String, LoadedModel> getLoadedModels() {
+    public Map<String, LoadedModel> getLoadedModels() {
         return loadedModels;
     }
+    public Map<String, Image> getLoadedTextures() {
+        return loadedTextures;
+    }
+
 
     public void setLoadedModels(HashMap<String, LoadedModel> loadedModels) {
         this.loadedModels = loadedModels;
     }
 
-    public Camera getCamera() {
-        return camera;
+    public Camera getCurrentCamera() {
+        return currentCamera;
     }
 
-    public void setCamera(Camera camera) {
-        this.camera = camera;
+    public Map<String, Camera> getAddedCameras() {
+        return addedCameras;
+    }
+
+    public String getCurrentCameraName() {
+        return currentCameraName;
+    }
+
+    public void setCurrentCamera(Camera currentCamera) {
+        this.currentCamera = currentCamera;
     }
 }

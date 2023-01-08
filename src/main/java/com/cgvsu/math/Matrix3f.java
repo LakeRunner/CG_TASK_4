@@ -61,6 +61,5 @@ public class Matrix3f extends Matrix {
     }
 
     public Matrix3f inversion() {
-        return new Matrix3f(Matrix.inversion(super.getMatrixArray(), 3).getMatrixArray());
-    }
-}
+        return new Matrix3f(Matrix.inversion(super.getMatrixArray()).getMatrixArray());
+    }}
