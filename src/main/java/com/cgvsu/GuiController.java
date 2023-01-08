@@ -18,10 +18,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.ScrollEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -159,6 +156,7 @@ public class GuiController {
     private double xAngle;
     private double yAngle;
     private double angleListenerValue = 0.05;
+    Image img = null;
 
     @FXML
     private void initialize() {
@@ -383,7 +381,7 @@ public class GuiController {
         timeline = new Timeline();
         timeline.setCycleCount(Animation.INDEFINITE);
 
-        Image img = null;
+
         try {
             img = new Image(new FileInputStream("src\\main\\resources\\textures\\NeutralWrapped.jpg"));
         } catch (FileNotFoundException e) {
@@ -402,12 +400,12 @@ public class GuiController {
                 scene.getLoadedModels().get(scene.currentModel).setRotateV(new Vector3f(Double.parseDouble(rotateX.getText()), Double.parseDouble(rotateY.getText()), Double.parseDouble(rotateZ.getText())));
                 scene.getLoadedModels().get(scene.currentModel).setScaleV(new Vector3f(Double.parseDouble(scaleX.getText()), Double.parseDouble(scaleY.getText()), Double.parseDouble(scaleZ.getText())));
                 scene.getLoadedModels().get(scene.currentModel).setTranslateV(new Vector3f(-Double.parseDouble(translateX.getText()), Double.parseDouble(translateY.getText()), Double.parseDouble(translateZ.getText())));
-                if (scene.getLoadedModels().get(scene.currentModel) != null) {
+                for (String model : selectedModels) {
                     RenderEngine.render(canvas.getGraphicsContext2D(), scene.getCamera(),
-                            scene.getLoadedModels().get(scene.currentModel), (int) width, (int) height,
-                            scene.getLoadedModels().get(scene.currentModel).getRotateV(),
-                            scene.getLoadedModels().get(scene.currentModel).getScaleV(),
-                            scene.getLoadedModels().get(scene.currentModel).getTranslateV(),
+                            scene.getLoadedModels().get(model), (int) width, (int) height,
+                            scene.getLoadedModels().get(model).getRotateV(),
+                            scene.getLoadedModels().get(model).getScaleV(),
+                            scene.getLoadedModels().get(model).getTranslateV(),
                             meshColor, drawPolygonMesh.isSelected(), drawTextures.isSelected(),
                             drawLighting.isSelected(), drawFilling.isSelected(), polygonFillColor.getValue(),
                             finalImg);
@@ -470,6 +468,7 @@ public class GuiController {
             scene.currentModel = name;
             listViewModels.getItems().add(scene.currentModel);
             listViewModels.scrollTo(scene.currentModel);
+            selectedModels.add(scene.currentModel);
             cleanTransform();
             // todo: обработка ошибок
         } catch (IOException exception) {
@@ -525,6 +524,12 @@ public class GuiController {
         name = checkContainsTexture(name);
         textures.put(name, new Image(new File(file.getAbsolutePath()).toURI().toString()));
         listViewTextures.getItems().add(name);
+    }
+
+    public void ctrlC(KeyEvent event) {
+        if (event.isControlDown() && (event.getCode() == KeyCode.C)) {
+            fovSlider.setValue(fovSlider.getValue()+0.1);
+        }
     }
 
     @FXML
@@ -633,9 +638,7 @@ public class GuiController {
     public void modelSelected (MouseEvent event) throws IOException {
         if (Objects.equals(event.getButton().toString(), "PRIMARY")) {
             checkSelectedModels();
-            String changeModelName = scene.currentModel;
-            Model changedModel = new Model(scene.getLoadedModels().get(scene.currentModel).modifiedVertecies(), scene.getLoadedModels().get(scene.currentModel).getTextureVertices(), scene.getLoadedModels().get(scene.currentModel).getNormals(), scene.getLoadedModels().get(scene.currentModel).getPolygons());
-            int index = listViewModels.getSelectionModel().getSelectedIndex();
+             int index = listViewModels.getSelectionModel().getSelectedIndex();
             if (index != -1) {
                 String name = listViewModels.getItems().get(index);
                 scene.currentModel = name;
@@ -658,10 +661,16 @@ public class GuiController {
                 @Override
                 public void handle(KeyEvent event) {
                     if (event.getCode() == KeyCode.ENTER && selectedModels.size() > 1) {
-                        changedModel.getVertices().addAll(scene.getLoadedModels().get(scene.currentModel).getVertices());
-                        changedModel.getNormals().addAll(scene.getLoadedModels().get(scene.currentModel).getNormals());
-                        changedModel.getTextureVertices().addAll(scene.getLoadedModels().get(scene.currentModel).getTextureVertices());
-                        changedModel.getPolygons().addAll(scene.getLoadedModels().get(scene.currentModel).getPolygons());
+                        Model changedModel = new Model();
+                        String changeModelName = "";
+                        for (String model : selectedModels) {
+                            changedModel.getVertices().addAll(scene.getLoadedModels().get(model).modifiedVertecies());
+                            changedModel.getTextureVertices().addAll(scene.getLoadedModels().get(model).getTextureVertices());
+                            changedModel.getNormals().addAll(scene.getLoadedModels().get(model).getNormals());
+                            changedModel.getPolygons().addAll(scene.getLoadedModels().get(model).getPolygons());
+                            changeModelName += model.substring(0, 3);
+                        }
+                        changeModelName += ".obj";
                         List<String> data = ObjWriter.write(changedModel);
                         StringBuilder fileContent = new StringBuilder();
                         for (String s : data) {
@@ -669,10 +678,9 @@ public class GuiController {
                         }
                         Model model = ObjReader.read(fileContent.toString(), true);
                         //model.calcNormals();
-                        String name = changeModelName.substring(0,3) + scene.currentModel.substring(0,3) + ".obj";
-                        name = checkContainsModel(name);
-                        scene.getLoadedModels().put(name, new LodedModel(model));
-                        scene.currentModel = name;
+                        changeModelName = checkContainsModel(changeModelName);
+                        scene.getLoadedModels().put(changeModelName, new LodedModel(model));
+                        scene.currentModel = changeModelName;
                         listViewModels.getItems().add(scene.currentModel);
                         listViewModels.scrollTo(scene.currentModel);
                         cleanTransform();
