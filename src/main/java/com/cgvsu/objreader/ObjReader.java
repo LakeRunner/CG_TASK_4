@@ -104,9 +104,9 @@ public class ObjReader {
 		if (listOfWordsWithoutToken.size() < 3) {
 			throw new ReaderExceptions.ObjReaderException("Not enough vertexes for polygon.", lineInd);
 		}
-		ArrayList<Integer> onePolygonVertexIndices = new ArrayList<>();
-		ArrayList<Integer> onePolygonTextureVertexIndices = new ArrayList<>();
-		ArrayList<Integer> onePolygonNormalIndices = new ArrayList<>();
+		List<Integer> onePolygonVertexIndices = new ArrayList<>();
+		List<Integer> onePolygonTextureVertexIndices = new ArrayList<>();
+		List<Integer> onePolygonNormalIndices = new ArrayList<>();
 		for (String s : listOfWordsWithoutToken) {
 			parseOneFaceWord(s, onePolygonVertexIndices, onePolygonTextureVertexIndices, onePolygonNormalIndices, lineInd);
 		}

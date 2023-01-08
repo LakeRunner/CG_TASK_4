@@ -633,6 +633,8 @@ public class GuiController {
     public void modelSelected (MouseEvent event) throws IOException {
         if (Objects.equals(event.getButton().toString(), "PRIMARY")) {
             checkSelectedModels();
+            String changeModelName = scene.currentModel;
+            Model changedModel = new Model(scene.getLoadedModels().get(scene.currentModel).modifiedVertecies(), scene.getLoadedModels().get(scene.currentModel).getTextureVertices(), scene.getLoadedModels().get(scene.currentModel).getNormals(), scene.getLoadedModels().get(scene.currentModel).getPolygons());
             int index = listViewModels.getSelectionModel().getSelectedIndex();
             if (index != -1) {
                 String name = listViewModels.getItems().get(index);
@@ -652,6 +654,31 @@ public class GuiController {
                     }
                 }
             });
+            anchorPane.setOnKeyPressed(new EventHandler<KeyEvent>() {
+                @Override
+                public void handle(KeyEvent event) {
+                    if (event.getCode() == KeyCode.ENTER && selectedModels.size() > 1) {
+                        changedModel.getVertices().addAll(scene.getLoadedModels().get(scene.currentModel).getVertices());
+                        changedModel.getNormals().addAll(scene.getLoadedModels().get(scene.currentModel).getNormals());
+                        changedModel.getTextureVertices().addAll(scene.getLoadedModels().get(scene.currentModel).getTextureVertices());
+                        changedModel.getPolygons().addAll(scene.getLoadedModels().get(scene.currentModel).getPolygons());
+                        List<String> data = ObjWriter.write(changedModel);
+                        StringBuilder fileContent = new StringBuilder();
+                        for (String s : data) {
+                            fileContent.append(s).append("\n");
+                        }
+                        Model model = ObjReader.read(fileContent.toString(), true);
+                        //model.calcNormals();
+                        String name = changeModelName.substring(0,3) + scene.currentModel.substring(0,3) + ".obj";
+                        name = checkContainsModel(name);
+                        scene.getLoadedModels().put(name, new LodedModel(model));
+                        scene.currentModel = name;
+                        listViewModels.getItems().add(scene.currentModel);
+                        listViewModels.scrollTo(scene.currentModel);
+                        cleanTransform();
+                    }
+                }
+            });
         }
     }
     public void checkSelectedModels () {
@@ -664,10 +691,9 @@ public class GuiController {
     public void textureSelected (MouseEvent event) throws IOException {
         if (Objects.equals(event.getButton().toString(), "PRIMARY")) {
             checkSelectedTextures();
-//            int index = listViewTextures.getSelectionModel().getSelectedIndex();
-//            if (index != -1) {
-//                String name = listViewTextures.getItems().get(index);
-//            }
+            int index = listViewTextures.getSelectionModel().getSelectedIndex();
+            Image image = textures.get(listViewTextures.getItems().get(index));
+
             anchorPane.setOnKeyPressed(new EventHandler<KeyEvent>() {
                 @Override
                 public void handle(KeyEvent event) {
