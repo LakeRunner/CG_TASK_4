@@ -68,7 +68,8 @@ public class GuiController {
 
     @FXML
     private AnchorPane loadedCameras;
-
+    @FXML
+    private AnchorPane enterCameraData;
 
     @FXML
     private Canvas canvas;
@@ -110,6 +111,14 @@ public class GuiController {
     private TextField translateZ;
     @FXML
     private TextField modelName;
+    @FXML
+    private TextField cameraName;
+    @FXML
+    private TextField cameraX;
+    @FXML
+    private TextField cameraY;
+    @FXML
+    private TextField cameraZ;
     @FXML
     private javafx.scene.shape.Rectangle rightUpRect;
 
@@ -178,10 +187,10 @@ public class GuiController {
     private Timeline timeline;
     private Robot robot;
     private boolean modelIsLoaded;
+    private boolean cameraIsLoaded;
     private List<TextField> list;
     private List <String> selectedModels = new ArrayList<>();
     private List <String> selectedTextures = new ArrayList<>();
-    private Map<String, Image> textures = new HashMap<>();
     private boolean textureIsLoaded;
     private boolean onActionListCameras;
     private boolean onActionTransform;
@@ -203,6 +212,12 @@ public class GuiController {
 
     @FXML
     private void initialize() {
+       Camera mainCamera = new Camera(new Vector3f(0, 0, 200),
+                                      new Vector3f(0, 0, 0),
+                                  1.0F, 1, 0.01F, 100);
+       scene.setCurrentCamera(mainCamera);
+       scene.getAddedCameras().put("mainCamera", mainCamera);
+       listViewCameras.getItems().add("mainCamera");
         listViewModels.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         scene.getLoadedModels().put("Mesh", new LoadedModel(mesh));
         scene.currentModelName = "Mesh";
@@ -252,13 +267,13 @@ public class GuiController {
         fovSlider.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
-                scene.getMainCamera().setFov((float) (fovSlider.getValue()));
+                scene.getCurrentCamera().setFov((float) (fovSlider.getValue()));
             }
         });
         aspectSlider.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
-                scene.getMainCamera().setAspectRatio((float) (aspectSlider.getValue()));
+                scene.getCurrentCamera().setAspectRatio((float) (aspectSlider.getValue()));
             }
         });
 
@@ -366,9 +381,9 @@ public class GuiController {
             public void handle(ScrollEvent scrollEvent) {
                 double deltaY = scrollEvent.getDeltaY();
                 if (deltaY < 0){
-                    scene.getMainCamera().movePosition(new Vector3f(0, 0, TRANSLATION));
+                    scene.getCurrentCamera().movePosition(new Vector3f(0, 0, TRANSLATION));
                 } else {
-                    scene.getMainCamera().movePosition(new Vector3f(0, 0, -TRANSLATION));
+                    scene.getCurrentCamera().movePosition(new Vector3f(0, 0, -TRANSLATION));
                 }
             }
         });
@@ -439,10 +454,13 @@ public class GuiController {
         anchorPane.prefHeightProperty().addListener((ov, oldValue, newValue) -> canvas.setHeight(newValue.doubleValue()));
         saveSelection.setStyle("-fx-background-color: lightgray;");
         enterModelName.setStyle("-fx-background-color: lightgray;");
+        enterCameraData.setStyle("-fx-background-color: lightgray;");
         timeline = new Timeline();
         timeline.setCycleCount(Animation.INDEFINITE);
 
         KeyFrame frame = new KeyFrame(Duration.millis(15), event -> {
+            modelIsLoaded = listViewModels.getItems().size() > 0;
+            textureIsLoaded = listViewTextures.getItems().size() > 0;
             checkModelLoading(modelIsLoaded, textureIsLoaded);
             double width = canvas.getWidth();
             double height = canvas.getHeight();
@@ -450,7 +468,7 @@ public class GuiController {
             Color meshColor = Color.BLACK;
             if (TransformFieldsNotNull() && scene.currentModelName != null) {
                 //scene.getMainCamera().setAspectRatio((float) (width / height));
-                scene.getMainCamera().setAspectRatio((float) ((width / height) * aspectSlider.getValue() * 2));
+                scene.getCurrentCamera().setAspectRatio((float) ((width / height) * aspectSlider.getValue() * 2));
                 scene.getLoadedModels().get(scene.currentModelName).setRotateV(new Vector3f(Double.parseDouble(rotateX.getText()), Double.parseDouble(rotateY.getText()), Double.parseDouble(rotateZ.getText())));
                 scene.getLoadedModels().get(scene.currentModelName).setScaleV(new Vector3f(Double.parseDouble(scaleX.getText()), Double.parseDouble(scaleY.getText()), Double.parseDouble(scaleZ.getText())));
                 scene.getLoadedModels().get(scene.currentModelName).setTranslateV(new Vector3f(-Double.parseDouble(translateX.getText()), Double.parseDouble(translateY.getText()), Double.parseDouble(translateZ.getText())));
@@ -579,21 +597,28 @@ public class GuiController {
         }
         String name = file.getName();
         name = checkContainsTexture(name);
-        textures.put(name, new Image(new File(file.getAbsolutePath()).toURI().toString()));
+        scene.getLoadedTextures().put(name, new Image(new File(file.getAbsolutePath()).toURI().toString()));
         listViewTextures.getItems().add(name);
         textureIsLoaded = true;
     }
 
     public void onAddCameraMenuItemClick() {
+        enterCameraData.setVisible(true);
+    }
+    public void okCameraPane () {
         Camera newCamera = new Camera(
-                new Vector3f(scene.getCurrentCamera().getPosition().getX() + 100, 0, 200),
+                new Vector3f(Integer.parseInt(cameraX.getText()), Integer.parseInt(cameraY.getText()), Integer.parseInt(cameraZ.getText())),
                 new Vector3f(0, 0, 0),
                 1.0F, 1, 0.01F, 100);
         Map<String, Camera> addedCameras = scene.getAddedCameras();
-        String name = "Camera" + (addedCameras.size() + 1);
+        String name =  cameraName.getText();
         addedCameras.put(name, newCamera);
         listViewCameras.getItems().add(name);
-        scene.setCurrentCamera(newCamera);
+        enterCameraData.setVisible(false);
+        cameraIsLoaded = true;
+    }
+    public void closeCameraPane () {
+        enterCameraData.setVisible(false);
     }
 
     public void hotkeys(KeyEvent event) {
@@ -698,32 +723,32 @@ public class GuiController {
 
     @FXML
     public void handleCameraForward(ActionEvent actionEvent) {
-        scene.getMainCamera().movePosition(new Vector3f(0, 0, -TRANSLATION));
+        scene.getCurrentCamera().movePosition(new Vector3f(0, 0, -TRANSLATION));
     }
 
     @FXML
     public void handleCameraBackward(ActionEvent actionEvent) {
-        scene.getMainCamera().movePosition(new Vector3f(0, 0, TRANSLATION));
+        scene.getCurrentCamera().movePosition(new Vector3f(0, 0, TRANSLATION));
     }
 
     @FXML
     public void handleCameraLeft(ActionEvent actionEvent) {
-        scene.getMainCamera().movePosition(new Vector3f(TRANSLATION, 0, 0));
+        scene.getCurrentCamera().movePosition(new Vector3f(TRANSLATION, 0, 0));
         //scene.getMainCamera().setTarget(new Vector3f(scene.getMainCamera().getTarget().getX() + TRANSLATION, scene.getMainCamera().getTarget().getY(), scene.getMainCamera().getTarget().getZ()));
     }
 
     @FXML
     public void handleCameraRight(ActionEvent actionEvent) {
-        scene.getMainCamera().movePosition(new Vector3f(-TRANSLATION, 0, 0));
+        scene.getCurrentCamera().movePosition(new Vector3f(-TRANSLATION, 0, 0));
         //camera.setTarget(new Vector3f(camera.getTarget().getX() - TRANSLATION, camera.getTarget().getY(), camera.getTarget().getZ()));
     }
 
     @FXML
-    public void handleCameraUp(ActionEvent actionEvent) {scene.getMainCamera().movePosition(new Vector3f(0, TRANSLATION, 0));}
+    public void handleCameraUp(ActionEvent actionEvent) {scene.getCurrentCamera().movePosition(new Vector3f(0, TRANSLATION, 0));}
 
     @FXML
     public void handleCameraDown(ActionEvent actionEvent) {
-        scene.getMainCamera().movePosition(new Vector3f(0, -TRANSLATION, 0));
+        scene.getCurrentCamera().movePosition(new Vector3f(0, -TRANSLATION, 0));
     }
 
     public List<TextField> getTextFields () {
@@ -790,7 +815,7 @@ public class GuiController {
 
     public String checkContainsTexture (String str) {
         int count = 0;
-        for (String name : textures.keySet()) {
+        for (String name : scene.getLoadedTextures().keySet()) {
             if (name.contains(str)) {
                 count++;
             }
@@ -830,7 +855,7 @@ public class GuiController {
         }
     }
 
-    public void okButton() {
+    public void okGigaModelPane() {
         Model gigaModel = createGigaModel(selectedModels);
         boolean flag = modelName.getText().contains(".obj");
         String changeModelName = flag ? modelName.getText() : modelName.getText() + ".obj";
@@ -893,7 +918,7 @@ public class GuiController {
         if (Objects.equals(event.getButton().toString(), "PRIMARY")) {
             checkSelectedTextures();
             int index = listViewTextures.getSelectionModel().getSelectedIndex();
-            texture = textures.get(listViewTextures.getItems().get(index));
+            texture = scene.getLoadedTextures().get(listViewTextures.getItems().get(index));
 
             anchorPane.setOnKeyPressed(new EventHandler<KeyEvent>() {
                 @Override
@@ -901,7 +926,7 @@ public class GuiController {
                     if (event.getCode() == KeyCode.DELETE) {
                         for (String str : selectedTextures) {
                             listViewTextures.getItems().remove(str);
-                            textures.remove(str);
+                            scene.getLoadedTextures().remove(str);
                         }
                     }
                 }
@@ -925,6 +950,7 @@ public class GuiController {
         anchorPane.setStyle("-fx-background-color: #454444;");
         saveSelection.setStyle("-fx-background-color: #707070;");
         enterModelName.setStyle("-fx-background-color: #707070;");
+        enterCameraData.setStyle("-fx-background-color: #707070;");
         listViewModels.setStyle("-fx-control-inner-background: #616161;");
         listViewTextures.setStyle("-fx-control-inner-background: #616161;");
         listViewCameras.setStyle("-fx-control-inner-background: #616161;");
@@ -934,6 +960,7 @@ public class GuiController {
         dark.setSelected(false);
         saveSelection.setStyle("-fx-background-color: lightgray;");
         enterModelName.setStyle("-fx-background-color: lightgray;");
+        enterCameraData.setStyle("-fx-background-color: lightgray;");
         anchorPane.setStyle("-fx-background-color: white;");
         listViewModels.setStyle("-fx-control-inner-background: white;");
         listViewTextures.setStyle("-fx-control-inner-background: white;");
@@ -986,6 +1013,7 @@ public class GuiController {
             loadedModels.setStyle(colors[1]);
             renderingModels.setStyle(colors[1]);
             loadedCameras.setStyle(colors[1]);
+            loadedCameras.setStyle(colors[1]);
         }
         if (!visibleT) {
             leftDownRect.setVisible(false);
@@ -996,7 +1024,6 @@ public class GuiController {
             leftDownRect.setVisible(true);
             leftDownText.setVisible(true);
             loadedTextures.setStyle(colors[1]);
-
         }
     }
     public String[] getBackGround(boolean theme) {
