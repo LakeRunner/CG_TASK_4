@@ -447,7 +447,7 @@ public class GuiController {
             double width = canvas.getWidth();
             double height = canvas.getHeight();
             canvas.getGraphicsContext2D().clearRect(0, 0, width, height);
-            Color meshColor = dark.isSelected() ? Color.LIGHTGRAY : Color.BLACK;
+            Color meshColor = Color.BLACK;
             if (TransformFieldsNotNull() && scene.currentModelName != null) {
                 //scene.getMainCamera().setAspectRatio((float) (width / height));
                 scene.getMainCamera().setAspectRatio((float) ((width / height) * aspectSlider.getValue() * 2));
@@ -494,7 +494,7 @@ public class GuiController {
         });*/
 
         timeline.getKeyFrames().add(frame);
-       // timeline.getKeyFrames().add(frame2);
+        // timeline.getKeyFrames().add(frame2);
         timeline.play();
     }
 
@@ -922,12 +922,18 @@ public class GuiController {
             dark.setSelected(true);
         }
         light.setSelected(false);
-        anchorPane.setStyle("-fx-background-color: black;");
+        anchorPane.setStyle("-fx-background-color: #454444;");
+        listViewModels.setStyle("-fx-control-inner-background: #616161;");
+        listViewTextures.setStyle("-fx-control-inner-background: #616161;");
+        listViewCameras.setStyle("-fx-control-inner-background: #616161;");
     }
 
     public void lightTheme () {
         dark.setSelected(false);
         anchorPane.setStyle("-fx-background-color: white;");
+        listViewModels.setStyle("-fx-control-inner-background: white;");
+        listViewTextures.setStyle("-fx-control-inner-background: white;");
+        listViewCameras.setStyle("-fx-control-inner-background: white;");
     }
 
     public void openSaveSelection() {
@@ -949,6 +955,7 @@ public class GuiController {
     }
 
     public void checkModelLoading (boolean visibleM, boolean visibleT) {
+        String[] colors = getBackGround(dark.isSelected());
         if (!visibleM) {
             rightUpRect.setVisible(false);
             rightUpText.setVisible(false);
@@ -958,10 +965,10 @@ public class GuiController {
             leftUpText.setVisible(false);
             leftMediumRect.setVisible(false);
             leftMediumText.setVisible(false);
-            modelTrans.setStyle("-fx-background-color: white;");
-            loadedModels.setStyle("-fx-background-color: white;");
-            renderingModels.setStyle("-fx-background-color: white;");
-            loadedCameras.setStyle("-fx-background-color: white;");
+            modelTrans.setStyle(colors[0]);
+            loadedModels.setStyle(colors[0]);
+            renderingModels.setStyle(colors[0]);
+            loadedCameras.setStyle(colors[0]);
 
         } else {
             rightUpRect.setVisible(true);
@@ -972,19 +979,28 @@ public class GuiController {
             leftUpText.setVisible(true);
             leftMediumRect.setVisible(true);
             leftMediumText.setVisible(true);
-            modelTrans.setStyle("-fx-background-color: lightgray;");
-            loadedModels.setStyle("-fx-background-color: lightgray;");
-            renderingModels.setStyle("-fx-background-color: lightgray;");
-            loadedCameras.setStyle("-fx-background-color: lightgray;");
+            modelTrans.setStyle(colors[1]);
+            loadedModels.setStyle(colors[1]);
+            renderingModels.setStyle(colors[1]);
+            loadedCameras.setStyle(colors[1]);
         }
         if (!visibleT) {
             leftDownRect.setVisible(false);
             leftDownText.setVisible(false);
-            loadedTextures.setStyle("-fx-background-color: white;");
+            loadedTextures.setStyle(colors[0]);
+
         } else {
             leftDownRect.setVisible(true);
             leftDownText.setVisible(true);
-            loadedTextures.setStyle("-fx-background-color: lightgray;");
+            loadedTextures.setStyle(colors[1]);
+
+        }
+    }
+    public String[] getBackGround(boolean theme) {
+        if (theme) {
+            return new String[] {"-fx-background-color: #454444;", "-fx-background-color: #707070;"};
+        } else {
+            return new String[] {"-fx-background-color: white;", "-fx-background-color: lightgray;"};
         }
     }
 }
