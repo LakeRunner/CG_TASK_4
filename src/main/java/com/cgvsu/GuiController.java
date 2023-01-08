@@ -191,6 +191,7 @@ public class GuiController {
     private List<TextField> list;
     private List <String> selectedModels = new ArrayList<>();
     private List <String> selectedTextures = new ArrayList<>();
+    private List<String> selectedCameras = new ArrayList<>();
     private boolean textureIsLoaded;
     private boolean onActionListCameras;
     private boolean onActionTransform;
@@ -212,12 +213,12 @@ public class GuiController {
 
     @FXML
     private void initialize() {
-       Camera mainCamera = new Camera(new Vector3f(0, 0, 200),
-                                      new Vector3f(0, 0, 0),
-                                  1.0F, 1, 0.01F, 100);
-       scene.setCurrentCamera(mainCamera);
-       scene.getAddedCameras().put("mainCamera", mainCamera);
-       listViewCameras.getItems().add("mainCamera");
+        Camera mainCamera = new Camera(new Vector3f(0, 0, 200),
+                new Vector3f(0, 0, 0),
+                1.0F, 1, 0.01F, 100);
+        scene.setCurrentCamera(mainCamera);
+        scene.getAddedCameras().put("mainCamera", mainCamera);
+        listViewCameras.getItems().add("mainCamera");
         listViewModels.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         scene.getLoadedModels().put("Mesh", new LoadedModel(mesh));
         scene.currentModelName = "Mesh";
@@ -484,33 +485,6 @@ public class GuiController {
                 }
             }
         });
-
-        /*KeyFrame frame2 = new KeyFrame(Duration.millis(1), event -> {
-            if (!onActionModes && !onActionListModels && !onActionTransform) {
-                Vector3f curZ = Vector3f.subtraction(scene.getMainCamera().getTarget(), scene.getMainCamera().getPosition());
-                Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getMainCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
-                if (endX > startX) {
-                    yAngle = angleListenerValue;
-                } else if (endX < startX) {
-                    yAngle = -angleListenerValue;
-                } else {
-                    yAngle = 0;
-                }
-                if (endY > startY) {
-                    xAngle = angleListenerValue;
-                } else if (endY < startY) {
-                    xAngle = -angleListenerValue;
-                } else {
-                    xAngle = 0;
-                }
-                Vector3f cameraTargetVis = GraphicConveyor.multiplierMatrixToVector(GraphicConveyor.rotate(new Vector3f(xAngle, yAngle, 0)), new Vector4f(oldCameraTargetVis.getX(), oldCameraTargetVis.getY(), oldCameraTargetVis.getZ(), 1));
-                Vector3f cameraTargetWorld = GraphicConveyor.multiplierMatrixToVector(scene.getMainCamera().getViewMatrix().inversion(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
-                scene.getMainCamera().setTarget(Vector3f.addition(cameraTargetWorld, scene.getMainCamera().getPosition()));
-                startY = endY;
-                startX = endX;
-            }
-        });*/
-
         timeline.getKeyFrames().add(frame);
         // timeline.getKeyFrames().add(frame2);
         timeline.play();
@@ -612,6 +586,7 @@ public class GuiController {
                 1.0F, 1, 0.01F, 100);
         Map<String, Camera> addedCameras = scene.getAddedCameras();
         String name =  cameraName.getText();
+        name = checkContainsTexture(name);
         addedCameras.put(name, newCamera);
         listViewCameras.getItems().add(name);
         enterCameraData.setVisible(false);
@@ -825,6 +800,18 @@ public class GuiController {
         }
         return str;
     }
+    public String checkContainsCamera (String str) {
+        int count = 0;
+        for (String name : scene.getAddedCameras().keySet()) {
+            if (name.contains(str)) {
+                count++;
+            }
+        }
+        if (count > 0) {
+            str += "(" + count + ")";
+        }
+        return str;
+    }
 
     public void modelSelected (MouseEvent event) throws IOException {
         if (Objects.equals(event.getButton().toString(), "PRIMARY")) {
@@ -939,6 +926,33 @@ public class GuiController {
         List<Integer> list = listViewTextures.getSelectionModel().getSelectedIndices();
         for (Integer i : list) {
             selectedTextures.add(listViewTextures.getItems().get(i));
+        }
+    }
+    public void cameraSelected (MouseEvent event) throws IOException {
+        if (Objects.equals(event.getButton().toString(), "PRIMARY")) {
+            checkSelectedCameras();
+            int index = listViewCameras.getSelectionModel().getSelectedIndex();
+            scene.setCurrentCamera(scene.getAddedCameras().get(listViewCameras.getItems().get(index)));
+            anchorPane.setOnKeyPressed(new EventHandler<KeyEvent>() {
+                @Override
+                public void handle(KeyEvent event) {
+                    if (event.getCode() == KeyCode.DELETE && listViewCameras.getItems().size() > selectedCameras.size()) {
+                        for (String str : selectedCameras) {
+                            listViewCameras.getItems().remove(str);
+                            scene.getAddedCameras().remove(str);
+                            scene.setCurrentCamera(scene.getAddedCameras().get(listViewCameras.getItems().get(listViewCameras.getItems().size()-1)));
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    public void checkSelectedCameras () {
+        selectedCameras = new ArrayList<>();
+        List<Integer> list = listViewCameras.getSelectionModel().getSelectedIndices();
+        for (Integer i : list) {
+            selectedCameras.add(listViewCameras.getItems().get(i));
         }
     }
 
