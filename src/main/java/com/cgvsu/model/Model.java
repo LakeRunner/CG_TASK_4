@@ -8,13 +8,13 @@ import java.util.*;
 
 public class Model {
 
-    private ArrayList<Vector3f> vertices;
-    private ArrayList<Vector2f> textureVertices;
-    private ArrayList<Vector3f> normals;
-    private ArrayList<Polygon> polygons;
+    private List<Vector3f> vertices;
+    private List<Vector2f> textureVertices;
+    private List<Vector3f> normals;
+    private List<Polygon> polygons;
 
-    public Model(final ArrayList<Vector3f> vertices, final ArrayList<Vector2f> textureVertices,
-                 final ArrayList<Vector3f> normals, final ArrayList<Polygon> polygons) {
+    public Model(final List<Vector3f> vertices, final List<Vector2f> textureVertices,
+                 final List<Vector3f> normals, final List<Polygon> polygons) {
         this.vertices = vertices;
         this.textureVertices = textureVertices;
         this.normals = normals;
@@ -42,39 +42,39 @@ public class Model {
         }
     }
 
-    public ArrayList<Vector3f> getVertices() {
+    public List<Vector3f> getVertices() {
         return vertices;
     }
 
-    public ArrayList<Vector2f> getTextureVertices() {
+    public List<Vector2f> getTextureVertices() {
         return textureVertices;
     }
 
-    public ArrayList<Vector3f> getNormals() {
+    public List<Vector3f> getNormals() {
         return normals;
     }
 
-    public ArrayList<Polygon> getPolygons() {
+    public List<Polygon> getPolygons() {
         return polygons;
     }
 
-    public void setVertices(final ArrayList<Vector3f> vertices) {
+    public void setVertices(final List<Vector3f> vertices) {
         this.vertices = vertices;
     }
 
-    public void setTextureVertices(final ArrayList<Vector2f> vertices) {
+    public void setTextureVertices(final List<Vector2f> vertices) {
         this.textureVertices = vertices;
     }
 
-    public void setNormals(final ArrayList<Vector3f> vertices) {
+    public void setNormals(final List<Vector3f> vertices) {
         this.normals = vertices;
     }
 
-    public void setPolygons(final ArrayList<Polygon> polygons) {
+    public void setPolygons(final List<Polygon> polygons) {
         this.polygons = polygons;
     }
 
-    public void checkConsistency() {
+    public boolean checkConsistency() {
         for (int i = 0; i < polygons.size(); i++) {
             List<Integer> vertexIndices = polygons.get(i).getVertexIndices();
             List<Integer> textureVertexIndices = polygons.get(i).getTextureVertexIndices();
@@ -113,10 +113,11 @@ public class Model {
                 }
             }
         }
+        return true;
     }
 
     public void triangulate() {
-        ArrayList<Polygon> triangulatedPolygons = new ArrayList<>();
+        List<Polygon> triangulatedPolygons = new ArrayList<>();
         for (Polygon polygon : polygons) {
             List<Integer> vertexIndices = polygon.getVertexIndices();
             List<Integer> textureVertexIndices = polygon.getTextureVertexIndices();
@@ -154,7 +155,7 @@ public class Model {
     }
 
     private void calcSmoothedNormals() {
-        ArrayList<Vector3f> smoothedNormals = new ArrayList<>();
+        List<Vector3f> smoothedNormals = new ArrayList<>();
         for (int vertexIndex = 0; vertexIndex < vertices.size(); vertexIndex++) {
             Vector3f sumNormals = new Vector3f();
             int k = 0;

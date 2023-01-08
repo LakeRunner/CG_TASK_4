@@ -16,7 +16,7 @@ public class Polygon {
         normalIndices = new ArrayList<Integer>();
     }
 
-    public Polygon(ArrayList<Integer> vertexIndices, ArrayList<Integer> textureVertexIndices, ArrayList<Integer> normalIndices) {
+    public Polygon(List<Integer> vertexIndices, List<Integer> textureVertexIndices, List<Integer> normalIndices) {
         this.vertexIndices = vertexIndices;
         this.textureVertexIndices = textureVertexIndices;
         this.normalIndices = normalIndices;
