@@ -20,6 +20,14 @@ public class Polygon {
         this.textureVertexIndices = textureVertexIndices;
         this.normalIndices = normalIndices;
     }
+    public void changePolygonNumeration(Polygon oldPolygon, int amountOfVertices, int amountOfTextureVertices, int amountOfNormals) {
+        this.vertexIndices = new ArrayList<>(oldPolygon.vertexIndices);
+        this.textureVertexIndices = new ArrayList<>(oldPolygon.textureVertexIndices);
+        this.normalIndices = new ArrayList<>(oldPolygon.normalIndices);
+        this.vertexIndices.replaceAll(integer -> integer + amountOfVertices);
+        this.textureVertexIndices.replaceAll(integer -> integer + amountOfTextureVertices);
+        this.normalIndices.replaceAll(integer -> integer + amountOfNormals);
+    }
 
     public void addVertexIndex(final int vertexIndex) {
         this.vertexIndices.add(vertexIndex);
