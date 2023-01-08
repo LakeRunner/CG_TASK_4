@@ -4,7 +4,6 @@ import com.cgvsu.math.*;
 import com.cgvsu.model.LoadedModel;
 import com.cgvsu.model.Polygon;
 import com.cgvsu.objwriter.ObjWriter;
-import com.cgvsu.render_engine.Camera;
 import com.cgvsu.render_engine.GraphicConveyor;
 import com.cgvsu.render_engine.RenderEngine;
 import javafx.animation.TranslateTransition;
@@ -50,7 +49,6 @@ public class GuiController {
 
     @FXML
     private AnchorPane saveSelection;
-
     @FXML
     private AnchorPane enterModelName;
 
@@ -65,21 +63,15 @@ public class GuiController {
 
     @FXML
     private AnchorPane loadedTextures;
-
     @FXML
     private AnchorPane loadedCameras;
-    @FXML
-    private AnchorPane enterCameraData;
+
 
     @FXML
     private Canvas canvas;
 
     @FXML
     private ListView<String> listViewModels;
-
-    @FXML
-    private ListView<String> listViewCameras;
-
     @FXML
     private ListView<String> listViewTextures;
 
@@ -111,14 +103,6 @@ public class GuiController {
     private TextField translateZ;
     @FXML
     private TextField modelName;
-    @FXML
-    private TextField cameraName;
-    @FXML
-    private TextField cameraX;
-    @FXML
-    private TextField cameraY;
-    @FXML
-    private TextField cameraZ;
     @FXML
     private javafx.scene.shape.Rectangle rightUpRect;
 
@@ -187,10 +171,10 @@ public class GuiController {
     private Timeline timeline;
     private Robot robot;
     private boolean modelIsLoaded;
-    private boolean cameraIsLoaded;
     private List<TextField> list;
     private List <String> selectedModels = new ArrayList<>();
     private List <String> selectedTextures = new ArrayList<>();
+    private Map<String, Image> textures = new HashMap<>();
     private boolean textureIsLoaded;
     private boolean onActionListCameras;
     private boolean onActionTransform;
@@ -212,15 +196,9 @@ public class GuiController {
 
     @FXML
     private void initialize() {
-       Camera mainCamera = new Camera(new Vector3f(0, 0, 200),
-                                      new Vector3f(0, 0, 0),
-                                  1.0F, 1, 0.01F, 100);
-       scene.setCurrentCamera(mainCamera);
-       scene.getAddedCameras().put("mainCamera", mainCamera);
-       listViewCameras.getItems().add("mainCamera");
         listViewModels.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         scene.getLoadedModels().put("Mesh", new LoadedModel(mesh));
-        scene.currentModelName = "Mesh";
+        scene.currentModel = "Mesh";
         list = getTextFields();
         List<Slider> sliders = Arrays.asList(xSlider, ySlider, zSlider);
         xSlider.valueProperty().addListener(new ChangeListener<Number>() {
@@ -267,13 +245,13 @@ public class GuiController {
         fovSlider.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
-                scene.getCurrentCamera().setFov((float) (fovSlider.getValue()));
+                scene.getCamera().setFov((float) (fovSlider.getValue()));
             }
         });
         aspectSlider.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
-                scene.getCurrentCamera().setAspectRatio((float) (aspectSlider.getValue()));
+                scene.getCamera().setAspectRatio((float) (aspectSlider.getValue()));
             }
         });
 
@@ -381,9 +359,9 @@ public class GuiController {
             public void handle(ScrollEvent scrollEvent) {
                 double deltaY = scrollEvent.getDeltaY();
                 if (deltaY < 0){
-                    scene.getCurrentCamera().movePosition(new Vector3f(0, 0, TRANSLATION));
+                    scene.getCamera().movePosition(new Vector3f(0, 0, TRANSLATION));
                 } else {
-                    scene.getCurrentCamera().movePosition(new Vector3f(0, 0, -TRANSLATION));
+                    scene.getCamera().movePosition(new Vector3f(0, 0, -TRANSLATION));
                 }
             }
         });
@@ -421,8 +399,8 @@ public class GuiController {
                 if (!onActionModes && !onActionListModels && !onActionTransform) {
                     //Vector3f curZ = Vector3f.subtraction(scene.getCamera().getTarget(), scene.getCamera().getPosition());
                     //Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
-                    Vector3f curZ = Vector3f.subtraction(new Vector3f(0, 0, 0), scene.getCurrentCamera().getPosition());
-                    Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getCurrentCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
+                    Vector3f curZ = Vector3f.subtraction(new Vector3f(0, 0, 0), scene.getCamera().getPosition());
+                    Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
                     if (endX > startX) {
                         yAngle = angleListenerValue;
                     } else if (endX < startX) {
@@ -440,9 +418,9 @@ public class GuiController {
                     summaryXAngle+=xAngle;
                     summaryYAngle+=yAngle;
                     Vector3f cameraTargetVis = GraphicConveyor.multiplierMatrixToVector(GraphicConveyor.rotate(new Vector3f(summaryXAngle, summaryYAngle, 0)), new Vector4f(oldCameraTargetVis.getX(), oldCameraTargetVis.getY(), oldCameraTargetVis.getZ(), 1));
-                    Vector3f cameraTargetWorld = GraphicConveyor.multiplierMatrixToVector(scene.getCurrentCamera().getViewMatrix().inversion(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
-                    Vector3f newTargetVector = Vector3f.addition(cameraTargetWorld, scene.getCurrentCamera().getPosition());
-                    scene.getCurrentCamera().setTarget(new Vector3f(newTargetVector.getX(), newTargetVector.getY(), 0));
+                    Vector3f cameraTargetWorld = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix().inversion(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
+                    Vector3f newTargetVector = Vector3f.addition(cameraTargetWorld, scene.getCamera().getPosition());
+                    scene.getCamera().setTarget(new Vector3f(newTargetVector.getX(), newTargetVector.getY(), 0));
                     startY = endY;
                     startX = endX;
                 }
@@ -450,30 +428,28 @@ public class GuiController {
         });
 
 
+
         anchorPane.prefWidthProperty().addListener((ov, oldValue, newValue) -> canvas.setWidth(newValue.doubleValue()));
         anchorPane.prefHeightProperty().addListener((ov, oldValue, newValue) -> canvas.setHeight(newValue.doubleValue()));
         saveSelection.setStyle("-fx-background-color: lightgray;");
         enterModelName.setStyle("-fx-background-color: lightgray;");
-        enterCameraData.setStyle("-fx-background-color: lightgray;");
         timeline = new Timeline();
         timeline.setCycleCount(Animation.INDEFINITE);
 
         KeyFrame frame = new KeyFrame(Duration.millis(15), event -> {
-            modelIsLoaded = listViewModels.getItems().size() > 0;
-            textureIsLoaded = listViewTextures.getItems().size() > 0;
             checkModelLoading(modelIsLoaded, textureIsLoaded);
             double width = canvas.getWidth();
             double height = canvas.getHeight();
             canvas.getGraphicsContext2D().clearRect(0, 0, width, height);
-            Color meshColor = Color.BLACK;
-            if (TransformFieldsNotNull() && scene.currentModelName != null) {
-                //scene.getMainCamera().setAspectRatio((float) (width / height));
-                scene.getCurrentCamera().setAspectRatio((float) ((width / height) * aspectSlider.getValue() * 2));
-                scene.getLoadedModels().get(scene.currentModelName).setRotateV(new Vector3f(Double.parseDouble(rotateX.getText()), Double.parseDouble(rotateY.getText()), Double.parseDouble(rotateZ.getText())));
-                scene.getLoadedModels().get(scene.currentModelName).setScaleV(new Vector3f(Double.parseDouble(scaleX.getText()), Double.parseDouble(scaleY.getText()), Double.parseDouble(scaleZ.getText())));
-                scene.getLoadedModels().get(scene.currentModelName).setTranslateV(new Vector3f(-Double.parseDouble(translateX.getText()), Double.parseDouble(translateY.getText()), Double.parseDouble(translateZ.getText())));
+            Color meshColor = dark.isSelected() ? Color.LIGHTGRAY : Color.BLACK;
+            if (TransformFieldsNotNull() && scene.currentModel != null) {
+                //scene.getCamera().setAspectRatio((float) (width / height));
+                scene.getCamera().setAspectRatio((float) ((width / height) * aspectSlider.getValue()*2));
+                scene.getLoadedModels().get(scene.currentModel).setRotateV(new Vector3f(Double.parseDouble(rotateX.getText()), Double.parseDouble(rotateY.getText()), Double.parseDouble(rotateZ.getText())));
+                scene.getLoadedModels().get(scene.currentModel).setScaleV(new Vector3f(Double.parseDouble(scaleX.getText()), Double.parseDouble(scaleY.getText()), Double.parseDouble(scaleZ.getText())));
+                scene.getLoadedModels().get(scene.currentModel).setTranslateV(new Vector3f(-Double.parseDouble(translateX.getText()), Double.parseDouble(translateY.getText()), Double.parseDouble(translateZ.getText())));
                 for (String model : selectedModels) {
-                    RenderEngine.render(canvas.getGraphicsContext2D(), scene.getCurrentCamera(),
+                    RenderEngine.render(canvas.getGraphicsContext2D(), scene.getCamera(),
                             scene.getLoadedModels().get(model), (int) width, (int) height,
                             scene.getLoadedModels().get(model).getRotateV(),
                             scene.getLoadedModels().get(model).getScaleV(),
@@ -487,8 +463,8 @@ public class GuiController {
 
         /*KeyFrame frame2 = new KeyFrame(Duration.millis(1), event -> {
             if (!onActionModes && !onActionListModels && !onActionTransform) {
-                Vector3f curZ = Vector3f.subtraction(scene.getMainCamera().getTarget(), scene.getMainCamera().getPosition());
-                Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getMainCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
+                Vector3f curZ = Vector3f.subtraction(scene.getCamera().getTarget(), scene.getCamera().getPosition());
+                Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
                 if (endX > startX) {
                     yAngle = angleListenerValue;
                 } else if (endX < startX) {
@@ -504,15 +480,15 @@ public class GuiController {
                     xAngle = 0;
                 }
                 Vector3f cameraTargetVis = GraphicConveyor.multiplierMatrixToVector(GraphicConveyor.rotate(new Vector3f(xAngle, yAngle, 0)), new Vector4f(oldCameraTargetVis.getX(), oldCameraTargetVis.getY(), oldCameraTargetVis.getZ(), 1));
-                Vector3f cameraTargetWorld = GraphicConveyor.multiplierMatrixToVector(scene.getMainCamera().getViewMatrix().inversion(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
-                scene.getMainCamera().setTarget(Vector3f.addition(cameraTargetWorld, scene.getMainCamera().getPosition()));
+                Vector3f cameraTargetWorld = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix().inversion(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
+                scene.getCamera().setTarget(Vector3f.addition(cameraTargetWorld, scene.getCamera().getPosition()));
                 startY = endY;
                 startX = endX;
             }
         });*/
 
         timeline.getKeyFrames().add(frame);
-        // timeline.getKeyFrames().add(frame2);
+       // timeline.getKeyFrames().add(frame2);
         timeline.play();
     }
 
@@ -537,11 +513,11 @@ public class GuiController {
             String name = file.getName();
             name = checkContainsModel(name);
             scene.getLoadedModels().put(name, new LoadedModel(model));
-            scene.currentModelName = name;
-            listViewModels.getItems().add(scene.currentModelName);
-            listViewModels.scrollTo(scene.currentModelName);
+            scene.currentModel = name;
+            listViewModels.getItems().add(scene.currentModel);
+            listViewModels.scrollTo(scene.currentModel);
             selectedModels = new ArrayList<>();
-            selectedModels.add(scene.currentModelName);
+            selectedModels.add(scene.currentModel);
             cleanTransform();
             // todo: обработка ошибок
         } catch (IOException exception) {
@@ -549,14 +525,13 @@ public class GuiController {
         }
         modelIsLoaded = true;
     }
-
     public void onOpenSaveUnchangedModel() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Model (*.obj)", "*.obj"));
         File file = fileChooser.showSaveDialog((Stage) canvas.getScene().getWindow());
 
         try {
-            List<String> fileContent2 = ObjWriter.write(scene.getLoadedModels().get(scene.currentModelName));
+            List<String> fileContent2 = ObjWriter.write(scene.getLoadedModels().get(scene.currentModel));
             FileWriter writer = new FileWriter(file);
             for (String s : fileContent2) {
                 writer.write(s + "\n");
@@ -573,7 +548,7 @@ public class GuiController {
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Model (*.obj)", "*.obj"));
         File file = fileChooser.showSaveDialog((Stage) canvas.getScene().getWindow());
         try {
-            Model changedModel = new Model(scene.getLoadedModels().get(scene.currentModelName).modifiedVertices(), scene.getLoadedModels().get(scene.currentModelName).getTextureVertices(), scene.getLoadedModels().get(scene.currentModelName).getNormals(), scene.getLoadedModels().get(scene.currentModelName).getPolygons());
+            Model changedModel = new Model(scene.getLoadedModels().get(scene.currentModel).modifiedVertices(), scene.getLoadedModels().get(scene.currentModel).getTextureVertices(), scene.getLoadedModels().get(scene.currentModel).getNormals(), scene.getLoadedModels().get(scene.currentModel).getPolygons());
             List<String> fileContent2 = ObjWriter.write(changedModel);
             FileWriter writer = new FileWriter(file);
             for (String s : fileContent2) {
@@ -585,8 +560,7 @@ public class GuiController {
         }
         saveSelection.setVisible(false);
     }
-
-    public void onOpenLoadTextureMenuItemClick() {
+    public void onOpenLoadTextureMenuItemClick () {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Texture (*.jpg)", "*.jpg"));
         fileChooser.setTitle("Load Texture");
@@ -597,28 +571,9 @@ public class GuiController {
         }
         String name = file.getName();
         name = checkContainsTexture(name);
-        scene.getLoadedTextures().put(name, new Image(new File(file.getAbsolutePath()).toURI().toString()));
+        textures.put(name, new Image(new File(file.getAbsolutePath()).toURI().toString()));
         listViewTextures.getItems().add(name);
         textureIsLoaded = true;
-    }
-
-    public void onAddCameraMenuItemClick() {
-        enterCameraData.setVisible(true);
-    }
-    public void okCameraPane () {
-        Camera newCamera = new Camera(
-                new Vector3f(Integer.parseInt(cameraX.getText()), Integer.parseInt(cameraY.getText()), Integer.parseInt(cameraZ.getText())),
-                new Vector3f(0, 0, 0),
-                1.0F, 1, 0.01F, 100);
-        Map<String, Camera> addedCameras = scene.getAddedCameras();
-        String name =  cameraName.getText();
-        addedCameras.put(name, newCamera);
-        listViewCameras.getItems().add(name);
-        enterCameraData.setVisible(false);
-        cameraIsLoaded = true;
-    }
-    public void closeCameraPane () {
-        enterCameraData.setVisible(false);
     }
 
     public void hotkeys(KeyEvent event) {
@@ -681,74 +636,74 @@ public class GuiController {
         if (event.isShiftDown() && (event.getCode() == KeyCode.X)) {
             //Vector3f curZ = Vector3f.subtraction(scene.getCamera().getTarget(), scene.getCamera().getPosition());
             //Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
-            Vector3f curZ = Vector3f.subtraction(new Vector3f(0, 0, 0), scene.getCurrentCamera().getPosition());
-            Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getCurrentCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
+            Vector3f curZ = Vector3f.subtraction(new Vector3f(0, 0, 0), scene.getCamera().getPosition());
+            Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
             summaryYAngle+=2;
             Vector3f cameraTargetVis = GraphicConveyor.multiplierMatrixToVector(GraphicConveyor.rotate(new Vector3f(summaryXAngle, summaryYAngle, 0)), new Vector4f(oldCameraTargetVis.getX(), oldCameraTargetVis.getY(), oldCameraTargetVis.getZ(), 1));
-            Vector3f cameraTargetWorld = GraphicConveyor.multiplierMatrixToVector(scene.getCurrentCamera().getViewMatrix().inversion(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
-            scene.getCurrentCamera().setTarget(Vector3f.addition(cameraTargetWorld, scene.getCurrentCamera().getPosition()));
+            Vector3f cameraTargetWorld = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix().inversion(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
+            scene.getCamera().setTarget(Vector3f.addition(cameraTargetWorld, scene.getCamera().getPosition()));
         }
         if (event.isControlDown() && (event.getCode() == KeyCode.X)) {
             //Vector3f curZ = Vector3f.subtraction(scene.getCamera().getTarget(), scene.getCamera().getPosition());
             //Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
-            Vector3f curZ = Vector3f.subtraction(new Vector3f(0, 0, 0), scene.getCurrentCamera().getPosition());
-            Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getCurrentCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
+            Vector3f curZ = Vector3f.subtraction(new Vector3f(0, 0, 0), scene.getCamera().getPosition());
+            Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
             summaryYAngle-=2;
             Vector3f cameraTargetVis = GraphicConveyor.multiplierMatrixToVector(GraphicConveyor.rotate(new Vector3f(summaryXAngle, summaryYAngle, 0)), new Vector4f(oldCameraTargetVis.getX(), oldCameraTargetVis.getY(), oldCameraTargetVis.getZ(), 1));
-            Vector3f cameraTargetWorld = GraphicConveyor.multiplierMatrixToVector(scene.getCurrentCamera().getViewMatrix().inversion(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
-            scene.getCurrentCamera().setTarget(Vector3f.addition(cameraTargetWorld, scene.getCurrentCamera().getPosition()));
-            System.out.println(scene.getCurrentCamera().getTarget().getX() + " " + scene.getCurrentCamera().getTarget().getY() + " " + scene.getCurrentCamera().getTarget().getZ());
+            Vector3f cameraTargetWorld = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix().inversion(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
+            scene.getCamera().setTarget(Vector3f.addition(cameraTargetWorld, scene.getCamera().getPosition()));
+            System.out.println(scene.getCamera().getTarget().getX() + " " + scene.getCamera().getTarget().getY() + " " + scene.getCamera().getTarget().getZ());
         }
         if (event.isShiftDown() && (event.getCode() == KeyCode.Y)) {
             //Vector3f curZ = Vector3f.subtraction(scene.getCamera().getTarget(), scene.getCamera().getPosition());
             //Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
-            Vector3f curZ = Vector3f.subtraction(new Vector3f(0, 0, 0), scene.getCurrentCamera().getPosition());
-            Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getCurrentCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
+            Vector3f curZ = Vector3f.subtraction(new Vector3f(0, 0, 0), scene.getCamera().getPosition());
+            Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
             summaryXAngle-=2;
             Vector3f cameraTargetVis = GraphicConveyor.multiplierMatrixToVector(GraphicConveyor.rotate(new Vector3f(summaryXAngle, summaryYAngle, 0)), new Vector4f(oldCameraTargetVis.getX(), oldCameraTargetVis.getY(), oldCameraTargetVis.getZ(), 1));
-            Vector3f cameraTargetWorld = GraphicConveyor.multiplierMatrixToVector(scene.getCurrentCamera().getViewMatrix().inversion(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
-            scene.getCurrentCamera().setTarget(Vector3f.addition(cameraTargetWorld, scene.getCurrentCamera().getPosition()));
+            Vector3f cameraTargetWorld = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix().inversion(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
+            scene.getCamera().setTarget(Vector3f.addition(cameraTargetWorld, scene.getCamera().getPosition()));
         }
         if (event.isControlDown() && (event.getCode() == KeyCode.Y)) {
-            // Vector3f curZ = Vector3f.subtraction(scene.getCamera().getTarget(), scene.getCamera().getPosition());
-            //Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
-            Vector3f curZ = Vector3f.subtraction(new Vector3f(0, 0, 0), scene.getCurrentCamera().getPosition());
-            Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getCurrentCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
+           // Vector3f curZ = Vector3f.subtraction(scene.getCamera().getTarget(), scene.getCamera().getPosition());
+           //Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
+            Vector3f curZ = Vector3f.subtraction(new Vector3f(0, 0, 0), scene.getCamera().getPosition());
+            Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
             summaryXAngle+=2;
             Vector3f cameraTargetVis = GraphicConveyor.multiplierMatrixToVector(GraphicConveyor.rotate(new Vector3f(summaryXAngle, summaryYAngle, 0)), new Vector4f(oldCameraTargetVis.getX(), oldCameraTargetVis.getY(), oldCameraTargetVis.getZ(), 1));
-            Vector3f cameraTargetWorld = GraphicConveyor.multiplierMatrixToVector(scene.getCurrentCamera().getViewMatrix().inversion(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
-            scene.getCurrentCamera().setTarget(Vector3f.addition(cameraTargetWorld, scene.getCurrentCamera().getPosition()));
+            Vector3f cameraTargetWorld = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix().inversion(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
+            scene.getCamera().setTarget(Vector3f.addition(cameraTargetWorld, scene.getCamera().getPosition()));
         }
     }
 
     @FXML
     public void handleCameraForward(ActionEvent actionEvent) {
-        scene.getCurrentCamera().movePosition(new Vector3f(0, 0, -TRANSLATION));
+        scene.getCamera().movePosition(new Vector3f(0, 0, -TRANSLATION));
     }
 
     @FXML
     public void handleCameraBackward(ActionEvent actionEvent) {
-        scene.getCurrentCamera().movePosition(new Vector3f(0, 0, TRANSLATION));
+        scene.getCamera().movePosition(new Vector3f(0, 0, TRANSLATION));
     }
 
     @FXML
     public void handleCameraLeft(ActionEvent actionEvent) {
-        scene.getCurrentCamera().movePosition(new Vector3f(TRANSLATION, 0, 0));
-        //scene.getMainCamera().setTarget(new Vector3f(scene.getMainCamera().getTarget().getX() + TRANSLATION, scene.getMainCamera().getTarget().getY(), scene.getMainCamera().getTarget().getZ()));
+        scene.getCamera().movePosition(new Vector3f(TRANSLATION, 0, 0));
+        //scene.getCamera().setTarget(new Vector3f(scene.getCamera().getTarget().getX() + TRANSLATION, scene.getCamera().getTarget().getY(), scene.getCamera().getTarget().getZ()));
     }
 
     @FXML
     public void handleCameraRight(ActionEvent actionEvent) {
-        scene.getCurrentCamera().movePosition(new Vector3f(-TRANSLATION, 0, 0));
+        scene.getCamera().movePosition(new Vector3f(-TRANSLATION, 0, 0));
         //camera.setTarget(new Vector3f(camera.getTarget().getX() - TRANSLATION, camera.getTarget().getY(), camera.getTarget().getZ()));
     }
 
     @FXML
-    public void handleCameraUp(ActionEvent actionEvent) {scene.getCurrentCamera().movePosition(new Vector3f(0, TRANSLATION, 0));}
+    public void handleCameraUp(ActionEvent actionEvent) {scene.getCamera().movePosition(new Vector3f(0, TRANSLATION, 0));}
 
     @FXML
     public void handleCameraDown(ActionEvent actionEvent) {
-        scene.getCurrentCamera().movePosition(new Vector3f(0, -TRANSLATION, 0));
+        scene.getCamera().movePosition(new Vector3f(0, -TRANSLATION, 0));
     }
 
     public List<TextField> getTextFields () {
@@ -764,7 +719,6 @@ public class GuiController {
         list.add(translateZ);
         return list;
     }
-
     public void disable (boolean disable) {
         for (TextField field : list) {
             field.setDisable(disable);
@@ -773,7 +727,6 @@ public class GuiController {
         ySlider.setDisable(disable);
         zSlider.setDisable(disable);
     }
-
     public boolean TransformFieldsNotNull() {
         String pattern = "^(-?\\d{1,3}(\\.\\d*))$";
         for (TextField field : list) {
@@ -784,22 +737,20 @@ public class GuiController {
         }
         return true;
     }
-
     public void cleanTransform() {
-        list.get(0).setText(String.valueOf(scene.getLoadedModels().get(scene.currentModelName).getRotateV().getX()));
-        list.get(1).setText(String.valueOf(scene.getLoadedModels().get(scene.currentModelName).getRotateV().getY()));
-        list.get(2).setText(String.valueOf(scene.getLoadedModels().get(scene.currentModelName).getRotateV().getZ()));
-        list.get(3).setText(String.valueOf(scene.getLoadedModels().get(scene.currentModelName).getScaleV().getX()));
-        list.get(4).setText(String.valueOf(scene.getLoadedModels().get(scene.currentModelName).getScaleV().getY()));
-        list.get(5).setText(String.valueOf(scene.getLoadedModels().get(scene.currentModelName).getScaleV().getZ()));
-        list.get(6).setText(String.valueOf(scene.getLoadedModels().get(scene.currentModelName).getTranslateV().getX()));
-        list.get(7).setText(String.valueOf(scene.getLoadedModels().get(scene.currentModelName).getTranslateV().getY()));
-        list.get(8).setText(String.valueOf(scene.getLoadedModels().get(scene.currentModelName).getTranslateV().getZ()));
-        xSlider.setValue(scene.getLoadedModels().get(scene.currentModelName).getRotateV().getX());
-        ySlider.setValue(scene.getLoadedModels().get(scene.currentModelName).getRotateV().getY());
-        zSlider.setValue(scene.getLoadedModels().get(scene.currentModelName).getRotateV().getZ());
+        list.get(0).setText(String.valueOf(scene.getLoadedModels().get(scene.currentModel).getRotateV().getX()));
+        list.get(1).setText(String.valueOf(scene.getLoadedModels().get(scene.currentModel).getRotateV().getY()));
+        list.get(2).setText(String.valueOf(scene.getLoadedModels().get(scene.currentModel).getRotateV().getZ()));
+        list.get(3).setText(String.valueOf(scene.getLoadedModels().get(scene.currentModel).getScaleV().getX()));
+        list.get(4).setText(String.valueOf(scene.getLoadedModels().get(scene.currentModel).getScaleV().getY()));
+        list.get(5).setText(String.valueOf(scene.getLoadedModels().get(scene.currentModel).getScaleV().getZ()));
+        list.get(6).setText(String.valueOf(scene.getLoadedModels().get(scene.currentModel).getTranslateV().getX()));
+        list.get(7).setText(String.valueOf(scene.getLoadedModels().get(scene.currentModel).getTranslateV().getY()));
+        list.get(8).setText(String.valueOf(scene.getLoadedModels().get(scene.currentModel).getTranslateV().getZ()));
+        xSlider.setValue(scene.getLoadedModels().get(scene.currentModel).getRotateV().getX());
+        ySlider.setValue(scene.getLoadedModels().get(scene.currentModel).getRotateV().getY());
+        zSlider.setValue(scene.getLoadedModels().get(scene.currentModel).getRotateV().getZ());
     }
-
     public String checkContainsModel (String str) {
         int count = 0;
         for (String name : scene.getLoadedModels().keySet()) {
@@ -812,10 +763,9 @@ public class GuiController {
         }
         return str;
     }
-
     public String checkContainsTexture (String str) {
         int count = 0;
-        for (String name : scene.getLoadedTextures().keySet()) {
+        for (String name : textures.keySet()) {
             if (name.contains(str)) {
                 count++;
             }
@@ -825,14 +775,13 @@ public class GuiController {
         }
         return str;
     }
-
     public void modelSelected (MouseEvent event) throws IOException {
         if (Objects.equals(event.getButton().toString(), "PRIMARY")) {
             int index = listViewModels.getSelectionModel().getSelectedIndex();
             if (index != -1) {
                 addSelectedModels();
                 String name = listViewModels.getItems().get(index);
-                scene.currentModelName = name;
+                scene.currentModel = name;
                 cleanTransform();
                 anchorPane.setOnKeyPressed(new EventHandler<KeyEvent>() {
                     @Override
@@ -846,7 +795,7 @@ public class GuiController {
                                 selectedModels.remove(str);
                                 scene.getLoadedModels().remove(str);
                                 boolean flag = listViewModels.getItems().size() > 0;
-                                scene.currentModelName = flag ? selectedModels.get(selectedModels.size() - 1) : null;
+                                scene.currentModel = flag ? selectedModels.get(selectedModels.size() - 1) : null;
                             }
                         }
                     }
@@ -854,8 +803,7 @@ public class GuiController {
             }
         }
     }
-
-    public void okGigaModelPane() {
+    public void okButton() {
         Model gigaModel = createGigaModel(selectedModels);
         boolean flag = modelName.getText().contains(".obj");
         String changeModelName = flag ? modelName.getText() : modelName.getText() + ".obj";
@@ -868,17 +816,15 @@ public class GuiController {
         //model.calcNormals();
         changeModelName = checkContainsModel(changeModelName);
         scene.getLoadedModels().put(changeModelName, new LoadedModel(model));
-        scene.currentModelName = changeModelName;
-        listViewModels.getItems().add(scene.currentModelName);
-        listViewModels.scrollTo(scene.currentModelName);
+        scene.currentModel = changeModelName;
+        listViewModels.getItems().add(scene.currentModel);
+        listViewModels.scrollTo(scene.currentModel);
         cleanTransform();
         enterModelName.setVisible(false);
     }
-
     public void closeEnterFileName () {
         enterModelName.setVisible(false);
     }
-
     public void addSelectedModels() {
         selectedModels = new ArrayList<>();
         List<Integer> list = listViewModels.getSelectionModel().getSelectedIndices();
@@ -887,7 +833,6 @@ public class GuiController {
             selectedModels.add(model);
         }
     }
-
     public Model createGigaModel(List<String> selectedModels) {
         Model model = new Model();
         int amountOfVertices = 0, amountOfTextureVertices = 0, amountOfNormals = 0;
@@ -903,7 +848,6 @@ public class GuiController {
         }
         return model;
     }
-
     public static List<com.cgvsu.model.Polygon> changePolygonsNumeration(List<com.cgvsu.model.Polygon> polygonList, int amountOfVertices, int amountOfTextureVertices, int amountOfNormals) {
         List<com.cgvsu.model.Polygon> polygons = new ArrayList<>();
         for (com.cgvsu.model.Polygon oldPolygon : polygonList) {
@@ -913,12 +857,11 @@ public class GuiController {
         }
         return polygons;
     }
-
     public void textureSelected (MouseEvent event) throws IOException {
         if (Objects.equals(event.getButton().toString(), "PRIMARY")) {
             checkSelectedTextures();
             int index = listViewTextures.getSelectionModel().getSelectedIndex();
-            texture = scene.getLoadedTextures().get(listViewTextures.getItems().get(index));
+            texture = textures.get(listViewTextures.getItems().get(index));
 
             anchorPane.setOnKeyPressed(new EventHandler<KeyEvent>() {
                 @Override
@@ -926,14 +869,13 @@ public class GuiController {
                     if (event.getCode() == KeyCode.DELETE) {
                         for (String str : selectedTextures) {
                             listViewTextures.getItems().remove(str);
-                            scene.getLoadedTextures().remove(str);
+                            textures.remove(str);
                         }
                     }
                 }
             });
         }
     }
-
     public void checkSelectedTextures () {
         selectedTextures = new ArrayList<>();
         List<Integer> list = listViewTextures.getSelectionModel().getSelectedIndices();
@@ -941,42 +883,25 @@ public class GuiController {
             selectedTextures.add(listViewTextures.getItems().get(i));
         }
     }
-
     public void darkTheme () {
         if (!dark.isSelected()) {
             dark.setSelected(true);
         }
         light.setSelected(false);
-        anchorPane.setStyle("-fx-background-color: #454444;");
-        saveSelection.setStyle("-fx-background-color: #707070;");
-        enterModelName.setStyle("-fx-background-color: #707070;");
-        enterCameraData.setStyle("-fx-background-color: #707070;");
-        listViewModels.setStyle("-fx-control-inner-background: #616161;");
-        listViewTextures.setStyle("-fx-control-inner-background: #616161;");
-        listViewCameras.setStyle("-fx-control-inner-background: #616161;");
+        anchorPane.setStyle("-fx-background-color: black;");
     }
-
     public void lightTheme () {
         dark.setSelected(false);
-        saveSelection.setStyle("-fx-background-color: lightgray;");
-        enterModelName.setStyle("-fx-background-color: lightgray;");
-        enterCameraData.setStyle("-fx-background-color: lightgray;");
         anchorPane.setStyle("-fx-background-color: white;");
-        listViewModels.setStyle("-fx-control-inner-background: white;");
-        listViewTextures.setStyle("-fx-control-inner-background: white;");
-        listViewCameras.setStyle("-fx-control-inner-background: white;");
     }
-
     public void openSaveSelection() {
         if (modelIsLoaded) {
             saveSelection.setVisible(true);
         }
     }
-
     public void closeSaveSelection () {
         saveSelection.setVisible(false);
     }
-
     public static void exception(String text) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Reader Exception");
@@ -984,9 +909,7 @@ public class GuiController {
         alert.setContentText("Please correct the data.");
         alert.showAndWait();
     }
-
     public void checkModelLoading (boolean visibleM, boolean visibleT) {
-        String[] colors = getBackGround(dark.isSelected());
         if (!visibleM) {
             rightUpRect.setVisible(false);
             rightUpText.setVisible(false);
@@ -996,10 +919,11 @@ public class GuiController {
             leftUpText.setVisible(false);
             leftMediumRect.setVisible(false);
             leftMediumText.setVisible(false);
-            modelTrans.setStyle(colors[0]);
-            loadedModels.setStyle(colors[0]);
-            renderingModels.setStyle(colors[0]);
-            loadedCameras.setStyle(colors[0]);
+            modelTrans.setStyle("-fx-background-color: white;");
+            loadedModels.setStyle("-fx-background-color: white;");
+            renderingModels.setStyle("-fx-background-color: white;");
+            loadedCameras.setStyle("-fx-background-color: white;");
+
         } else {
             rightUpRect.setVisible(true);
             rightUpText.setVisible(true);
@@ -1009,28 +933,20 @@ public class GuiController {
             leftUpText.setVisible(true);
             leftMediumRect.setVisible(true);
             leftMediumText.setVisible(true);
-            modelTrans.setStyle(colors[1]);
-            loadedModels.setStyle(colors[1]);
-            renderingModels.setStyle(colors[1]);
-            loadedCameras.setStyle(colors[1]);
-            loadedCameras.setStyle(colors[1]);
+            modelTrans.setStyle("-fx-background-color: lightgray;");
+            loadedModels.setStyle("-fx-background-color: lightgray;");
+            renderingModels.setStyle("-fx-background-color: lightgray;");
+            loadedCameras.setStyle("-fx-background-color: lightgray;");
         }
         if (!visibleT) {
             leftDownRect.setVisible(false);
             leftDownText.setVisible(false);
-            loadedTextures.setStyle(colors[0]);
-
+            loadedTextures.setStyle("-fx-background-color: white;");
         } else {
             leftDownRect.setVisible(true);
             leftDownText.setVisible(true);
-            loadedTextures.setStyle(colors[1]);
+            loadedTextures.setStyle("-fx-background-color: lightgray;");
         }
     }
-    public String[] getBackGround(boolean theme) {
-        if (theme) {
-            return new String[] {"-fx-background-color: #454444;", "-fx-background-color: #707070;"};
-        } else {
-            return new String[] {"-fx-background-color: white;", "-fx-background-color: lightgray;"};
-        }
-    }
+
 }
