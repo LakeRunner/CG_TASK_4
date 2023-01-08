@@ -11,8 +11,8 @@ class MyVector2Test {
         Vector2f first = new Vector2f(2, 4);
         Vector2f second = new Vector2f(2, 4);
         Vector2f answer = new Vector2f(4, 8);
-        assertEquals(answer.getCoords()[0], Vector2f.addition(first, second).getCoords()[0]);
-        assertEquals(answer.getCoords()[1], Vector2f.addition(first, second).getCoords()[1]);
+        assertEquals(answer.getCoordinates()[0], Vector2f.addition(first, second).getCoordinates()[0]);
+        assertEquals(answer.getCoordinates()[1], Vector2f.addition(first, second).getCoordinates()[1]);
     }
 
     @Test
@@ -20,8 +20,8 @@ class MyVector2Test {
         Vector2f first = new Vector2f(2, 4);
         Vector2f second = new Vector2f(2, 4);
         Vector2f answer = new Vector2f(0, 0);
-        assertEquals(answer.getCoords()[0], Vector2f.subtraction(first, second).getCoords()[0]);
-        assertEquals(answer.getCoords()[1], Vector2f.subtraction(first, second).getCoords()[1]);
+        assertEquals(answer.getCoordinates()[0], Vector2f.subtraction(first, second).getCoordinates()[0]);
+        assertEquals(answer.getCoordinates()[1], Vector2f.subtraction(first, second).getCoordinates()[1]);
     }
 
     @Test
@@ -29,8 +29,8 @@ class MyVector2Test {
         Vector2f first = new Vector2f(2, 4);
         double second = 5;
         Vector2f answer = new Vector2f(10, 20);
-        assertEquals(answer.getCoords()[0], Vector2f.multiplierVector(first, second).getCoords()[0]);
-        assertEquals(answer.getCoords()[1], Vector2f.multiplierVector(first, second).getCoords()[1]);
+        assertEquals(answer.getCoordinates()[0], Vector2f.multiplierVector(first, second).getCoordinates()[0]);
+        assertEquals(answer.getCoordinates()[1], Vector2f.multiplierVector(first, second).getCoordinates()[1]);
     }
 
     @Test
@@ -38,8 +38,8 @@ class MyVector2Test {
         Vector2f first = new Vector2f(2, 4);
         double second = 5;
         Vector2f answer = new Vector2f(0.4, 0.8);
-        assertEquals(answer.getCoords()[0], Vector2f.separationVector(first, second).getCoords()[0]);
-        assertEquals(answer.getCoords()[1], Vector2f.separationVector(first, second).getCoords()[1]);
+        assertEquals(answer.getCoordinates()[0], Vector2f.separationVector(first, second).getCoordinates()[0]);
+        assertEquals(answer.getCoordinates()[1], Vector2f.separationVector(first, second).getCoordinates()[1]);
     }
 
     @Test

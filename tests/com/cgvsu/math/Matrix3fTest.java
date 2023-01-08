@@ -102,9 +102,9 @@ class Matrix3fTest {
         Vector3f answer3 = new Vector3f(7, 7, 0);
 
         Vector3f answer4 = Matrix3f.multiplierVector(answer, answer2);
-        assertEquals(answer3.getCoords()[0], answer4.getCoords()[0]);
-        assertEquals(answer3.getCoords()[1], answer4.getCoords()[1]);
-        assertEquals(answer3.getCoords()[2], answer4.getCoords()[2]);
+        assertEquals(answer3.getCoordinates()[0], answer4.getCoordinates()[0]);
+        assertEquals(answer3.getCoordinates()[1], answer4.getCoordinates()[1]);
+        assertEquals(answer3.getCoordinates()[2], answer4.getCoordinates()[2]);
     }
 
     @Test
