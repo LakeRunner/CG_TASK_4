@@ -1,25 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.canvas.Canvas?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.ColorPicker?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.RadioMenuItem?>
-<?import javafx.scene.control.Slider?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.input.KeyCodeCombination?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.paint.Color?>
-<?import javafx.scene.shape.Rectangle?>
-<?import javafx.scene.text.Font?>
-<?import javafx.scene.text.Text?>
+<?import javafx.scene.canvas.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.input.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane fx:id="anchorPane" onKeyPressed="#hotkeys" prefHeight="693.0" prefWidth="1281.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cgvsu.GuiController">
+<AnchorPane fx:id="anchorPane" onKeyPressed="#hotkeys" prefHeight="693.0" prefWidth="1281.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cgvsu.GuiController">
     <MenuBar>
         <Menu mnemonicParsing="false" text="File">
             <MenuItem mnemonicParsing="false" onAction="#onOpenLoadModelMenuItemClick" text="Load Model">
@@ -36,6 +25,7 @@
                 <accelerator>
                     <KeyCodeCombination alt="UP" code="D" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                 </accelerator></MenuItem>
+         <MenuItem mnemonicParsing="false" onAction="#onAddCameraMenuItemClick" text="Add camera" />
         </Menu>
         <Menu mnemonicParsing="false" text="Camera Options">
             <MenuItem mnemonicParsing="false" onAction="#handleCameraForward" text="Forward" visible="false">
@@ -310,8 +300,8 @@
     </MenuBar>
     <AnchorPane fx:id="loadedCameras" layoutY="275.0" prefHeight="196.0" prefWidth="260.0">
         <children>
-            <ListView layoutY="34.0" prefHeight="166.0" prefWidth="235.0" />
-            <Label alignment="CENTER" layoutX="46.0" layoutY="2.0" prefHeight="30.0" prefWidth="144.0" text="Loaded cameras">
+            <ListView fx:id="listViewCameras" layoutY="34.0" prefHeight="166.0" prefWidth="235.0" />
+            <Label alignment="CENTER" layoutX="46.0" layoutY="2.0" prefHeight="30.0" prefWidth="144.0" text="Added cameras">
                 <font>
                     <Font size="19.0" />
                 </font>

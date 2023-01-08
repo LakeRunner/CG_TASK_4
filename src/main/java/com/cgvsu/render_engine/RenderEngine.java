@@ -142,8 +142,16 @@ public class RenderEngine {
                         final Vector2f t1 = texturePoints.get(0);
                         final Vector2f t2 = texturePoints.get(1);
                         final Vector2f t3 = texturePoints.get(2);
-                        double xt = (bc.getU() * t1.getX() + bc.getV() * t2.getX() + bc.getW() * t3.getX()) * img.getWidth();
-                        double yt = (1 - (bc.getU() * t1.getY() + bc.getV() * t2.getY() + bc.getW() * t3.getY())) * img.getHeight();
+                        double xt = bc.getU() * t1.getX() + bc.getV() * t2.getX() + bc.getW() * t3.getX();
+                        double yt = bc.getU() * t1.getY() + bc.getV() * t2.getY() + bc.getW() * t3.getY();
+                        if (xt > 1) {
+                            xt--;
+                        }
+                        if (yt > 1) {
+                            yt--;
+                        }
+                        xt *= img.getWidth();
+                        yt = img.getHeight() - yt * img.getHeight();
                         color = img.getPixelReader().getColor((int) xt, (int) yt);
                     } else {
                         color = Color.color(polygonFillColor.getRed(), polygonFillColor.getGreen(), polygonFillColor.getBlue());
