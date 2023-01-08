@@ -197,6 +197,8 @@ public class GuiController {
     private double xAngle;
     private double yAngle;
     private double angleListenerValue = 0.05;
+    private double summaryXAngle = 0;
+    private double summaryYAngle = 0;
     private Image texture;
 
     @FXML
@@ -387,8 +389,8 @@ public class GuiController {
                 //startY = anchorPane.getHeight() / 2;
                 //double x = ((endX*2)-(anchorPane.getWidth()-1))/(anchorPane.getWidth()-1);
                 //double y = -(((endY*2)-(anchorPane.getHeight() - 1))/(anchorPane.getHeight() - 1));
-                /*Vector3f first = new Vector3f(scene.getMainCamera().getPosition().getX() - scene.getMainCamera().getTarget().getX(), scene.getMainCamera().getPosition().getY() - scene.getMainCamera().getTarget().getY(), scene.getMainCamera().getPosition().getZ() - scene.getMainCamera().getTarget().getZ());
-                Vector3f second = new Vector3f(scene.getMainCamera().getPosition().getX() - x, scene.getMainCamera().getPosition().getY() - y, scene.getMainCamera().getPosition().getZ());
+                /*Vector3f first = new Vector3f(scene.getCamera().getPosition().getX() - scene.getCamera().getTarget().getX(), scene.getCamera().getPosition().getY() - scene.getCamera().getTarget().getY(), scene.getCamera().getPosition().getZ() - scene.getCamera().getTarget().getZ());
+                Vector3f second = new Vector3f(scene.getCamera().getPosition().getX() - x, scene.getCamera().getPosition().getY() - y, scene.getCamera().getPosition().getZ());
                 double cos = (Vector3f.dotProduct(first, second)/ (first.length() * second.length()));
                 double sin = Math.sqrt(1-(cos * cos));
                 текущий з домножаем на лук эт поворачиваем с помощью матрицы поворота с помощью обратного лук эт в мировое простаранство и з прибавляем к позиции*/
@@ -399,11 +401,13 @@ public class GuiController {
                 //xAngle = deltaX * 0.1;
                 //yAngle = deltaY * 0.1;
                 // Vector3f cameraTargetVis = GraphicConveyor.multiplierMatrixToVector(GraphicConveyor.rotate(new Vector3f(yAngle, xAngle, 0)), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
-                //Vector3f cameraTargetCam = GraphicConveyor.multiplierMatrixToVector(scene.getMainCamera().getViewMatrix(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
-                //Vector3f cameraTargetWindow = GraphicConveyor.multiplierMatrixToVector(scene.getMainCamera().getProjectionMatrix(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
+                //Vector3f cameraTargetCam = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
+                //Vector3f cameraTargetWindow = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getProjectionMatrix(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
                 if (!onActionModes && !onActionListModels && !onActionTransform) {
-                    Vector3f curZ = Vector3f.subtraction(scene.getMainCamera().getTarget(), scene.getMainCamera().getPosition());
-                    Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getMainCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
+                    //Vector3f curZ = Vector3f.subtraction(scene.getCamera().getTarget(), scene.getCamera().getPosition());
+                    //Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
+                    Vector3f curZ = Vector3f.subtraction(new Vector3f(0, 0, 0), scene.getCurrentCamera().getPosition());
+                    Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getCurrentCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
                     if (endX > startX) {
                         yAngle = angleListenerValue;
                     } else if (endX < startX) {
@@ -418,14 +422,18 @@ public class GuiController {
                     } else {
                         xAngle = 0;
                     }
-                    Vector3f cameraTargetVis = GraphicConveyor.multiplierMatrixToVector(GraphicConveyor.rotate(new Vector3f(xAngle, yAngle, 0)), new Vector4f(oldCameraTargetVis.getX(), oldCameraTargetVis.getY(), oldCameraTargetVis.getZ(), 1));
-                    Vector3f cameraTargetWorld = GraphicConveyor.multiplierMatrixToVector(scene.getMainCamera().getViewMatrix().inversion(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
-                    scene.getMainCamera().setTarget(Vector3f.addition(cameraTargetWorld, scene.getMainCamera().getPosition()));
+                    summaryXAngle+=xAngle;
+                    summaryYAngle+=yAngle;
+                    Vector3f cameraTargetVis = GraphicConveyor.multiplierMatrixToVector(GraphicConveyor.rotate(new Vector3f(summaryXAngle, summaryYAngle, 0)), new Vector4f(oldCameraTargetVis.getX(), oldCameraTargetVis.getY(), oldCameraTargetVis.getZ(), 1));
+                    Vector3f cameraTargetWorld = GraphicConveyor.multiplierMatrixToVector(scene.getCurrentCamera().getViewMatrix().inversion(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
+                    Vector3f newTargetVector = Vector3f.addition(cameraTargetWorld, scene.getCurrentCamera().getPosition());
+                    scene.getCurrentCamera().setTarget(new Vector3f(newTargetVector.getX(), newTargetVector.getY(), 0));
                     startY = endY;
                     startX = endX;
                 }
             }
         });
+
 
         anchorPane.prefWidthProperty().addListener((ov, oldValue, newValue) -> canvas.setWidth(newValue.doubleValue()));
         anchorPane.prefHeightProperty().addListener((ov, oldValue, newValue) -> canvas.setHeight(newValue.doubleValue()));
@@ -646,33 +654,45 @@ public class GuiController {
             }
         }
         if (event.isShiftDown() && (event.getCode() == KeyCode.X)) {
-            Vector3f curZ = Vector3f.subtraction(scene.getMainCamera().getTarget(), scene.getMainCamera().getPosition());
-            Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getMainCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
-            Vector3f cameraTargetVis = GraphicConveyor.multiplierMatrixToVector(GraphicConveyor.rotate(new Vector3f(0, 2, 0)), new Vector4f(oldCameraTargetVis.getX(), oldCameraTargetVis.getY(), oldCameraTargetVis.getZ(), 1));
-            Vector3f cameraTargetWorld = GraphicConveyor.multiplierMatrixToVector(scene.getMainCamera().getViewMatrix().inversion(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
-            scene.getMainCamera().setTarget(Vector3f.addition(cameraTargetWorld, scene.getMainCamera().getPosition()));
+            //Vector3f curZ = Vector3f.subtraction(scene.getCamera().getTarget(), scene.getCamera().getPosition());
+            //Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
+            Vector3f curZ = Vector3f.subtraction(new Vector3f(0, 0, 0), scene.getCurrentCamera().getPosition());
+            Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getCurrentCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
+            summaryYAngle+=2;
+            Vector3f cameraTargetVis = GraphicConveyor.multiplierMatrixToVector(GraphicConveyor.rotate(new Vector3f(summaryXAngle, summaryYAngle, 0)), new Vector4f(oldCameraTargetVis.getX(), oldCameraTargetVis.getY(), oldCameraTargetVis.getZ(), 1));
+            Vector3f cameraTargetWorld = GraphicConveyor.multiplierMatrixToVector(scene.getCurrentCamera().getViewMatrix().inversion(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
+            scene.getCurrentCamera().setTarget(Vector3f.addition(cameraTargetWorld, scene.getCurrentCamera().getPosition()));
         }
         if (event.isControlDown() && (event.getCode() == KeyCode.X)) {
-            Vector3f curZ = Vector3f.subtraction(scene.getMainCamera().getTarget(), scene.getMainCamera().getPosition());
-            Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getMainCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
-            Vector3f cameraTargetVis = GraphicConveyor.multiplierMatrixToVector(GraphicConveyor.rotate(new Vector3f(0, -2, 0)), new Vector4f(oldCameraTargetVis.getX(), oldCameraTargetVis.getY(), oldCameraTargetVis.getZ(), 1));
-            Vector3f cameraTargetWorld = GraphicConveyor.multiplierMatrixToVector(scene.getMainCamera().getViewMatrix().inversion(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
-            scene.getMainCamera().setTarget(Vector3f.addition(cameraTargetWorld, scene.getMainCamera().getPosition()));
-            System.out.println(scene.getMainCamera().getTarget().getX() + " " + scene.getMainCamera().getTarget().getY() + " " + scene.getMainCamera().getTarget().getZ());
+            //Vector3f curZ = Vector3f.subtraction(scene.getCamera().getTarget(), scene.getCamera().getPosition());
+            //Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
+            Vector3f curZ = Vector3f.subtraction(new Vector3f(0, 0, 0), scene.getCurrentCamera().getPosition());
+            Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getCurrentCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
+            summaryYAngle-=2;
+            Vector3f cameraTargetVis = GraphicConveyor.multiplierMatrixToVector(GraphicConveyor.rotate(new Vector3f(summaryXAngle, summaryYAngle, 0)), new Vector4f(oldCameraTargetVis.getX(), oldCameraTargetVis.getY(), oldCameraTargetVis.getZ(), 1));
+            Vector3f cameraTargetWorld = GraphicConveyor.multiplierMatrixToVector(scene.getCurrentCamera().getViewMatrix().inversion(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
+            scene.getCurrentCamera().setTarget(Vector3f.addition(cameraTargetWorld, scene.getCurrentCamera().getPosition()));
+            System.out.println(scene.getCurrentCamera().getTarget().getX() + " " + scene.getCurrentCamera().getTarget().getY() + " " + scene.getCurrentCamera().getTarget().getZ());
         }
         if (event.isShiftDown() && (event.getCode() == KeyCode.Y)) {
-            Vector3f curZ = Vector3f.subtraction(scene.getMainCamera().getTarget(), scene.getMainCamera().getPosition());
-            Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getMainCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
-            Vector3f cameraTargetVis = GraphicConveyor.multiplierMatrixToVector(GraphicConveyor.rotate(new Vector3f(-2, 0, 0)), new Vector4f(oldCameraTargetVis.getX(), oldCameraTargetVis.getY(), oldCameraTargetVis.getZ(), 1));
-            Vector3f cameraTargetWorld = GraphicConveyor.multiplierMatrixToVector(scene.getMainCamera().getViewMatrix().inversion(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
-            scene.getMainCamera().setTarget(Vector3f.addition(cameraTargetWorld, scene.getMainCamera().getPosition()));
+            //Vector3f curZ = Vector3f.subtraction(scene.getCamera().getTarget(), scene.getCamera().getPosition());
+            //Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
+            Vector3f curZ = Vector3f.subtraction(new Vector3f(0, 0, 0), scene.getCurrentCamera().getPosition());
+            Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getCurrentCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
+            summaryXAngle-=2;
+            Vector3f cameraTargetVis = GraphicConveyor.multiplierMatrixToVector(GraphicConveyor.rotate(new Vector3f(summaryXAngle, summaryYAngle, 0)), new Vector4f(oldCameraTargetVis.getX(), oldCameraTargetVis.getY(), oldCameraTargetVis.getZ(), 1));
+            Vector3f cameraTargetWorld = GraphicConveyor.multiplierMatrixToVector(scene.getCurrentCamera().getViewMatrix().inversion(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
+            scene.getCurrentCamera().setTarget(Vector3f.addition(cameraTargetWorld, scene.getCurrentCamera().getPosition()));
         }
         if (event.isControlDown() && (event.getCode() == KeyCode.Y)) {
-            Vector3f curZ = Vector3f.subtraction(scene.getMainCamera().getTarget(), scene.getMainCamera().getPosition());
-            Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getMainCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
-            Vector3f cameraTargetVis = GraphicConveyor.multiplierMatrixToVector(GraphicConveyor.rotate(new Vector3f(2, 0, 0)), new Vector4f(oldCameraTargetVis.getX(), oldCameraTargetVis.getY(), oldCameraTargetVis.getZ(), 1));
-            Vector3f cameraTargetWorld = GraphicConveyor.multiplierMatrixToVector(scene.getMainCamera().getViewMatrix().inversion(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
-            scene.getMainCamera().setTarget(Vector3f.addition(cameraTargetWorld, scene.getMainCamera().getPosition()));
+            // Vector3f curZ = Vector3f.subtraction(scene.getCamera().getTarget(), scene.getCamera().getPosition());
+            //Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
+            Vector3f curZ = Vector3f.subtraction(new Vector3f(0, 0, 0), scene.getCurrentCamera().getPosition());
+            Vector3f oldCameraTargetVis = GraphicConveyor.multiplierMatrixToVector(scene.getCurrentCamera().getViewMatrix(), new Vector4f(curZ.getX(), curZ.getY(), curZ.getZ(), 1));
+            summaryXAngle+=2;
+            Vector3f cameraTargetVis = GraphicConveyor.multiplierMatrixToVector(GraphicConveyor.rotate(new Vector3f(summaryXAngle, summaryYAngle, 0)), new Vector4f(oldCameraTargetVis.getX(), oldCameraTargetVis.getY(), oldCameraTargetVis.getZ(), 1));
+            Vector3f cameraTargetWorld = GraphicConveyor.multiplierMatrixToVector(scene.getCurrentCamera().getViewMatrix().inversion(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
+            scene.getCurrentCamera().setTarget(Vector3f.addition(cameraTargetWorld, scene.getCurrentCamera().getPosition()));
         }
     }
 
