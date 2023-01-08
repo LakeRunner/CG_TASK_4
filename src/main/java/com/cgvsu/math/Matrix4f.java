@@ -69,6 +69,5 @@ public class Matrix4f extends Matrix {
     }
 
     public Matrix4f inversion() {
-        return new Matrix4f(Matrix.inversion(super.getMatrixArray(), 4).getMatrixArray());
-    }
-}
+        return new Matrix4f(Matrix.inversion(super.getMatrixArray()).getMatrixArray());
+    }}

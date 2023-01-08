@@ -68,53 +68,49 @@ public class Matrix {
         return new Matrix(m);
     }
 
-    public static Matrix inversion(double[][] matrixArray, int n) {
-        double temp;
-        float[][] E = new float[n][n];
-
-
-        for (int i = 0; i < n; i++)
-            for (int j = 0; j < n; j++) {
-                E[i][j] = 0f;
-
-                if (i == j)
-                    E[i][j] = 1f;
-            }
-
-        for (int k = 0; k < n; k++) {
-            temp = matrixArray[k][k];
-
-            for (int j = 0; j < n; j++) {
-                matrixArray[k][j] /= temp;
-                E[k][j] /= temp;
-            }
-
-            for (int i = k + 1; i < n; i++) {
-                temp = matrixArray[i][k];
-
-                for (int j = 0; j < n; j++) {
-                    matrixArray[i][j] -= matrixArray[k][j] * temp;
-                    E[i][j] -= E[k][j] * temp;
-                }
-            }
-        }
-
-        for (int k = n - 1; k > 0; k--) {
-            for (int i = k - 1; i >= 0; i--) {
-                temp = matrixArray[i][k];
-
-                for (int j = 0; j < n; j++) {
-                    matrixArray[i][j] -= matrixArray[k][j] * temp;
-                    E[i][j] -= E[k][j] * temp;
-                }
-            }
-        }
-
+    static Matrix4f inversion(double[][] matrix) {
+        if (matrix.length != matrix[0].length) return null;
+        int n = matrix.length;
+        double[][] augmented = new double[n][n * 2];
         for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                matrixArray[i][j] = E[i][j];
-            }
+            for (int j = 0; j < n; j++) augmented[i][j] = matrix[i][j];
+            augmented[i][i + n] = 1;
         }
-        return new Matrix4f(matrixArray);
+        solve(augmented);
+        double[][] inv = new double[n][n];
+        for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) inv[i][j] = augmented[i][j + n];
+        return new Matrix4f(inv);
+    }
+
+    // Solves a system of linear equations as an augmented matrix
+    // with the rightmost column containing the constants. The answers
+    // will be stored on the rightmost column after the algorithm is done.
+    // NOTE: make sure your matrix is consistent and does not have multiple
+    // solutions before you solve the system if you want a unique valid answer.
+    // Time Complexity: O(r²c)
+    static void solve(double[][] augmentedMatrix) {
+        int nRows = augmentedMatrix.length, nCols = augmentedMatrix[0].length, lead = 0;
+        for (int r = 0; r < nRows; r++) {
+            if (lead >= nCols) break;
+            int i = r;
+            while (Math.abs(augmentedMatrix[i][lead]) < 0.00000001) {
+                if (++i == nRows) {
+                    i = r;
+                    if (++lead == nCols) return;
+                }
+            }
+            double[] temp = augmentedMatrix[r];
+            augmentedMatrix[r] = augmentedMatrix[i];
+            augmentedMatrix[i] = temp;
+            double lv = augmentedMatrix[r][lead];
+            for (int j = 0; j < nCols; j++) augmentedMatrix[r][j] /= lv;
+            for (i = 0; i < nRows; i++) {
+                if (i != r) {
+                    lv = augmentedMatrix[i][lead];
+                    for (int j = 0; j < nCols; j++) augmentedMatrix[i][j] -= lv * augmentedMatrix[r][j];
+                }
+            }
+            lead++;
+        }
     }
 }
