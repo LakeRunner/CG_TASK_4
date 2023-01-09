@@ -184,6 +184,9 @@ public class GuiController {
     @FXML
     private Slider rotateSpeed;
 
+    @FXML
+    private CheckBox hitboxWriting;
+
     private Timeline timeline;
     private Robot robot;
     private boolean modelIsLoaded;
@@ -481,7 +484,7 @@ public class GuiController {
                             scene.getLoadedModels().get(model).getTranslateV(),
                             meshColor, drawPolygonMesh.isSelected(), drawTextures.isSelected(),
                             drawLighting.isSelected(), drawFilling.isSelected(), polygonFillColor.getValue(),
-                            texture);
+                            texture, hitboxWriting.isSelected());
                 }
             }
         });
@@ -516,6 +519,42 @@ public class GuiController {
             listViewModels.scrollTo(scene.currentModelName);
             selectedModels = new ArrayList<>();
             selectedModels.add(scene.currentModelName);
+            double maxX=0;
+            double minX=0;
+            double maxY=0;
+            double minY=0;
+            double maxZ=0;
+            double minZ=0;
+            for (Vector3f vertex : model.getVertices()) {
+                if(vertex.getX()>maxX){
+                    maxX = vertex.getX();
+                }
+                if(vertex.getY()>maxY){
+                    maxY = vertex.getY();
+                }
+                if(vertex.getZ()>maxZ){
+                    maxZ = vertex.getZ();
+                }
+                if(vertex.getX()<minX){
+                    minX = vertex.getX();
+                }
+                if(vertex.getY()<minY){
+                    minY = vertex.getY();
+                }
+                if(vertex.getZ()<minZ){
+                    minZ = vertex.getZ();
+                }
+            }
+            List<Vector3f> hitBoxList = new ArrayList<>();
+            hitBoxList.add(new Vector3f(minX, minY, minZ));
+            hitBoxList.add(new Vector3f(maxX, minY, minZ));
+            hitBoxList.add(new Vector3f(maxX, minY, maxZ));
+            hitBoxList.add(new Vector3f(minX, minY, maxZ));
+            hitBoxList.add(new Vector3f(minX, maxY, minZ));
+            hitBoxList.add(new Vector3f(maxX, maxY, minZ));
+            hitBoxList.add(new Vector3f(maxX, maxY, maxZ));
+            hitBoxList.add(new Vector3f(minX, maxY, maxZ));
+            scene.getLoadedModels().get(scene.currentModelName).setHitBoxPoints(hitBoxList);
             cleanTransform();
             // todo: обработка ошибок
         } catch (IOException exception) {
@@ -662,6 +701,10 @@ public class GuiController {
             Vector3f cameraTargetVis = GraphicConveyor.multiplierMatrixToVector(GraphicConveyor.rotate(new Vector3f(summaryXAngle, summaryYAngle, 0)), new Vector4f(oldCameraTargetVis.getX(), oldCameraTargetVis.getY(), oldCameraTargetVis.getZ(), 1));
             Vector3f cameraTargetWorld = GraphicConveyor.multiplierMatrixToVector(scene.getCurrentCamera().getViewMatrix().inversion(), new Vector4f(cameraTargetVis.getX(), cameraTargetVis.getY(), cameraTargetVis.getZ(), 1));
             scene.getCurrentCamera().setTarget(Vector3f.addition(cameraTargetWorld, scene.getCurrentCamera().getPosition()));
+            System.out.println(yAngle);
+            System.out.println(scene.getCurrentCamera().getTarget().getX());
+            System.out.println(scene.getCurrentCamera().getTarget().getY());
+            System.out.println(scene.getCurrentCamera().getTarget().getZ());
         }
         if (event.isControlDown() && (event.getCode() == KeyCode.X)) {
             //Vector3f curZ = Vector3f.subtraction(scene.getCamera().getTarget(), scene.getCamera().getPosition());
