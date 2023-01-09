@@ -18,7 +18,7 @@ public class RenderEngine {
                               final int width, final int height, final Vector3f rotateV, final Vector3f scaleV,
                               final Vector3f translateV, final Color meshColor, final boolean drawPolygonMesh,
                               boolean drawTextures, final boolean drawLighting, final boolean drawFilling,
-                              final Color polygonFillColor, final Image img) {
+                              final Color polygonFillColor, final Image img, final boolean hitbox) {
         double[][] zBuffer = new double[width][height];
         for (int i = 0; i < zBuffer.length; i++) {
             for (int j = 0; j < zBuffer[0].length; j++) {
@@ -33,7 +33,6 @@ public class RenderEngine {
         modelViewProjectionMatrix = Matrix4f.matrixMultiplier(modelViewProjectionMatrix, viewMatrix);
         modelViewProjectionMatrix = Matrix4f.matrixMultiplier(modelViewProjectionMatrix, modelMatrix);
         final int nPolygons = model.getPolygons().size();
-
         for (int polygonInd = 0; polygonInd < nPolygons; polygonInd++) {
             Polygon polygon = model.getPolygons().get(polygonInd);
             List<Integer> vertexIndices = polygon.getVertexIndices();
@@ -76,6 +75,33 @@ public class RenderEngine {
                 strokePolygon(resultPoints, originalVectors, graphicsContext, zBuffer);
             }
         }
+        if(hitbox) {
+            List<Vector2f> hitBoxPoint = new ArrayList<>();
+            List<Vector3f> hitBoxPointMultiplier = new ArrayList<>();
+            for (int i = 0; i < model.getHitBoxPoints().size(); i++) {
+                Vector4f vertex4f = new Vector4f(model.getHitBoxPoints().get(i).getX(), model.getHitBoxPoints().get(i).getY(), model.getHitBoxPoints().get(i).getZ(), 1);
+                hitBoxPointMultiplier.add(multiplierMatrixToVector(modelViewProjectionMatrix, vertex4f));
+                hitBoxPoint.add(GraphicConveyor.vertexToPoint(hitBoxPointMultiplier.get(i), width, height));
+            }
+            strokeHitBox(hitBoxPoint, graphicsContext);
+        }
+
+    }
+
+    private static void strokeHitBox(final List<Vector2f> hitBoxPoint, GraphicsContext graphicsContext){
+        graphicsContext.setStroke(Color.GREEN);
+        graphicsContext.strokeLine(hitBoxPoint.get(0).getX(), hitBoxPoint.get(0).getY(), hitBoxPoint.get(1).getX(), hitBoxPoint.get(1).getY());
+        graphicsContext.strokeLine(hitBoxPoint.get(1).getX(), hitBoxPoint.get(1).getY(), hitBoxPoint.get(2).getX(), hitBoxPoint.get(2).getY());
+        graphicsContext.strokeLine(hitBoxPoint.get(2).getX(), hitBoxPoint.get(2).getY(), hitBoxPoint.get(3).getX(), hitBoxPoint.get(3).getY());
+        graphicsContext.strokeLine(hitBoxPoint.get(3).getX(), hitBoxPoint.get(3).getY(), hitBoxPoint.get(0).getX(), hitBoxPoint.get(0).getY());
+        graphicsContext.strokeLine(hitBoxPoint.get(4).getX(), hitBoxPoint.get(4).getY(), hitBoxPoint.get(5).getX(), hitBoxPoint.get(5).getY());
+        graphicsContext.strokeLine(hitBoxPoint.get(5).getX(), hitBoxPoint.get(5).getY(), hitBoxPoint.get(6).getX(), hitBoxPoint.get(6).getY());
+        graphicsContext.strokeLine(hitBoxPoint.get(6).getX(), hitBoxPoint.get(6).getY(), hitBoxPoint.get(7).getX(), hitBoxPoint.get(7).getY());
+        graphicsContext.strokeLine(hitBoxPoint.get(7).getX(), hitBoxPoint.get(7).getY(), hitBoxPoint.get(4).getX(), hitBoxPoint.get(4).getY());
+        graphicsContext.strokeLine(hitBoxPoint.get(4).getX(), hitBoxPoint.get(4).getY(), hitBoxPoint.get(0).getX(), hitBoxPoint.get(0).getY());
+        graphicsContext.strokeLine(hitBoxPoint.get(5).getX(), hitBoxPoint.get(5).getY(), hitBoxPoint.get(1).getX(), hitBoxPoint.get(1).getY());
+        graphicsContext.strokeLine(hitBoxPoint.get(6).getX(), hitBoxPoint.get(6).getY(), hitBoxPoint.get(2).getX(), hitBoxPoint.get(2).getY());
+        graphicsContext.strokeLine(hitBoxPoint.get(7).getX(), hitBoxPoint.get(7).getY(), hitBoxPoint.get(3).getX(), hitBoxPoint.get(3).getY());
     }
 
     private static void strokePolygon(final List<Vector2f> resultPoints,

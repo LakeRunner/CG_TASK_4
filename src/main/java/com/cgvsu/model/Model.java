@@ -12,6 +12,7 @@ public class Model {
     private List<Vector2f> textureVertices;
     private List<Vector3f> normals;
     private List<Polygon> polygons;
+    private List<Vector3f> hitBoxPoints;
 
     public Model(final List<Vector3f> vertices, final List<Vector2f> textureVertices,
                  final List<Vector3f> normals, final List<Polygon> polygons) {
@@ -40,6 +41,14 @@ public class Model {
             normals = new ArrayList<>();
             polygons = new ArrayList<>();
         }
+    }
+
+    public List<Vector3f> getHitBoxPoints() {
+        return hitBoxPoints;
+    }
+
+    public void setHitBoxPoints(List<Vector3f> hitBoxPoints) {
+        this.hitBoxPoints = hitBoxPoints;
     }
 
     public List<Vector3f> getVertices() {
